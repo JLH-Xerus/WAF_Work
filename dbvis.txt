@@ -1,0 +1,11 @@
+# DbVisualizer license key
+dbvis.license.product        = DbVisualizer
+dbvis.license.edition        = Personal
+dbvis.license.id             = 504137002 / #1
+dbvis.license.name           = Xerus Holdings, LLC
+dbvis.license.org            = Xerus Holdings, LLC
+dbvis.license.activation     = 2025-06-02
+dbvis.license.expire         = 2099-01-01
+dbvis.license.upgrade.expire = 2028-06-05
+dbvis.license.seal           = MC0CFDbaTa6CHEUnks0JqIYj08YB5VSTAhUAlF0Y+CJKf+rXOu4jd49JzJwWH/c=
+dbvis.license.version        = 5.*
