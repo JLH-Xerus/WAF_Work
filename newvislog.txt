@@ -1,0 +1,80 @@
+2026-02-23 14:18:50.129 INFO   610 [ExecutorRunner-pool-5-thread-52 - m.b] Exception while connecting SQL Server
+Login failed for user 'WALGREENCO\jhunte6u'.
+
+[Exception Chain]:
+1: Root-> (SQLException) [Code:18456, SQL State: 28000] Login failed for user 'WALGREENCO\jhunte6u'.
+
+[Stack trace]:
+java.sql.SQLException: Login failed for user 'WALGREENCO\jhunte6u'.
+	at net.sourceforge.jtds.jdbc.SQLDiagnostic.addDiagnostic(SQLDiagnostic.java:372)
+	at net.sourceforge.jtds.jdbc.TdsCore.tdsErrorToken(TdsCore.java:2988)
+	at net.sourceforge.jtds.jdbc.TdsCore.nextToken(TdsCore.java:2421)
+	at net.sourceforge.jtds.jdbc.TdsCore.login(TdsCore.java:649)
+	at net.sourceforge.jtds.jdbc.JtdsConnection.<init>(JtdsConnection.java:371)
+	at net.sourceforge.jtds.jdbc.Driver.connect(Driver.java:184)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-23 14:18:56.958 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-23 14:18:57.110 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.208. Success files: 16. Failed: 0
+2026-02-23 14:18:57.461 INFO   610 [ExecutorRunner-pool-5-thread-51 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:jtds:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (jTDS) (Based on SQL Server (jTDS) (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'APPNAME' = 'dbvis' (TEMPLATE)
+'DOMAIN' = 'WALGREENCO' (USER_CONNECTION)
+'USENTLMV2' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server (jTDS)
+DefaultClass: net.sourceforge.jtds.jdbc.Driver
+Artifacts: 
+   MAVEN Artifact (Activated) net.sourceforge.jtds:jtds:1.3.1
+      maven/net/sourceforge/jtds/jtds/1.3.1/jtds-1.3.1.jar
+   LOCAL Artifact (Activated) /Applications/DbVisualizer.app/Contents/Resources/app/resources/dbinfo/templates/driverTypes/sqlserver_jtds/x64/SSO/ntlmauth.dll (LIBRARY)
+   LOCAL Artifact (Activated) /Applications/DbVisualizer.app/Contents/Resources/app/resources/dbinfo/templates/driverTypes/sqlserver_jtds/x86/SSO/ntlmauth.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 14:18:57.461 INFO   610 [ExecutorRunner-pool-5-thread-51 - m.b] Exception while connecting SQL Server
+Login failed for user 'WALGREENCO\jhunte6u'.
+
+[Exception Chain]:
+1: Root-> (SQLException) [Code:18456, SQL State: 28000] Login failed for user 'WALGREENCO\jhunte6u'.
+
+[Stack trace]:
+java.sql.SQLException: Login failed for user 'WALGREENCO\jhunte6u'.
+	at net.sourceforge.jtds.jdbc.SQLDiagnostic.addDiagnostic(SQLDiagnostic.java:372)
+	at net.sourceforge.jtds.jdbc.TdsCore.tdsErrorToken(TdsCore.java:2988)
+	at net.sourceforge.jtds.jdbc.TdsCore.nextToken(TdsCore.java:2421)
+	at net.sourceforge.jtds.jdbc.TdsCore.login(TdsCore.java:649)
+	at net.sourceforge.jtds.jdbc.JtdsConnection.<init>(JtdsConnection.java:371)
+	at net.sourceforge.jtds.jdbc.Driver.connect(Driver.java:184)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
