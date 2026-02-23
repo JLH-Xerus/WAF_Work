@@ -1,0 +1,2052 @@
+2026-02-19 13:25:54.623 INFO   610 [AWT-EventQueue-0 - g.initialize] DbVisualizer: STARTING
+2026-02-19 13:25:54.625 CONFIG 610 [AWT-EventQueue-0 - g.f] Product: DbVisualizer 25.3.2 (build: 4658)
+2026-02-19 13:25:54.625 CONFIG 610 [AWT-EventQueue-0 - g.f] OS: Mac OS X
+2026-02-19 13:25:54.625 CONFIG 610 [AWT-EventQueue-0 - g.f] OS Version: 26.3
+2026-02-19 13:25:54.625 CONFIG 610 [AWT-EventQueue-0 - g.f] OS Arch: aarch64
+2026-02-19 13:25:54.625 CONFIG 610 [AWT-EventQueue-0 - g.f] Java Version: 21.0.9
+2026-02-19 13:25:54.626 CONFIG 610 [AWT-EventQueue-0 - g.f] Java VM: OpenJDK 64-Bit Server VM
+2026-02-19 13:25:54.626 CONFIG 610 [AWT-EventQueue-0 - g.f] Java Vendor: Eclipse Adoptium
+2026-02-19 13:25:54.626 CONFIG 610 [AWT-EventQueue-0 - g.f] Java Home: /Applications/DbVisualizer.app/Contents/Resources/jre.bundle/Contents/Home
+2026-02-19 13:25:54.626 CONFIG 610 [AWT-EventQueue-0 - g.f] DbVis Home: /Applications/DbVisualizer.app/Contents/Resources/app
+2026-02-19 13:25:54.626 CONFIG 610 [AWT-EventQueue-0 - g.f] User Home: /Users/jhunte6u
+2026-02-19 13:25:54.626 CONFIG 610 [AWT-EventQueue-0 - g.f] PrefsDir: /Users/jhunte6u/.dbvis
+2026-02-19 13:25:54.626 CONFIG 610 [AWT-EventQueue-0 - g.f] DefaultLocale: en-US
+2026-02-19 13:25:54.626 CONFIG 610 [AWT-EventQueue-0 - g.f] SessionId: 610
+2026-02-19 13:25:54.627 CONFIG 610 [AWT-EventQueue-0 - g.f] Java Arguments: <none>
+2026-02-19 13:25:54.627 CONFIG 610 [AWT-EventQueue-0 - g.f] Java Properties: 
+--add-exports=java.base/sun.security.action=ALL-UNNAMED
+--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED
+--add-exports=java.desktop/sun.awt.shell=ALL-UNNAMED
+--add-exports=java.desktop/sun.swing.plaf.synth=ALL-UNNAMED
+--add-exports=java.desktop/sun.swing.table=ALL-UNNAMED
+--add-exports=java.desktop/sun.swing=ALL-UNNAMED
+--add-exports=java.security.jgss/sun.security.krb5=ALL-UNNAMED
+--add-exports=java.xml/com.sun.org.apache.xerces.internal.parsers=ALL-UNNAMED
+--add-modules=com.install4j.runtime
+--add-modules=javafx.controls,javafx.web,javafx.swing
+--add-opens=java.base/java.nio=ALL-UNNAMED
+--add-opens=java.base/java.util=ALL-UNNAMED
+--add-opens=java.desktop/java.awt.event=ALL-UNNAMED
+--add-opens=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED
+--add-opens=java.desktop/javax.swing.plaf.synth=ALL-UNNAMED
+--add-opens=java.desktop/javax.swing.text.html=ALL-UNNAMED
+--add-opens=java.desktop/javax.swing.tree=ALL-UNNAMED
+--add-opens=java.desktop/javax.swing=ALL-UNNAMED
+--add-opens=java.desktop/sun.awt.image=ALL-UNNAMED
+--add-opens=java.desktop/sun.awt.shell=ALL-UNNAMED
+--add-opens=java.desktop/sun.awt=ALL-UNNAMED
+--add-opens=java.xml/com.sun.org.apache.xerces.internal.util=ALL-UNNAMED
+--enable-native-access=ALL-UNNAMED
+--module-path=/Applications/DbVisualizer.app/Contents/Resources/app/.install4j/i4jruntime.jar:/Applications/DbVisualizer.app/Contents/Resources/app/lib/javafx/
+-Dapple.awt.application.appearance=system
+-Ddbvis.home=/Applications/DbVisualizer.app/Contents/Resources/app
+-Dexe4j.moduleName=/Applications/DbVisualizer.app
+-Dfile.encoding=UTF-8
+-Di4j.jreBundle=/Applications/DbVisualizer.app/Contents/Resources/jre.bundle
+-Di4j.ownBundlePath=/Applications/DbVisualizer.app
+-Dinstall4j.launcherId=3074
+-Dinstall4j.swt=false
+-XX:StringTableSize=1000003
+-Xmx4096M
+2026-02-19 13:25:54.627 CONFIG 610 [AWT-EventQueue-0 - g.f] Default Charset: UTF-8
+2026-02-19 13:25:54.648 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/Bookmarks
+2026-02-19 13:25:54.648 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/cache
+2026-02-19 13:25:54.648 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/cache/driver
+2026-02-19 13:25:54.649 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/cache/metadata
+2026-02-19 13:25:54.649 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/cache/update
+2026-02-19 13:25:54.649 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/config253
+2026-02-19 13:25:54.650 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/config253/ai
+2026-02-19 13:25:54.650 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/config253/ai/chats
+2026-02-19 13:25:54.650 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/config253/borders
+2026-02-19 13:25:54.650 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/config253/keymaps
+2026-02-19 13:25:54.651 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/config253/layouts
+2026-02-19 13:25:54.651 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/config253/sqlformats
+2026-02-19 13:25:54.651 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/config253/cache/pathmeta
+2026-02-19 13:25:54.652 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/config253/databaseinfo
+2026-02-19 13:25:54.652 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/config253/databaseinfo/user
+2026-02-19 13:25:54.652 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/config253/databaseinfo/user/databaseTypes
+2026-02-19 13:25:54.653 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/config253/databaseinfo/user/driverTypes
+2026-02-19 13:25:54.653 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/config253/connections
+2026-02-19 13:25:54.653 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/config253/connections_private
+2026-02-19 13:25:54.654 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/ext
+2026-02-19 13:25:54.654 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/ext/images
+2026-02-19 13:25:54.654 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/ext/images/16x16
+2026-02-19 13:25:54.654 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/ext/images/24x24
+2026-02-19 13:25:54.655 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/ext/profiles
+2026-02-19 13:25:54.655 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/ext/ui
+2026-02-19 13:25:54.655 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/ext/keywords
+2026-02-19 13:25:54.655 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/History
+2026-02-19 13:25:54.656 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/import
+2026-02-19 13:25:54.656 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/jdbc
+2026-02-19 13:25:54.657 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/Monitors
+2026-02-19 13:25:54.657 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/sqllogs
+2026-02-19 13:25:54.657 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/Workspace
+2026-02-19 13:25:54.657 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/Workspace/default
+2026-02-19 13:25:54.658 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/wsLocks
+2026-02-19 13:25:54.658 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/drivers
+2026-02-19 13:25:54.659 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/drivers/maven
+2026-02-19 13:25:54.659 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/drivers/remote
+2026-02-19 13:25:54.660 INFO   610 [AWT-EventQueue-0 - c.b] Directory created: /Users/jhunte6u/.dbvis/drivers/local
+2026-02-19 13:25:55.104 INFO   610 [AWT-EventQueue-0 - v.fd] Loaded connections. Successful: 0 Errors: 0.  Total time :12
+2026-02-19 13:25:55.109 INFO   610 [AWT-EventQueue-0 - c.b] Result of loading object hierarchies
++----------+-------------------------------------------------------------------------------------------+
+| Severity | Details                                                                                   |
++----------+-------------------------------------------------------------------------------------------+
+| INFO     | Index file does not exist: /Users/jhunte6u/.dbvis/config253/connections/connections_index |
++----------+-------------------------------------------------------------------------------------------+
+2026-02-19 13:25:55.134 INFO   610 [AWT-EventQueue-0 - bb.s] Cleaning any old driver files
+2026-02-19 13:25:55.135 INFO   610 [AWT-EventQueue-0 - bb.s] Finished cleaning old driver dirs. Time: 1ms
+2026-02-19 13:25:55.136 INFO   610 [AWT-EventQueue-0 - OraTNSUtil.getTNSDirectory] The TNS_ADMIN environment variable is not set. Trying ORACLE_HOME
+2026-02-19 13:25:55.136 INFO   610 [AWT-EventQueue-0 - OraTNSUtil.getTNSDirectory] The ORACLE_HOME environment variable is not set. TNS names cannot be used for Oracle connections
+2026-02-19 13:25:55.324 INFO   610 [AWT-EventQueue-0 - pb.h] Existing beans: 'G1 Old Gen' max: 4294967296
+2026-02-19 13:25:55.326 INFO   610 [AWT-EventQueue-0 - pb.h] Memory monitor initialized for MxBean: 'G1 Old Gen' Notification threshold: 41943040 Low memory threshold: 25165824 release buffer: 1048576 Usage threshold: 4253024256
+2026-02-19 13:25:55.341 INFO   610 [AWT-EventQueue-0 - k.d] User icons file: /Users/jhunte6u/.dbvis/ext/profiles/icons-db.prefs doesn't exist. Ignoring
+2026-02-19 13:25:55.344 INFO   610 [AWT-EventQueue-0 - y.flush] SLF4J(W): No SLF4J providers were found.
+
+2026-02-19 13:25:55.344 INFO   610 [AWT-EventQueue-0 - y.flush] SLF4J(W): Defaulting to no-operation (NOP) logger implementation
+
+2026-02-19 13:25:55.344 INFO   610 [AWT-EventQueue-0 - y.flush] SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
+
+2026-02-19 15:08:12.206 INFO   610 [ExecutorRunner-pool-5-thread-1 - d.g] /Users/jhunte6u/.dbvis/config253 was created during session. Checking if migration is needed
+2026-02-19 15:08:12.206 INFO   610 [ExecutorRunner-pool-5-thread-1 - d.g] Migration not needed since there is no previous configuration in: [/Users/jhunte6u/.dbvis/config252, /Users/jhunte6u/.dbvis/config251, /Users/jhunte6u/.dbvis/config243, /Users/jhunte6u/.dbvis/config233, /Users/jhunte6u/.dbvis/config232, /Users/jhunte6u/.dbvis/config231, /Users/jhunte6u/.dbvis/config140, /Users/jhunte6u/.dbvis/config130, /Users/jhunte6u/.dbvis/config70, /Users/jhunte6u/.dbvis/config]
+2026-02-19 15:08:12.324 INFO   610 [ExecutorRunner-pool-5-thread-1 - h.w] Internal cache driver loaded: /Applications/DbVisualizer.app/Contents/Resources/app/lib/confined/h2-2.3.232.jar. Driver version: 2.3
+2026-02-19 15:08:12.517 INFO   610 [ExecutorRunner-pool-5-thread-1 - h.j] Internal cache connected: jdbc:h2:async:/Users/jhunte6u/.dbvis/cache/metadata/MetaDataCache-v8;AUTO_SERVER=TRUE
+2026-02-19 15:08:12.530 INFO   610 [AWT-EventQueue-0 - f.c] Starting check for stale metadata (threshold=60)
+2026-02-19 15:08:12.817 INFO   610 [AWT-EventQueue-0 - r.d] Generating descriptor for legacy workspace.
+2026-02-19 15:08:12.838 INFO   610 [AWT-EventQueue-0 - DbVisualizerGUI.initialize] Startup time: 6.069
+2026-02-19 15:08:12.871 INFO   610 [AWT-EventQueue-0 - c.c] Load workspace time: 0.014
+2026-02-19 15:08:12.871 INFO   610 [AWT-EventQueue-0 - qc.f] Workspace auto saver thread started. Interval: 30 sec
+2026-02-19 15:08:12.872 INFO   610 [AWT-EventQueue-0 - vb.c] Connection keep-alive thread started. Interval: 10 sec
+2026-02-19 15:08:12.873 INFO   610 [AWT-EventQueue-0 - pb.c] Workspace file modification monitor thread started. Interval: 30 sec
+2026-02-19 15:08:12.874 INFO   610 [AWT-EventQueue-0 - DbVisualizerGUI.cc] Startup time + loading workspace: 6.105
+2026-02-19 15:11:12.842 INFO   610 [DbVisScheduledVersionCheck-9 - g.jle] Starting checking artifact versions for 0 drivers
+2026-02-19 15:11:12.855 INFO   610 [DbVisScheduledVersionCheck-9 - g.jle] Check version of all artifacts. Successful: 0 of 0. Duration: 11ms
+2026-02-20 11:41:24.169 INFO   610 [ExecutorRunner-pool-5-thread-2 - b.g] Wrote user properties files. Time: 0.265. Success files: 15. Failed: 0
+2026-02-20 11:41:28.666 INFO   610 [ExecutorRunner-pool-5-thread-2 - m.e] The driver 'SQL Server' uses native libraries. Changing the driver requires DbVisualizer restart.
+2026-02-20 11:41:28.821 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-20 11:41:28.961 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.264. Success files: 16. Failed: 0
+2026-02-20 11:42:28.202 INFO   610 [ExecutorRunner-pool-5-thread-3 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-20 11:42:28.202 INFO   610 [ExecutorRunner-pool-5-thread-3 - m.b] Exception while connecting SQL Server
+Connection was lost
+
+[Exception Chain]:
+1:        (SQLServerException) [Code:0, SQL State: 08S01] "encrypt" property is set to "true" and "trustServerCertificate" property is set to "false" but the driver could not establish a secure connection to SQL Server by using Secure Sockets Layer (SSL) encryption: Error: (certificate_unknown) PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target. ClientConnectionId:7ec71b90-c296-499d-80ee-b5c51829582f
+2:        (SSLHandshakeException) (certificate_unknown) PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+3:        (ValidatorException) PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+4: Root-> (SunCertPathBuilderException) unable to find valid certification path to requested target
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: "encrypt" property is set to "true" and "trustServerCertificate" property is set to "false" but the driver could not establish a secure connection to SQL Server by using Secure Sockets Layer (SSL) encryption: Error: (certificate_unknown) PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target. ClientConnectionId:7ec71b90-c296-499d-80ee-b5c51829582f
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.terminate(SQLServerConnection.java:4708)
+	at com.microsoft.sqlserver.jdbc.TDSChannel.enableSSL(IOBuffer.java:1983)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4230)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+	Suppressed: com.onseven.dbvis.db.n.b.c: Connection was lost
+		at com.onseven.dbvis.db.n.b.b.b(Z:3535)
+		at com.onseven.dbvis.jdbc.b.g.b(Z:215)
+		at com.onseven.dbvis.jdbc.b.g$_b.call(Z:2810)
+		... 4 more
+Caused by: javax.net.ssl.SSLHandshakeException: (certificate_unknown) PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at java.base/sun.security.ssl.Alert.createSSLException(Alert.java:130)
+	at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:383)
+	at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:326)
+	at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:321)
+	at java.base/sun.security.ssl.CertificateMessage$T12CertificateConsumer.checkServerCerts(CertificateMessage.java:647)
+	at java.base/sun.security.ssl.CertificateMessage$T12CertificateConsumer.onCertificate(CertificateMessage.java:467)
+	at java.base/sun.security.ssl.CertificateMessage$T12CertificateConsumer.consume(CertificateMessage.java:363)
+	at java.base/sun.security.ssl.SSLHandshake.consume(SSLHandshake.java:393)
+	at java.base/sun.security.ssl.HandshakeContext.dispatch(HandshakeContext.java:477)
+	at java.base/sun.security.ssl.HandshakeContext.dispatch(HandshakeContext.java:448)
+	at java.base/sun.security.ssl.TransportContext.dispatch(TransportContext.java:206)
+	at java.base/sun.security.ssl.SSLTransport.decode(SSLTransport.java:172)
+	at java.base/sun.security.ssl.SSLSocketImpl.decode(SSLSocketImpl.java:1506)
+	at java.base/sun.security.ssl.SSLSocketImpl.readHandshakeRecord(SSLSocketImpl.java:1421)
+	at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:455)
+	at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:426)
+	at com.microsoft.sqlserver.jdbc.TDSChannel.enableSSL(IOBuffer.java:1872)
+	... 13 more
+Caused by: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at java.base/sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:388)
+	at java.base/sun.security.validator.PKIXValidator.engineValidate(PKIXValidator.java:271)
+	at java.base/sun.security.validator.Validator.validate(Validator.java:256)
+	at java.base/sun.security.ssl.X509TrustManagerImpl.checkTrusted(X509TrustManagerImpl.java:241)
+	at java.base/sun.security.ssl.X509TrustManagerImpl.checkServerTrusted(X509TrustManagerImpl.java:113)
+	at com.microsoft.sqlserver.jdbc.HostNameOverrideX509TrustManager.checkServerTrusted(SQLServerTrustManager.java:88)
+	at java.base/sun.security.ssl.AbstractTrustManagerWrapper.checkServerTrusted(SSLContextImpl.java:1430)
+	at java.base/sun.security.ssl.CertificateMessage$T12CertificateConsumer.checkServerCerts(CertificateMessage.java:631)
+	... 25 more
+Caused by: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at java.base/sun.security.provider.certpath.SunCertPathBuilder.build(SunCertPathBuilder.java:148)
+	at java.base/sun.security.provider.certpath.SunCertPathBuilder.engineBuild(SunCertPathBuilder.java:129)
+	at java.base/java.security.cert.CertPathBuilder.build(CertPathBuilder.java:297)
+	at java.base/sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:383)
+	... 32 more
+2026-02-20 11:54:48.567 INFO   610 [ExecutorRunner-pool-5-thread-6 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-20 11:54:48.568 INFO   610 [ExecutorRunner-pool-5-thread-6 - m.b] Exception while connecting SQL Server
+Connection was lost
+
+[Exception Chain]:
+1:        (SQLServerException) [Code:0, SQL State: 08S01] "encrypt" property is set to "true" and "trustServerCertificate" property is set to "false" but the driver could not establish a secure connection to SQL Server by using Secure Sockets Layer (SSL) encryption: Error: (certificate_unknown) PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target. ClientConnectionId:17deaaae-1a06-44ac-8102-fcbaec72b97f
+2:        (SSLHandshakeException) (certificate_unknown) PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+3:        (ValidatorException) PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+4: Root-> (SunCertPathBuilderException) unable to find valid certification path to requested target
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: "encrypt" property is set to "true" and "trustServerCertificate" property is set to "false" but the driver could not establish a secure connection to SQL Server by using Secure Sockets Layer (SSL) encryption: Error: (certificate_unknown) PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target. ClientConnectionId:17deaaae-1a06-44ac-8102-fcbaec72b97f
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.terminate(SQLServerConnection.java:4708)
+	at com.microsoft.sqlserver.jdbc.TDSChannel.enableSSL(IOBuffer.java:1983)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4230)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+	Suppressed: com.onseven.dbvis.db.n.b.c: Connection was lost
+		at com.onseven.dbvis.db.n.b.b.b(Z:3535)
+		at com.onseven.dbvis.jdbc.b.g.b(Z:215)
+		at com.onseven.dbvis.jdbc.b.g$_b.call(Z:2810)
+		... 4 more
+Caused by: javax.net.ssl.SSLHandshakeException: (certificate_unknown) PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at java.base/sun.security.ssl.Alert.createSSLException(Alert.java:130)
+	at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:383)
+	at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:326)
+	at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:321)
+	at java.base/sun.security.ssl.CertificateMessage$T12CertificateConsumer.checkServerCerts(CertificateMessage.java:647)
+	at java.base/sun.security.ssl.CertificateMessage$T12CertificateConsumer.onCertificate(CertificateMessage.java:467)
+	at java.base/sun.security.ssl.CertificateMessage$T12CertificateConsumer.consume(CertificateMessage.java:363)
+	at java.base/sun.security.ssl.SSLHandshake.consume(SSLHandshake.java:393)
+	at java.base/sun.security.ssl.HandshakeContext.dispatch(HandshakeContext.java:477)
+	at java.base/sun.security.ssl.HandshakeContext.dispatch(HandshakeContext.java:448)
+	at java.base/sun.security.ssl.TransportContext.dispatch(TransportContext.java:206)
+	at java.base/sun.security.ssl.SSLTransport.decode(SSLTransport.java:172)
+	at java.base/sun.security.ssl.SSLSocketImpl.decode(SSLSocketImpl.java:1506)
+	at java.base/sun.security.ssl.SSLSocketImpl.readHandshakeRecord(SSLSocketImpl.java:1421)
+	at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:455)
+	at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:426)
+	at com.microsoft.sqlserver.jdbc.TDSChannel.enableSSL(IOBuffer.java:1872)
+	... 13 more
+Caused by: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at java.base/sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:388)
+	at java.base/sun.security.validator.PKIXValidator.engineValidate(PKIXValidator.java:271)
+	at java.base/sun.security.validator.Validator.validate(Validator.java:256)
+	at java.base/sun.security.ssl.X509TrustManagerImpl.checkTrusted(X509TrustManagerImpl.java:241)
+	at java.base/sun.security.ssl.X509TrustManagerImpl.checkServerTrusted(X509TrustManagerImpl.java:113)
+	at com.microsoft.sqlserver.jdbc.HostNameOverrideX509TrustManager.checkServerTrusted(SQLServerTrustManager.java:88)
+	at java.base/sun.security.ssl.AbstractTrustManagerWrapper.checkServerTrusted(SSLContextImpl.java:1430)
+	at java.base/sun.security.ssl.CertificateMessage$T12CertificateConsumer.checkServerCerts(CertificateMessage.java:631)
+	... 25 more
+Caused by: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at java.base/sun.security.provider.certpath.SunCertPathBuilder.build(SunCertPathBuilder.java:148)
+	at java.base/sun.security.provider.certpath.SunCertPathBuilder.engineBuild(SunCertPathBuilder.java:129)
+	at java.base/java.security.cert.CertPathBuilder.build(CertPathBuilder.java:297)
+	at java.base/sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:383)
+	... 32 more
+2026-02-20 11:56:37.280 INFO   610 [ExecutorRunner-pool-5-thread-9 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-20 11:56:37.281 INFO   610 [ExecutorRunner-pool-5-thread-9 - m.b] Exception while connecting SQL Server
+Login failed for user 'justin.hunter@walgreens.com'. ClientConnectionId:71437a1d-d972-4dd1-a023-79cca5cfac65
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'justin.hunter@walgreens.com'. ClientConnectionId:71437a1d-d972-4dd1-a023-79cca5cfac65
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'justin.hunter@walgreens.com'. ClientConnectionId:71437a1d-d972-4dd1-a023-79cca5cfac65
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-20 11:57:58.357 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-20 11:57:58.518 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.290. Success files: 16. Failed: 0
+2026-02-20 11:57:59.304 INFO   610 [ExecutorRunner-pool-5-thread-11 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'integratedSecurity' = 'true' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-20 11:57:59.305 INFO   610 [ExecutorRunner-pool-5-thread-11 - m.b] Exception while connecting SQL Server
+Connection was lost
+
+[Exception Chain]:
+1:        (SQLServerException) [Code:0, SQL State: 08S01] This driver is not configured for integrated authentication. ClientConnectionId:68d4686f-4298-482c-a7ca-375db7182218
+2: Root-> (UnsatisfiedLinkError) Unable to load authentication DLL mssql-jdbc_auth-13.2.1.x64
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: This driver is not configured for integrated authentication. ClientConnectionId:68d4686f-4298-482c-a7ca-375db7182218
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.terminate(SQLServerConnection.java:4708)
+	at com.microsoft.sqlserver.jdbc.AuthenticationJNI.<init>(AuthenticationJNI.java:78)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5864)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+	Suppressed: com.onseven.dbvis.db.n.b.c: Connection was lost
+		at com.onseven.dbvis.db.n.b.b.b(Z:3535)
+		at com.onseven.dbvis.jdbc.b.g.b(Z:215)
+		at com.onseven.dbvis.jdbc.b.g$_b.call(Z:2810)
+		... 4 more
+Caused by: java.lang.UnsatisfiedLinkError: Unable to load authentication DLL mssql-jdbc_auth-13.2.1.x64
+	at com.microsoft.sqlserver.jdbc.AuthenticationJNI.<clinit>(AuthenticationJNI.java:67)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5863)
+	... 16 more
+2026-02-20 12:17:04.603 INFO   610 [ExecutorRunner-pool-5-thread-14 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'integratedSecurity' = 'true' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-20 12:17:04.604 INFO   610 [ExecutorRunner-pool-5-thread-14 - m.b] Exception while connecting SQL Server
+Connection was lost
+
+[Exception Chain]:
+1:        (SQLServerException) [Code:0, SQL State: 08S01] This driver is not configured for integrated authentication. ClientConnectionId:812db97a-18fc-43f6-8d14-2351beb8903b
+2: Root-> (UnsatisfiedLinkError) Unable to load authentication DLL mssql-jdbc_auth-13.2.1.x64
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: This driver is not configured for integrated authentication. ClientConnectionId:812db97a-18fc-43f6-8d14-2351beb8903b
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.terminate(SQLServerConnection.java:4708)
+	at com.microsoft.sqlserver.jdbc.AuthenticationJNI.<init>(AuthenticationJNI.java:78)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5864)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+	Suppressed: com.onseven.dbvis.db.n.b.c: Connection was lost
+		at com.onseven.dbvis.db.n.b.b.b(Z:3535)
+		at com.onseven.dbvis.jdbc.b.g.b(Z:215)
+		at com.onseven.dbvis.jdbc.b.g$_b.call(Z:2810)
+		... 4 more
+Caused by: java.lang.UnsatisfiedLinkError: Unable to load authentication DLL mssql-jdbc_auth-13.2.1.x64
+	at com.microsoft.sqlserver.jdbc.AuthenticationJNI.<clinit>(AuthenticationJNI.java:67)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5863)
+	... 16 more
+2026-02-20 12:17:36.982 INFO   610 [ExecutorRunner-pool-5-thread-14 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-20 12:17:36.983 INFO   610 [ExecutorRunner-pool-5-thread-14 - m.b] Exception while connecting SQL Server
+Login failed for user 'jhunte6u'. ClientConnectionId:b6b4a35c-01f9-43f5-adc8-f64b094f03e1
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'jhunte6u'. ClientConnectionId:b6b4a35c-01f9-43f5-adc8-f64b094f03e1
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'jhunte6u'. ClientConnectionId:b6b4a35c-01f9-43f5-adc8-f64b094f03e1
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-20 12:19:58.521 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-20 12:19:58.684 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.257. Success files: 16. Failed: 0
+2026-02-20 12:19:59.119 INFO   610 [ExecutorRunner-pool-5-thread-16 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-20 12:19:59.121 INFO   610 [ExecutorRunner-pool-5-thread-16 - m.b] Exception while connecting SQL Server
+Login failed for user 'jhunte6u'. ClientConnectionId:1dff0d5a-031f-45c3-b25e-fc16e76e680d
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'jhunte6u'. ClientConnectionId:1dff0d5a-031f-45c3-b25e-fc16e76e680d
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'jhunte6u'. ClientConnectionId:1dff0d5a-031f-45c3-b25e-fc16e76e680d
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-20 12:20:15.149 INFO   610 [ExecutorRunner-pool-5-thread-17 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-20 12:20:15.149 INFO   610 [ExecutorRunner-pool-5-thread-17 - m.b] Exception while connecting SQL Server
+Login failed for user 'jhunte6u'. ClientConnectionId:01c5c6f8-d725-44d3-a658-e6ae6b1156d3
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'jhunte6u'. ClientConnectionId:01c5c6f8-d725-44d3-a658-e6ae6b1156d3
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'jhunte6u'. ClientConnectionId:01c5c6f8-d725-44d3-a658-e6ae6b1156d3
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-23 09:48:22.370 INFO   610 [ExecutorRunner-pool-5-thread-20 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 09:48:22.372 INFO   610 [ExecutorRunner-pool-5-thread-20 - m.b] Exception while connecting SQL Server
+Connection was lost
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:0, SQL State: 08S01] The TCP/IP connection to the host Symphony-LST01, port 1433 has failed. Error: "Symphony-LST01. Verify the connection properties. Make sure that an instance of SQL Server is running on the host and accepting TCP/IP connections at the port. Make sure that TCP connections to the port are not blocked by a firewall.".
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: The TCP/IP connection to the host Symphony-LST01, port 1433 has failed. Error: "Symphony-LST01. Verify the connection properties. Make sure that an instance of SQL Server is running on the host and accepting TCP/IP connections at the port. Make sure that TCP connections to the port are not blocked by a firewall.".
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDriverError(SQLServerException.java:250)
+	at com.microsoft.sqlserver.jdbc.SQLServerException.convertConnectExceptionToSQLServerException(SQLServerException.java:316)
+	at com.microsoft.sqlserver.jdbc.SocketFinder.findSocket(IOBuffer.java:2611)
+	at com.microsoft.sqlserver.jdbc.TDSChannel.open(IOBuffer.java:736)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4201)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+	Suppressed: com.onseven.dbvis.db.n.b.c: Connection was lost
+		at com.onseven.dbvis.db.n.b.b.b(Z:3535)
+		at com.onseven.dbvis.jdbc.b.g.b(Z:215)
+		at com.onseven.dbvis.jdbc.b.g$_b.call(Z:2810)
+		... 4 more
+2026-02-23 09:49:28.862 INFO   610 [ExecutorRunner-pool-5-thread-23 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 09:49:28.863 INFO   610 [ExecutorRunner-pool-5-thread-23 - m.b] Exception while connecting SQL Server
+Login failed for user 'jhunte6u'. ClientConnectionId:2ae3defb-e2c3-4a95-9642-424e23d9fc2e
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'jhunte6u'. ClientConnectionId:2ae3defb-e2c3-4a95-9642-424e23d9fc2e
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'jhunte6u'. ClientConnectionId:2ae3defb-e2c3-4a95-9642-424e23d9fc2e
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-23 11:40:55.659 INFO   610 [ExecutorRunner-pool-5-thread-26 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 11:40:55.659 INFO   610 [ExecutorRunner-pool-5-thread-26 - m.b] Exception while connecting SQL Server
+Connection was lost
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:0, SQL State: 08S01] The TCP/IP connection to the host Symphony-LST01, port 1433 has failed. Error: "Symphony-LST01. Verify the connection properties. Make sure that an instance of SQL Server is running on the host and accepting TCP/IP connections at the port. Make sure that TCP connections to the port are not blocked by a firewall.".
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: The TCP/IP connection to the host Symphony-LST01, port 1433 has failed. Error: "Symphony-LST01. Verify the connection properties. Make sure that an instance of SQL Server is running on the host and accepting TCP/IP connections at the port. Make sure that TCP connections to the port are not blocked by a firewall.".
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDriverError(SQLServerException.java:250)
+	at com.microsoft.sqlserver.jdbc.SQLServerException.convertConnectExceptionToSQLServerException(SQLServerException.java:316)
+	at com.microsoft.sqlserver.jdbc.SocketFinder.findSocket(IOBuffer.java:2611)
+	at com.microsoft.sqlserver.jdbc.TDSChannel.open(IOBuffer.java:736)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4201)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+	Suppressed: com.onseven.dbvis.db.n.b.c: Connection was lost
+		at com.onseven.dbvis.db.n.b.b.b(Z:3535)
+		at com.onseven.dbvis.jdbc.b.g.b(Z:215)
+		at com.onseven.dbvis.jdbc.b.g$_b.call(Z:2810)
+		... 4 more
+2026-02-23 11:40:58.696 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-23 11:40:58.884 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.326. Success files: 16. Failed: 0
+2026-02-23 11:40:58.911 INFO   610 [ExecutorRunner-pool-5-thread-25 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 11:40:58.911 INFO   610 [ExecutorRunner-pool-5-thread-25 - m.b] Exception while connecting SQL Server
+Connection was lost
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:0, SQL State: 08S01] The TCP/IP connection to the host Symphony-LST01, port 1433 has failed. Error: "Symphony-LST01. Verify the connection properties. Make sure that an instance of SQL Server is running on the host and accepting TCP/IP connections at the port. Make sure that TCP connections to the port are not blocked by a firewall.".
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: The TCP/IP connection to the host Symphony-LST01, port 1433 has failed. Error: "Symphony-LST01. Verify the connection properties. Make sure that an instance of SQL Server is running on the host and accepting TCP/IP connections at the port. Make sure that TCP connections to the port are not blocked by a firewall.".
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDriverError(SQLServerException.java:250)
+	at com.microsoft.sqlserver.jdbc.SQLServerException.convertConnectExceptionToSQLServerException(SQLServerException.java:316)
+	at com.microsoft.sqlserver.jdbc.SocketFinder.findSocket(IOBuffer.java:2611)
+	at com.microsoft.sqlserver.jdbc.TDSChannel.open(IOBuffer.java:736)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4201)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+	Suppressed: com.onseven.dbvis.db.n.b.c: Connection was lost
+		at com.onseven.dbvis.db.n.b.b.b(Z:3535)
+		at com.onseven.dbvis.jdbc.b.g.b(Z:215)
+		at com.onseven.dbvis.jdbc.b.g$_b.call(Z:2810)
+		... 4 more
+2026-02-23 11:41:31.631 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-23 11:41:31.772 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.230. Success files: 16. Failed: 0
+2026-02-23 11:41:32.467 INFO   610 [ExecutorRunner-pool-5-thread-25 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 11:41:32.468 INFO   610 [ExecutorRunner-pool-5-thread-25 - m.b] Exception while connecting SQL Server
+Login failed for user 'jhunte6u'. ClientConnectionId:e9e21bb0-a14a-4653-91c7-0b7c0e729424
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'jhunte6u'. ClientConnectionId:e9e21bb0-a14a-4653-91c7-0b7c0e729424
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'jhunte6u'. ClientConnectionId:e9e21bb0-a14a-4653-91c7-0b7c0e729424
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-23 12:06:42.955 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-23 12:06:43.122 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.250. Success files: 16. Failed: 0
+2026-02-23 12:06:43.903 INFO   610 [ExecutorRunner-pool-5-thread-28 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 12:06:43.904 INFO   610 [ExecutorRunner-pool-5-thread-28 - m.b] Exception while connecting SQL Server
+Login failed for user 'jhunte6u'. ClientConnectionId:bbe0acc6-e215-42ed-844e-e0d71b6de6d7
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'jhunte6u'. ClientConnectionId:bbe0acc6-e215-42ed-844e-e0d71b6de6d7
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'jhunte6u'. ClientConnectionId:bbe0acc6-e215-42ed-844e-e0d71b6de6d7
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-23 12:08:30.235 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-23 12:08:30.388 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.215. Success files: 16. Failed: 0
+2026-02-23 12:08:30.822 INFO   610 [ExecutorRunner-pool-5-thread-30 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 12:08:30.823 INFO   610 [ExecutorRunner-pool-5-thread-30 - m.b] Exception while connecting SQL Server
+Login failed for user 'jhunte6u'. ClientConnectionId:2983908f-8367-45e2-8f3e-33e4bcabd98e
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'jhunte6u'. ClientConnectionId:2983908f-8367-45e2-8f3e-33e4bcabd98e
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'jhunte6u'. ClientConnectionId:2983908f-8367-45e2-8f3e-33e4bcabd98e
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-23 12:09:04.673 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-23 12:09:04.802 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.183. Success files: 16. Failed: 0
+2026-02-23 12:09:05.245 INFO   610 [ExecutorRunner-pool-5-thread-30 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 12:09:05.245 INFO   610 [ExecutorRunner-pool-5-thread-30 - m.b] Exception while connecting SQL Server
+Login failed for user 'jhunte6u'. ClientConnectionId:0219dece-6019-455a-96fa-75bb94d1eb63
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'jhunte6u'. ClientConnectionId:0219dece-6019-455a-96fa-75bb94d1eb63
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'jhunte6u'. ClientConnectionId:0219dece-6019-455a-96fa-75bb94d1eb63
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-23 12:10:06.671 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-23 12:10:06.846 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.276. Success files: 16. Failed: 0
+2026-02-23 12:10:06.902 WARN   610 [pool-8-thread-12 - SQLServerConnection.connectInternal] ConnectionID:17ActiveDirectoryPassword authentication method is deprecated.
+2026-02-23 12:10:07.323 INFO   610 [ExecutorRunner-pool-5-thread-32 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'authentication' = 'ActiveDirectoryPassword' (USER_CONNECTION)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 12:10:07.324 INFO   610 [ExecutorRunner-pool-5-thread-32 - m.b] Exception while connecting SQL Server
+Login failed for user ''. ClientConnectionId:805f1304-2da8-4345-8ec1-a86181ab1206
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user ''. ClientConnectionId:805f1304-2da8-4345-8ec1-a86181ab1206
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user ''. ClientConnectionId:805f1304-2da8-4345-8ec1-a86181ab1206
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-23 12:10:38.313 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-23 12:10:38.475 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.247. Success files: 16. Failed: 0
+2026-02-23 12:10:38.951 INFO   610 [ExecutorRunner-pool-5-thread-32 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'authentication' = 'ActiveDirectoryInteractive' (USER_CONNECTION)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 12:10:38.952 INFO   610 [ExecutorRunner-pool-5-thread-32 - m.b] Exception while connecting SQL Server
+Login failed for user 'jhunte6u'. ClientConnectionId:c979b458-b9df-4f24-8016-49b461a4f35d
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'jhunte6u'. ClientConnectionId:c979b458-b9df-4f24-8016-49b461a4f35d
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'jhunte6u'. ClientConnectionId:c979b458-b9df-4f24-8016-49b461a4f35d
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-23 12:10:53.498 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-23 12:10:53.641 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.212. Success files: 16. Failed: 0
+2026-02-23 12:10:54.131 INFO   610 [ExecutorRunner-pool-5-thread-32 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'authentication' = 'ActiveDirectoryInteractive' (USER_CONNECTION)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 12:10:54.132 INFO   610 [ExecutorRunner-pool-5-thread-32 - m.b] Exception while connecting SQL Server
+Login failed for user 'WALGREENCO\jhunte6u'. ClientConnectionId:729bc3fe-20e9-4825-88ab-59e89f55dbc5
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'WALGREENCO\jhunte6u'. ClientConnectionId:729bc3fe-20e9-4825-88ab-59e89f55dbc5
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'WALGREENCO\jhunte6u'. ClientConnectionId:729bc3fe-20e9-4825-88ab-59e89f55dbc5
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-23 12:11:06.186 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-23 12:11:06.337 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.247. Success files: 16. Failed: 0
+2026-02-23 12:11:06.797 INFO   610 [ExecutorRunner-pool-5-thread-32 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'authentication' = 'ActiveDirectoryInteractive' (USER_CONNECTION)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 12:11:06.798 INFO   610 [ExecutorRunner-pool-5-thread-32 - m.b] Exception while connecting SQL Server
+Login failed for user 'walgreenco\jhunte6u'. ClientConnectionId:acee23fe-236d-479c-8650-436184fec3cd
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'walgreenco\jhunte6u'. ClientConnectionId:acee23fe-236d-479c-8650-436184fec3cd
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'walgreenco\jhunte6u'. ClientConnectionId:acee23fe-236d-479c-8650-436184fec3cd
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-23 12:11:12.029 INFO   610 [ExecutorRunner-pool-5-thread-33 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'authentication' = 'ActiveDirectoryInteractive' (USER_CONNECTION)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 12:11:12.029 INFO   610 [ExecutorRunner-pool-5-thread-33 - m.b] Exception while connecting SQL Server
+Login failed for user 'walgreenco\jhunte6u'. ClientConnectionId:744113b2-416d-4818-9be2-173113da7900
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'walgreenco\jhunte6u'. ClientConnectionId:744113b2-416d-4818-9be2-173113da7900
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'walgreenco\jhunte6u'. ClientConnectionId:744113b2-416d-4818-9be2-173113da7900
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-23 12:12:23.904 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-23 12:12:24.026 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.185. Success files: 16. Failed: 0
+2026-02-23 12:12:24.490 INFO   610 [ExecutorRunner-pool-5-thread-35 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'authenticationScheme' = 'javaKerberos' (USER_CONNECTION)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 12:12:24.490 INFO   610 [ExecutorRunner-pool-5-thread-35 - m.b] Exception while connecting SQL Server
+Login failed for user 'jhunte6u'. ClientConnectionId:67fd3f57-216c-4286-ac81-679a7615c553
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'jhunte6u'. ClientConnectionId:67fd3f57-216c-4286-ac81-679a7615c553
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'jhunte6u'. ClientConnectionId:67fd3f57-216c-4286-ac81-679a7615c553
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-23 12:14:02.819 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-23 12:14:02.981 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.259. Success files: 16. Failed: 0
+2026-02-23 12:14:03.470 INFO   610 [ExecutorRunner-pool-5-thread-37 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 12:14:03.471 INFO   610 [ExecutorRunner-pool-5-thread-37 - m.b] Exception while connecting SQL Server
+Login failed for user 'jhunte6u'. ClientConnectionId:4d174ab8-956d-4814-9de4-faa6edaffad4
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'jhunte6u'. ClientConnectionId:4d174ab8-956d-4814-9de4-faa6edaffad4
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'jhunte6u'. ClientConnectionId:4d174ab8-956d-4814-9de4-faa6edaffad4
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-23 12:15:53.822 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-23 12:15:53.952 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.229. Success files: 16. Failed: 0
+2026-02-23 12:15:54.394 INFO   610 [ExecutorRunner-pool-5-thread-39 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'authenticationScheme' = 'ntlm' (USER_CONNECTION)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 12:15:54.395 INFO   610 [ExecutorRunner-pool-5-thread-39 - m.b] Exception while connecting SQL Server
+Login failed for user 'jhunte6u'. ClientConnectionId:838bf863-d3cc-4765-a9ea-a26a33d701e8
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'jhunte6u'. ClientConnectionId:838bf863-d3cc-4765-a9ea-a26a33d701e8
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'jhunte6u'. ClientConnectionId:838bf863-d3cc-4765-a9ea-a26a33d701e8
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-23 12:16:01.598 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-23 12:16:01.756 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.250. Success files: 16. Failed: 0
+2026-02-23 12:16:02.247 INFO   610 [ExecutorRunner-pool-5-thread-39 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'authenticationScheme' = 'ntlm' (USER_CONNECTION)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 12:16:02.247 INFO   610 [ExecutorRunner-pool-5-thread-39 - m.b] Exception while connecting SQL Server
+Login failed for user 'jhunte6u'. ClientConnectionId:2caca693-aab2-4db5-a298-6f31f6dbcf1c
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'jhunte6u'. ClientConnectionId:2caca693-aab2-4db5-a298-6f31f6dbcf1c
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'jhunte6u'. ClientConnectionId:2caca693-aab2-4db5-a298-6f31f6dbcf1c
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-23 13:48:53.881 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-23 13:48:54.034 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.208. Success files: 16. Failed: 0
+2026-02-23 13:48:55.109 INFO   610 [ExecutorRunner-pool-5-thread-41 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'authenticationScheme' = 'ntlm' (USER_CONNECTION)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'integratedSecurity' = 'true' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 13:48:55.110 INFO   610 [ExecutorRunner-pool-5-thread-41 - m.b] Exception while connecting SQL Server
+Login failed for user 'WALGREENCO\jhunte6u'. ClientConnectionId:73091bbb-9242-4a85-bc1a-c121a7b61ceb
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'WALGREENCO\jhunte6u'. ClientConnectionId:73091bbb-9242-4a85-bc1a-c121a7b61ceb
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'WALGREENCO\jhunte6u'. ClientConnectionId:73091bbb-9242-4a85-bc1a-c121a7b61ceb
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-23 13:49:50.599 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-23 13:49:50.736 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.195. Success files: 16. Failed: 0
+2026-02-23 13:49:51.590 INFO   610 [ExecutorRunner-pool-5-thread-41 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'authenticationScheme' = 'NTLM' (USER_CONNECTION)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'integratedSecurity' = 'true' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 13:49:51.591 INFO   610 [ExecutorRunner-pool-5-thread-41 - m.b] Exception while connecting SQL Server
+Login failed for user 'WALGREENCO\jhunte6u'. ClientConnectionId:835f880b-60ae-4f9e-af45-c0a02f6f3520
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'WALGREENCO\jhunte6u'. ClientConnectionId:835f880b-60ae-4f9e-af45-c0a02f6f3520
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'WALGREENCO\jhunte6u'. ClientConnectionId:835f880b-60ae-4f9e-af45-c0a02f6f3520
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-02-23 13:51:50.971 INFO   610 [AWT-EventQueue-0 - q.b] Automatically resolved index with 1 entries
+2026-02-23 13:51:51.118 INFO   610 [AWT-EventQueue-0 - b.g] Wrote user properties files. Time: 0.201. Success files: 16. Failed: 0
+2026-02-23 13:51:51.910 INFO   610 [ExecutorRunner-pool-5-thread-43 - m.b] Exception while connecting SQL Server
+*** Database Properties ****************************
+Alias: SQL Server
+Notes: [0 characters]
+Settings Format: Server Info
+URL: jdbc:sqlserver://Symphony-LST01:1433
+Driver: SQL Server (Based on SQL Server (Supported))
+Preferred Database Type: AUTO
+Current Database Type: SQL_SERVER
+Preferred Profile: auto
+Current Profile: null (not connected?)
+Connection State(s): DISCONNECTED
+--- Object Type Settings ---------------------------
+None
+--- Overridden User Properties ---------------------
+None
+--- Overridden Driver Properties -------------------
+'applicationName' = 'dbvis' (TEMPLATE)
+'authenticationScheme' = 'NTLM' (USER_CONNECTION)
+'domain' = 'WALGREENCO' (USER_CONNECTION)
+'integratedSecurity' = 'true' (USER_CONNECTION)
+'trustServerCertificate' = 'true' (USER_CONNECTION)
+*** End Database Properties ************************
+*** Driver Information *****************************
+Name: SQL Server
+DefaultClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+Artifacts: 
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11
+      maven/com/microsoft/sqlserver/mssql-jdbc/13.2.1.jre11/mssql-jdbc-13.2.1.jre11.jar
+   MAVEN Artifact (Activated) com.microsoft.sqlserver:mssql-jdbc_auth:dll:13.2.1.x64
+      maven/com/microsoft/sqlserver/mssql-jdbc_auth/13.2.1.x64/mssql-jdbc_auth-13.2.1.x64.dll (LIBRARY)
+*** End Driver Information *************************
+*** Current Connection Message *********************
+Disconnected.
+*** End Current Connection Message *****************
+
+2026-02-23 13:51:51.911 INFO   610 [ExecutorRunner-pool-5-thread-43 - m.b] Exception while connecting SQL Server
+Login failed for user 'WALGREENCO\jhunte6u'. ClientConnectionId:f7d03213-a119-4bf2-a93f-78358841828a
+
+[Exception Chain]:
+1: Root-> (SQLServerException) [Code:18456, SQL State: S0001] Login failed for user 'WALGREENCO\jhunte6u'. ClientConnectionId:f7d03213-a119-4bf2-a93f-78358841828a
+
+[Stack trace]:
+com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'WALGREENCO\jhunte6u'. ClientConnectionId:f7d03213-a119-4bf2-a93f-78358841828a
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:278)
+	at com.microsoft.sqlserver.jdbc.TDSTokenHandler.onEOF(tdsparser.java:329)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:137)
+	at com.microsoft.sqlserver.jdbc.TDSParser.parse(tdsparser.java:42)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.sendLogon(SQLServerConnection.java:7423)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:5921)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:5853)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7825)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:4828)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectHelper(SQLServerConnection.java:4261)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.login(SQLServerConnection.java:3817)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connectInternal(SQLServerConnection.java:3591)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.connect(SQLServerConnection.java:2286)
+	at com.microsoft.sqlserver.jdbc.SQLServerDriver.connect(SQLServerDriver.java:1371)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.onseven.dbvis.jdbc.b.e.b(Z:950)
+	at com.onseven.dbvis.jdbc.b.g$_b.call(Z:1895)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
