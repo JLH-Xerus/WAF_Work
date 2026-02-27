@@ -151,39 +151,36 @@ ORDER BY
 
 
 -- ============================================================================
--- QUERY 3: Purge Execution Logs (from the event logging table)
--- Adjust table/column names if lsp_DbLogSqlEvent writes to a different table.
--- This assumes the event log table is EvtSqlEvent or similar.
--- If this query errors, check what table lsp_DbLogSqlEvent inserts into
--- and adjust accordingly.
+-- QUERY 3: Purge Execution Logs from EvtEvent
+-- Schema: TrxId (bigint PK), Module (varchar 4), Event (varchar 20),
+--         OprId, EventDtTm, Results, RxNum, Ndc, Qty, TcdSn,
+--         Notes (varchar 255), SubRoutine (varchar 50), ComputerName,
+--         ExeCode, CanisterSn
+-- The purge proc calls lsp_DbLogSqlEvent with module 'A' and event
+-- descriptions like 'PurgeOldData Beg' / 'PurgeOldData End'.
 -- Expected runtime: < 5 seconds
 -- ============================================================================
-
--- Option A: If there is an EvtSqlEvent or EvtDiagEvent table with event codes:
 SELECT
-    EventCode
-  , EventDesc
+    TrxId
+  , Module
+  , Event
+  , SubRoutine
   , Notes
-  , DtTm
-  , Source
+  , Results
+  , EventDtTm
+  , ComputerName
 FROM
-    EvtSqlEvent  -- << adjust table name if different
+    dbo.EvtEvent
 WHERE
-    (   Notes LIKE '%PurgeOldData%'
+    (   Event LIKE '%PurgeOldData%'
+     OR Event LIKE '%Purge%'
      OR Notes LIKE '%lsp_DbPurgeHistoryData%'
-     OR EventDesc LIKE '%PurgeOldData%'
-     OR Source LIKE '%lsp_DbPurgeHistoryData%'
+     OR Notes LIKE '%PurgeOldData%'
+     OR SubRoutine LIKE '%lsp_DbPurge%'
     )
-    AND DtTm >= DATEADD(MONTH, -3, GETDATE())
+    AND EventDtTm >= DATEADD(MONTH, -3, GETDATE())
 ORDER BY
-    DtTm DESC;
-
--- Option B: If Option A errors, try this broader search:
--- SELECT TOP 200 *
--- FROM EvtSqlEvent
--- WHERE DtTm >= DATEADD(MONTH, -1, GETDATE())
---   AND (Notes LIKE '%Purge%' OR EventDesc LIKE '%Purge%' OR Source LIKE '%Purge%')
--- ORDER BY DtTm DESC;
+    EventDtTm DESC;
 
 
 -- ============================================================================
