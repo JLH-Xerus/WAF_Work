@@ -11,7 +11,7 @@ Object Name:
    lsp_DbDeleteOldPmssData
 
 Version:
-   1
+   2
 
 Description:
    Delete data from following PMSS tables based on the System-Wide > PMSS > DaysToKeepEncryptedLogs parameter.
@@ -21,17 +21,27 @@ Description:
       - CfCapturedPmssTrxs
 
 Return:
-   @Rc - 0     = Successful
-         Non-0 = Failed
+   Return Code:
+          0 = Successful
+      Non-0 = Failed
 
 Comments:
    This stored procedure is called from nightly maintenance procedure.
    The oldest records are deleted first.
 
+   NOTE: If the DaysToKeepEncryptedLogs parameter definition exists in CfgSystemParamDef but has no
+         corresponding value row in vCfgSystemParamVal, @configuredRetentionPeriod will remain NULL
+         and the procedure will log "parameter is not configured" and exit successfully.
+
+Updates (v2):
+   - Narrowed CTE select from "Select *" to "Select Id" in all four deletion loops to reduce I/O.
+   - Fixed variable naming typo: @NumOfRowsDeleted_PmssCapturedOrderTrxs -> @NumOfRowsDeleted_PmssCapturedOrderTrxs.
+   - Added error message to failure end event notes alongside the partial row count.
+   - Removed unused @Rc variable; simplified return to use literal 0.
+   - Corrected Return Value documentation to match actual return behavior.
 */
 
-Declare @Rc Int                          -- SQL Command Return Code.  (Saved Value of @@Error.)
-      , @CutoffDtTm DateTime             -- "X Days Ago" Cutoff Date/Time.
+Declare @CutoffDtTm DateTime             -- "X Days Ago" Cutoff Date/Time.
       , @NumOfRowsDeleted Int = 0        -- Number of rows that have been deleted.
       , @EventType Char(1)               -- Type of event.
       , @EventPrefix VarChar(15)         -- Prefix of the logged event.
@@ -90,7 +100,7 @@ Begin Try
 
          ;With Cte As
             (
-               Select Top (@NumOfRowsBlockSize) * From CfCapturedPmssTrxs Where TrxDtTm < @CutoffDtTm Order By Id
+               Select Top (@NumOfRowsBlockSize) Id From CfCapturedPmssTrxs Where TrxDtTm < @CutoffDtTm Order By Id
             )
          Delete From Cte
 
@@ -130,7 +140,7 @@ Begin Try
 
          ;With Cte As
             (
-               Select Top (@NumOfRowsBlockSize) * From CfCollectedCentralFillPmssTrxs Where TrxDtTm < @CutoffDtTm Order By Id
+               Select Top (@NumOfRowsBlockSize) Id From CfCollectedCentralFillPmssTrxs Where TrxDtTm < @CutoffDtTm Order By Id
             )
          Delete From Cte
 
@@ -148,7 +158,7 @@ Begin Try
       --===================================
       -- Start > PmssCapturedOrderTrxs Loop
       --===================================
-      Declare @NumOfRowsDeleted_PmssCapturedOrderTrxsint Int = 0
+      Declare @NumOfRowsDeleted_PmssCapturedOrderTrxs Int = 0
       ---------------------------------------------------------------------------
       -- Delete PmssCapturedOrderTrxs rows logged prior to the cut-off date/time.
       ---------------------------------------------------------------------------
@@ -158,7 +168,7 @@ Begin Try
       -- While there are old rows and the maximum number of deletions has not occurred:
       --   Progress with deleting a block of Trx rows.
       ---------------------------------------------------------------------------------
-      While Exists (Select * From PmssCapturedOrderTrxs Where TrxDtTm < @CutoffDtTm) And @NumOfRowsDeleted_PmssCapturedOrderTrxsint < @MaxToDelete
+      While Exists (Select * From PmssCapturedOrderTrxs Where TrxDtTm < @CutoffDtTm) And @NumOfRowsDeleted_PmssCapturedOrderTrxs < @MaxToDelete
       Begin
       
          -----------------------------------
@@ -168,16 +178,16 @@ Begin Try
 
          ;With Cte As
             (
-               Select Top (@NumOfRowsBlockSize) * From PmssCapturedOrderTrxs Where TrxDtTm < @CutoffDtTm Order By Id
+               Select Top (@NumOfRowsBlockSize) Id From PmssCapturedOrderTrxs Where TrxDtTm < @CutoffDtTm Order By Id
             )
          Delete From Cte
 
          ------------------------------------
          -- Track the number of rows deleted.
          ------------------------------------
-         Set @NumOfRowsDeleted_PmssCapturedOrderTrxsint = @NumOfRowsDeleted_PmssCapturedOrderTrxsint + @@ROWCOUNT
+         Set @NumOfRowsDeleted_PmssCapturedOrderTrxs = @NumOfRowsDeleted_PmssCapturedOrderTrxs + @@ROWCOUNT
 
-      End  -- While Exists (Select * From PmssCapturedOrderTrxs Where TrxDtTm < @CutoffDtTm) And @NumOfRowsDeleted_PmssCapturedOrderTrxsint < @MaxToDelete
+      End  -- While Exists (Select * From PmssCapturedOrderTrxs Where TrxDtTm < @CutoffDtTm) And @NumOfRowsDeleted_PmssCapturedOrderTrxs < @MaxToDelete
 
       --=================================
       -- End > PmssCapturedOrderTrxs Loop
@@ -208,7 +218,7 @@ Begin Try
 
          ;With Cte As
             (
-               Select Top (@NumOfRowsBlockSize) * From PmssCapturedXmlTrxs Where TrxDtTm < @CutoffDtTm Order By Id
+               Select Top (@NumOfRowsBlockSize) Id From PmssCapturedXmlTrxs Where TrxDtTm < @CutoffDtTm Order By Id
             )
          Delete From Cte
 
@@ -221,7 +231,7 @@ Begin Try
 
       Set @NumOfRowsDeleted =   @NumOfRowsDeleted_CfCapturedPmssTrxs
                               + @NumOfRowsDeleted_CfCollectedCentralFillPmssTrxs
-                              + @NumOfRowsDeleted_PmssCapturedOrderTrxsint
+                              + @NumOfRowsDeleted_PmssCapturedOrderTrxs
                               + @NumOfRowsDeleted_PmssCapturedXmlTrxs
       --=================================
       -- End > PmssCapturedXmlTrxs Loop
@@ -245,8 +255,7 @@ Begin Try
       Exec lsp_DbLogSqlEvent @EvtType = @eventType, @Event = @Event, @Results = 'Success', @Notes = @EvtNotes, @Routine = @Routine
    End
 
-   Set @RC = 0
-   Return @RC
+   Return 0  -- Return Success
 End Try
 Begin Catch
 
@@ -264,7 +273,7 @@ Begin Catch
    -- Log a failed end event.
    -- - - - - - - - - - - - -
    Print 'Failed.' + '   (' + Convert(VarChar(30), GetDate(), 120) + ')'
-   Set @EvtNotes = Concat('Total Number of rows deleted - ', Cast (@NumOfRowsDeleted As VarChar(20)))
+   Set @EvtNotes = Left('Rows deleted before failure - ' + Cast(@NumOfRowsDeleted As VarChar(20)) + '; ' + @ErrMsg, 255)
    Exec lsp_DbLogSqlEvent
         @EvtType = @eventType
       , @Event = @Event

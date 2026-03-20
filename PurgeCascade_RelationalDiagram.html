@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PharmAssist Purge Cascade — Complete Relational Diagram</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #0d1117; color: #c9d1d9; overflow: hidden; }
+
+  #header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(180deg, #161b22 0%, #161b22ee 80%, transparent 100%);
+    padding: 16px 24px 24px;
+  }
+  #header h1 { font-size: 18px; color: #58a6ff; font-weight: 600; margin-bottom: 4px; }
+  #header .subtitle { font-size: 12px; color: #8b949e; }
+
+  #legend {
+    position: fixed; top: 70px; left: 24px; z-index: 100;
+    background: #161b22; border: 1px solid #30363d; border-radius: 8px;
+    padding: 12px 16px; font-size: 11px; line-height: 2.0; max-width: 310px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .legend-line { width: 24px; height: 0; flex-shrink: 0; }
+
+  #info-panel {
+    position: fixed; top: 70px; right: 24px; z-index: 100;
+    background: #161b22; border: 1px solid #30363d; border-radius: 8px;
+    padding: 16px; width: 360px; font-size: 12px; display: none;
+    max-height: calc(100vh - 120px); overflow-y: auto;
+  }
+  #info-panel h3 { color: #58a6ff; margin-bottom: 8px; font-size: 14px; }
+  #info-panel .stat { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #21262d; }
+  #info-panel .stat-label { color: #8b949e; }
+  #info-panel .stat-value { color: #f0f6fc; font-weight: 600; }
+  #info-panel .fk-list { margin-top: 8px; }
+  #info-panel .fk-item { padding: 4px 0; border-bottom: 1px solid #21262d; line-height: 1.4; }
+  #info-panel .fk-cascade { color: #f85149; font-weight: 600; }
+  #info-panel .fk-formal { color: #58a6ff; }
+  #info-panel .fk-logical { color: #d2a8ff; }
+  #info-panel .fk-orphan { color: #f0883e; }
+  #info-panel .badge {
+    display: inline-block; font-size: 9px; padding: 1px 5px; border-radius: 3px;
+    font-weight: 600; vertical-align: middle; margin-left: 4px;
+  }
+  .badge-fk { background: #1f3d5c; color: #58a6ff; }
+  .badge-logic { background: #2d1f4e; color: #d2a8ff; }
+  .badge-orphan { background: #3d2e1f; color: #f0883e; }
+  .badge-cascade { background: #3d1f1f; color: #f85149; }
+  .badge-dead { background: #3d1f1f; color: #f85149; border: 1px dashed #f85149; }
+
+  #controls {
+    position: fixed; bottom: 24px; left: 24px; z-index: 100;
+    display: flex; gap: 8px; flex-wrap: wrap; max-width: 600px;
+  }
+  #controls button {
+    background: #21262d; border: 1px solid #30363d; color: #c9d1d9;
+    padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px;
+  }
+  #controls button:hover { background: #30363d; }
+  #controls button.active { background: #1f6feb; border-color: #58a6ff; }
+
+  #stats-bar {
+    position: fixed; bottom: 24px; right: 24px; z-index: 100;
+    background: #161b22; border: 1px solid #30363d; border-radius: 8px;
+    padding: 8px 16px; font-size: 11px; color: #8b949e; max-width: 400px;
+  }
+
+  svg { width: 100vw; height: 100vh; }
+
+  .link { fill: none; }
+  .link-fk { stroke: #30363d; stroke-width: 1.5; stroke-opacity: 0.5; }
+  .link-logical { stroke: #7c3aed; stroke-width: 1.5; stroke-opacity: 0.4; stroke-dasharray: 4,3; }
+  .link-orphan { stroke: #f0883e; stroke-width: 1.5; stroke-opacity: 0.4; stroke-dasharray: 8,4; }
+  .link-cascade { stroke: #f85149; stroke-width: 2.5; stroke-opacity: 0.6; stroke-dasharray: 6,3; }
+  .link-dead { stroke: #f85149; stroke-width: 1.5; stroke-opacity: 0.3; stroke-dasharray: 2,4; }
+  .link-highlight { stroke-opacity: 1 !important; stroke-width: 3 !important; }
+
+  .node-circle { stroke-width: 2; cursor: pointer; transition: opacity 0.2s; }
+  .node-label { fill: #c9d1d9; font-size: 10px; pointer-events: none; text-anchor: middle; font-weight: 500; }
+  .node-sublabel { fill: #8b949e; font-size: 8px; pointer-events: none; text-anchor: middle; }
+  .node-phase { fill: #484f58; font-size: 7px; pointer-events: none; text-anchor: middle; font-style: italic; }
+
+  .dimmed { opacity: 0.06 !important; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <h1>PharmAssist Purge Cascade — Complete Relational Diagram</h1>
+  <div class="subtitle">FK constraints + stored procedure logical relationships | 63 tables deleted by lsp_DbPurgeHistoryData | Click any node for details</div>
+</div>
+
+<div id="legend">
+  <div style="font-weight:600;color:#58a6ff;margin-bottom:4px">Node Colors</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f85149"></div> Purge Parent (FK parent in purge set)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#3fb950"></div> Tier 1 — Partition SWITCH candidate</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#58a6ff"></div> Purge table (Tier 2/3)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#d2a8ff"></div> Logical-only (no FK, proc-managed)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#484f58;opacity:0.5"></div> External / Lookup table</div>
+  <div style="font-weight:600;color:#58a6ff;margin:8px 0 4px">Edge Types</div>
+  <div class="legend-item"><div class="legend-line" style="border-top:2px solid #30363d"></div> Formal FK (NO_ACTION)</div>
+  <div class="legend-item"><div class="legend-line" style="border-top:2px solid #f85149;border-style:dashed"></div> Formal FK (CASCADE DELETE)</div>
+  <div class="legend-item"><div class="legend-line" style="border-top:2px dashed #7c3aed"></div> Logical (proc-managed, no FK)</div>
+  <div class="legend-item"><div class="legend-line" style="border-top:2px dashed #f0883e"></div> Orphan detection (proc-managed)</div>
+  <div class="legend-item"><div class="legend-line" style="border-top:1px dotted #f85149;opacity:0.5"></div> Commented out (deadlock)</div>
+</div>
+
+<div id="info-panel"></div>
+
+<div id="controls">
+  <button id="btn-all" class="active" onclick="filterView('all')">All Tables</button>
+  <button id="btn-purge" onclick="filterView('purge')">Purge Only</button>
+  <button id="btn-nofk" onclick="filterView('nofk')">No FK (Logical)</button>
+  <button id="btn-orphan" onclick="filterView('orphan')">Orphan Chains</button>
+  <button id="btn-cascade" onclick="filterView('cascade')">CASCADE DELETE</button>
+  <button id="btn-ship" onclick="filterView('shipment')">Shipment Chain</button>
+  <button id="btn-group" onclick="filterView('group')">Group Chain</button>
+  <button id="btn-reset" onclick="resetView()">Reset Zoom</button>
+</div>
+
+<div id="stats-bar">
+  <span>63 tables deleted | 98 formal FKs | 18 logical-only relationships | 5 orphan patterns | 4 CASCADE DELETEs | 1 commented-out (deadlock)</span>
+</div>
+
+<svg id="graph"></svg>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script>
+// =====================================================================
+// NODE DATA — every table touched by the purge proc
+// =====================================================================
+const tableData = {
+  // Tier 1 - Partition SWITCH candidates
+  "OeStatusTrail":                   { rows:1829100000, sizeMB:116182, tier:1, phase:"orphan_post", deleteOrder:52 },
+  "EvtEvent":                        { rows:1126000000, sizeMB:72000,  tier:1, phase:"separate_proc", deleteOrder:0 },
+  "OeOrderHistory":                  { rows:287795090,  sizeMB:28493,  tier:1, phase:"main", deleteOrder:49, note:"THE driving table" },
+  "OeOrderSecondaryData":            { rows:230581112,  sizeMB:20074,  tier:1, phase:"direct", deleteOrder:1 },
+  "OeOrderTextDocument":             { rows:117736268,  sizeMB:2503000,tier:1, phase:"direct", deleteOrder:14 },
+  "OeOrderThirdPartyPlan":           { rows:97600000,   sizeMB:9600,   tier:1, phase:"direct", deleteOrder:15 },
+  "OeFlaggedRxs":                    { rows:84700000,   sizeMB:5800,   tier:1, phase:"direct", deleteOrder:7 },
+  "OeOrderShipmentAssoc":            { rows:78571551,   sizeMB:4200,   tier:1, phase:"cascade_ship", deleteOrder:34 },
+  "ShpManifestShipmentAssoc":        { rows:72486531,   sizeMB:5486,   tier:1, phase:"cascade_ship", deleteOrder:39 },
+  "OeOrderAuxLabelText":             { rows:57510322,   sizeMB:10063,  tier:1, phase:"direct", deleteOrder:10 },
+  "PwkPaperworkSetOrderAssoc":       { rows:52778170,   sizeMB:3199,   tier:1, phase:"cascade_pwk", deleteOrder:27 },
+  "ShpShipmentPackageLabelInstance":  { rows:25788573,   sizeMB:2879,   tier:1, phase:"cascade_ship", deleteOrder:40 },
+  "ImgImage":                        { rows:20853444,   sizeMB:171000, tier:1, phase:"cascade_image", deleteOrder:22 },
+  "SrtShipToteShipmentAssoc":        { rows:13766,      sizeMB:1,      tier:1, phase:"cascade_ship", deleteOrder:38 },
+  "OeOrder":                         { rows:474364,     sizeMB:27254,  tier:1, phase:"reference_only", deleteOrder:0, note:"Referenced, not deleted by this proc" },
+
+  // Tier 2 - Orphan cleanup / FK parents
+  "OeGroup":              { rows:152771814, sizeMB:12806, tier:2, phase:"cascade_group", deleteOrder:62, isParent:true },
+  "ShpShipment":          { rows:96826212,  sizeMB:8451,  tier:2, phase:"cascade_ship", deleteOrder:41, isParent:true },
+  "PwkPaperworkSet":      { rows:52659248,  sizeMB:4105,  tier:2, phase:"cascade_pwk", deleteOrder:28, isParent:true },
+  "OeGroupOrderData":     { rows:50919644,  sizeMB:5627,  tier:2, phase:"cascade_group", deleteOrder:58 },
+  "OeGroupUserDef":       { rows:50919622,  sizeMB:4375,  tier:2, phase:"cascade_group", deleteOrder:60 },
+  "OePatientCust":        { rows:14924485,  sizeMB:2107,  tier:2, phase:"cascade_patient", deleteOrder:67, isParent:true },
+  "ShpManifest":          { rows:4699314,   sizeMB:398,   tier:2, phase:"cascade_mpl", deleteOrder:48, isParent:true },
+  "OePatientCustSecondaryData": { rows:2984897, sizeMB:385, tier:2, phase:"cascade_patient", deleteOrder:65 },
+  "ShpPalletManifestAssoc": { rows:2275104, sizeMB:104,   tier:2, phase:"cascade_mpl", deleteOrder:44 },
+  "ShpPallet":            { rows:180495,    sizeMB:14,    tier:2, phase:"cascade_mpl", deleteOrder:47, isParent:true },
+  "OeGroupCvyFillData":   { rows:113602,   sizeMB:8,     tier:2, phase:"cascade_group", deleteOrder:57 },
+  "ShpLoadPalletAssoc":   { rows:51864,    sizeMB:3,     tier:2, phase:"cascade_mpl", deleteOrder:45 },
+  "ShpLoad":              { rows:7840,     sizeMB:1,     tier:2, phase:"cascade_mpl", deleteOrder:46, isParent:true },
+
+  // Tier 3 - Prune-back / small tables
+  "OePrescriber":         { rows:7477719,  sizeMB:1085,  tier:3, phase:"dead_code", deleteOrder:0, isParent:true, note:"DELETE COMMENTED OUT - deadlock" },
+  "CanLotCodeHistory":    { rows:2940468,  sizeMB:211,   tier:3, phase:"cascade_can", deleteOrder:31 },
+  "CanCanisterHistory":   { rows:1120784,  sizeMB:168,   tier:3, phase:"cascade_can", deleteOrder:32, isParent:true },
+  "CaAudit":              { rows:289134,   sizeMB:23,    tier:3, phase:"direct", deleteOrder:3 },
+  "OeDurData":            { rows:26527,    sizeMB:3,     tier:3, phase:"direct", deleteOrder:5 },
+  "CvyRxRoute":           { rows:12050,    sizeMB:1,     tier:3, phase:"direct", deleteOrder:4 },
+  "PwkPrinterTray":       { rows:161,     sizeMB:0,     tier:3, phase:"cascade_ship", deleteOrder:36 },
+  "ImgImage_IntId":       { rows:0,       sizeMB:0,     tier:3, phase:"cascade_image", deleteOrder:21 },
+  "GovOnHoldGroups":      { rows:0,       sizeMB:0,     tier:3, phase:"cascade_group", deleteOrder:55 },
+  "OeExceptionGroups":    { rows:0,       sizeMB:0,     tier:3, phase:"cascade_group", deleteOrder:56 },
+  "OeGroupPayment":       { rows:0,       sizeMB:0,     tier:3, phase:"cascade_group", deleteOrder:59 },
+  "OeRxRequest":          { rows:0,       sizeMB:0,     tier:3, phase:"reference_only", deleteOrder:0 },
+  "DsRxDoseSched":        { rows:0,       sizeMB:0,     tier:3, phase:"cascade_dose", deleteOrder:26, isParent:true },
+  "DsRxDoseSchedDose":    { rows:0,       sizeMB:0,     tier:3, phase:"cascade_dose", deleteOrder:24 },
+  "DsRxDoseSchedDoseByDayOfWeek": { rows:0, sizeMB:0,   tier:3, phase:"cascade_dose", deleteOrder:25 },
+  "CvyPackageRoute":      { rows:0,       sizeMB:0,     tier:3, phase:"cascade_ship", deleteOrder:35 },
+  "ShpShipmentPkgLabelData":         { rows:0, sizeMB:0, tier:3, phase:"cascade_ship", deleteOrder:37 },
+  "ShpShipmentSpecialServiceAssoc":  { rows:0, sizeMB:0, tier:3, phase:"cascade_ship", deleteOrder:37 },
+  "PrivacySignature":     { rows:0,       sizeMB:0,     tier:3, phase:"cascade_patient", deleteOrder:66 },
+  "OeOrderAcceptReject":  { rows:0,       sizeMB:0,     tier:3, phase:"standalone", deleteOrder:70 },
+
+  // Logical-only tables (no FK, deleted by proc)
+  "OeOrderCurrHistoryDtTm":  { rows:0, sizeMB:0, tier:0, phase:"direct", deleteOrder:2, logicalOnly:true },
+  "OeDurFreeFormText":        { rows:0, sizeMB:0, tier:0, phase:"direct", deleteOrder:6, logicalOnly:true },
+  "OeLotCode":                { rows:0, sizeMB:0, tier:0, phase:"direct", deleteOrder:8, logicalOnly:true },
+  "OeOrderAuxLabelFile":      { rows:0, sizeMB:0, tier:0, phase:"direct", deleteOrder:9, logicalOnly:true },
+  "OeOrderExtSysDocument":    { rows:0, sizeMB:0, tier:0, phase:"direct", deleteOrder:11, logicalOnly:true },
+  "OeOrderExtUserDef":        { rows:0, sizeMB:0, tier:0, phase:"direct", deleteOrder:12, logicalOnly:true },
+  "OeOrderTcdAssoc":          { rows:0, sizeMB:0, tier:0, phase:"direct", deleteOrder:13, logicalOnly:true },
+  "OeRxBagAssoc":             { rows:0, sizeMB:0, tier:0, phase:"direct", deleteOrder:16, logicalOnly:true },
+  "OeRxItemHistory":          { rows:0, sizeMB:0, tier:0, phase:"direct", deleteOrder:17, logicalOnly:true },
+  "OeRxPouchDispenserAssoc":  { rows:0, sizeMB:0, tier:0, phase:"direct", deleteOrder:18, logicalOnly:true },
+  "OeRxPrefLangData":         { rows:0, sizeMB:0, tier:0, phase:"direct", deleteOrder:19, logicalOnly:true },
+  "ImgRxImgAssoc":            { rows:0, sizeMB:0, tier:0, phase:"cascade_image", deleteOrder:20, logicalOnly:true },
+  "OeRxDoseSched":            { rows:0, sizeMB:0, tier:0, phase:"cascade_dose", deleteOrder:23, logicalOnly:true },
+  "OeOrderCanReplenAssoc":    { rows:0, sizeMB:0, tier:0, phase:"cascade_can", deleteOrder:29, logicalOnly:true },
+  "ImgCanImgAssoc":           { rows:0, sizeMB:0, tier:0, phase:"cascade_can", deleteOrder:33, logicalOnly:true },
+  "OeComments":               { rows:0, sizeMB:0, tier:0, phase:"orphan_post", deleteOrder:50, logicalOnly:true },
+  "OeOrderPoNumAssoc":        { rows:0, sizeMB:0, tier:0, phase:"orphan_post", deleteOrder:51, logicalOnly:true },
+  "OeProblemRxs":             { rows:0, sizeMB:0, tier:0, phase:"orphan_post", deleteOrder:52, logicalOnly:true },
+  "OeRequireCorrespondenceRxs": { rows:0, sizeMB:0, tier:0, phase:"orphan_post", deleteOrder:53, logicalOnly:true },
+};
+
+// External lookup tables referenced by FKs
+const externalTables = [
+  "OePriority","OeDelivMethod","OeFillType","OeRefillType","OeFillMethod",
+  "OePaymentStatus","OeSourceCheckoutType","OeTextDocumentType","OeTextDocumentFmt",
+  "OeCountry","OeDiseaseCode","OeDurSeverity","OeDurPharmacyCategory","OeDurPrescrCategory",
+  "OePatientPrintPaperworkOption","OeRxRequestType","OeScriptSource",
+  "ShpShipType","ShpService","ShpAddress","ShpAddressType","ShpCarrier",
+  "ShpLoadStatus","ShpPalletStatus","ShpTrailer","ShpSpecialService",
+  "SrtShipTote","ToteRouteLoc","TotePopWorkflowStep",
+  "LngLanguage","PatSpecies","Pharmacy","InvMaster","ImgContent",
+  "CaAuditRule","DsDoseSchedType","DsDoseTime","DsDayOfWeek",
+  // CASCADE targets (external)
+  "CvyMultiBaggerGroupQueue","OeOrdersWithInvalidProductAlias",
+  "OePatientAddress","ShpDestinationTemperature","OeGroupSplitCodeAssoc"
+];
+
+// =====================================================================
+// EDGE DATA — ALL relationships (FK + logical + orphan + dead)
+// =====================================================================
+const allEdges = [
+  // ===== FORMAL FK RELATIONSHIPS =====
+  // OeGroup children (FK)
+  { s:"OeGroup", t:"CvyMultiBaggerGroupQueue", type:"cascade", cols:"GroupNum" },
+  { s:"OeGroup", t:"GovOnHoldGroups", type:"fk", cols:"GroupNum" },
+  { s:"OeGroup", t:"OeExceptionGroups", type:"fk", cols:"GroupNum" },
+  { s:"OeGroup", t:"OeGroup", type:"fk", cols:"ParentGroupNum→GroupNum", selfRef:true },
+  { s:"OeGroup", t:"OeGroupCvyFillData", type:"fk", cols:"GroupNum" },
+  { s:"OeGroup", t:"OeGroupOrderData", type:"fk", cols:"GroupNum" },
+  { s:"OeGroup", t:"OeGroupPayment", type:"fk", cols:"GroupNum" },
+  { s:"OeGroup", t:"OeGroupSplitCodeAssoc", type:"fk", cols:"GroupNum" },
+  { s:"OeGroup", t:"OeGroupUserDef", type:"fk", cols:"GroupNum" },
+  { s:"OeGroup", t:"OeOrder", type:"fk", cols:"GroupNum" },
+  { s:"OeGroup", t:"OeOrderHistory", type:"fk", cols:"GroupNum" },
+  { s:"OeGroup", t:"OeRxRequest", type:"fk", cols:"GroupNum" },
+  // ShpShipment children (FK)
+  { s:"ShpShipment", t:"ShpDestinationTemperature", type:"cascade", cols:"ShipmentId→Id" },
+  { s:"ShpShipment", t:"CvyPackageRoute", type:"fk", cols:"ShipmentId→Id" },
+  { s:"ShpShipment", t:"OeOrderShipmentAssoc", type:"fk", cols:"ShipmentId→Id" },
+  { s:"ShpShipment", t:"PwkPrinterTray", type:"fk", cols:"ShipmentId→Id" },
+  { s:"ShpShipment", t:"ShpManifestShipmentAssoc", type:"fk", cols:"ShipmentId→Id" },
+  { s:"ShpShipment", t:"ShpShipmentPackageLabelInstance", type:"fk", cols:"ShipmentId→Id" },
+  { s:"ShpShipment", t:"ShpShipmentPkgLabelData", type:"fk", cols:"ShipmentId→Id" },
+  { s:"ShpShipment", t:"ShpShipmentSpecialServiceAssoc", type:"fk", cols:"ShipmentId→Id" },
+  { s:"ShpShipment", t:"SrtShipToteShipmentAssoc", type:"fk", cols:"ShipmentId→Id" },
+  // OePatientCust children (FK)
+  { s:"OePatientCust", t:"OePatientAddress", type:"cascade", cols:"PatCustId" },
+  { s:"OePatientCust", t:"OeGroup", type:"fk", cols:"PatCustId" },
+  { s:"OePatientCust", t:"OeOrder", type:"fk", cols:"PatCustId" },
+  { s:"OePatientCust", t:"OeOrderHistory", type:"fk", cols:"PatCustId" },
+  { s:"OePatientCust", t:"OeRxRequest", type:"fk", cols:"PatCustId" },
+  { s:"OePatientCust", t:"PrivacySignature", type:"fk", cols:"PatCustId" },
+  // OePrescriber children (FK)
+  { s:"OePrescriber", t:"OeOrder", type:"dead", cols:"PrescrId", note:"DELETE COMMENTED OUT" },
+  { s:"OePrescriber", t:"OeOrderHistory", type:"dead", cols:"PrescrId", note:"DELETE COMMENTED OUT" },
+  { s:"OePrescriber", t:"OeRxRequest", type:"dead", cols:"PrescrId" },
+  // ShpManifest children (FK)
+  { s:"ShpManifest", t:"ShpManifestShipmentAssoc", type:"fk", cols:"ManifestId→Id" },
+  { s:"ShpManifest", t:"ShpPalletManifestAssoc", type:"fk", cols:"ManifestId→Id" },
+  // ShpPallet children (FK)
+  { s:"ShpPallet", t:"ShpLoadPalletAssoc", type:"fk", cols:"PalletId→Id" },
+  { s:"ShpPallet", t:"ShpPalletManifestAssoc", type:"fk", cols:"PalletId→Id" },
+  // OeOrder children (FK)
+  { s:"OeOrder", t:"OeOrdersWithInvalidProductAlias", type:"cascade", cols:"OrderId" },
+  // Other FK parents in purge set
+  { s:"DsRxDoseSched", t:"DsRxDoseSchedDose", type:"fk", cols:"RxDoseSchedId→Id" },
+  { s:"DsRxDoseSched", t:"DsRxDoseSchedDoseByDayOfWeek", type:"fk", cols:"RxDoseSchedId→Id" },
+  { s:"DsRxDoseSched", t:"OeRxDoseSched", type:"fk", cols:"RxDoseSchedId→Id" },
+  { s:"CanCanisterHistory", t:"CanLotCodeHistory", type:"fk", cols:"CanisterSn,LastReplenDtTm" },
+  { s:"PwkPaperworkSet", t:"PwkPaperworkSetOrderAssoc", type:"fk", cols:"PaperworkSetId→Id" },
+  { s:"ShpLoad", t:"ShpLoadPalletAssoc", type:"fk", cols:"LoadId→Id" },
+
+  // ===== LOGICAL RELATIONSHIPS (proc-managed, no FK) =====
+  // Direct children of OeOrderHistory block (OrderId + HistoryDtTm)
+  { s:"OeOrderHistory", t:"OeOrderSecondaryData", type:"logical", cols:"OrderId, HistoryDtTm" },
+  { s:"OeOrderHistory", t:"OeOrderCurrHistoryDtTm", type:"logical", cols:"OrderId, HistoryDtTm" },
+  { s:"OeOrderHistory", t:"CaAudit", type:"logical", cols:"OrderId, HistoryDtTm" },
+  { s:"OeOrderHistory", t:"CvyRxRoute", type:"logical", cols:"OrderId, HistoryDtTm" },
+  { s:"OeOrderHistory", t:"OeDurData", type:"logical", cols:"OrderId, HistoryDtTm" },
+  { s:"OeOrderHistory", t:"OeDurFreeFormText", type:"logical", cols:"OrderId, HistoryDtTm" },
+  { s:"OeOrderHistory", t:"OeFlaggedRxs", type:"logical", cols:"OrderId, HistoryDtTm" },
+  { s:"OeOrderHistory", t:"OeLotCode", type:"logical", cols:"OrderId, HistoryDtTm" },
+  { s:"OeOrderHistory", t:"OeOrderAuxLabelFile", type:"logical", cols:"OrderId, HistoryDtTm" },
+  { s:"OeOrderHistory", t:"OeOrderAuxLabelText", type:"logical", cols:"OrderId, HistoryDtTm" },
+  { s:"OeOrderHistory", t:"OeOrderExtSysDocument", type:"logical", cols:"OrderId, HistoryDtTm" },
+  { s:"OeOrderHistory", t:"OeOrderExtUserDef", type:"logical", cols:"OrderId, HistoryDtTm" },
+  { s:"OeOrderHistory", t:"OeOrderTcdAssoc", type:"logical", cols:"OrderId, HistoryDtTm" },
+  { s:"OeOrderHistory", t:"OeOrderTextDocument", type:"logical", cols:"OrderId, HistoryDtTm" },
+  { s:"OeOrderHistory", t:"OeOrderThirdPartyPlan", type:"logical", cols:"OrderId, HistoryDtTm" },
+  { s:"OeOrderHistory", t:"OeRxBagAssoc", type:"logical", cols:"OrderId, HistoryDtTm" },
+  { s:"OeOrderHistory", t:"OeRxItemHistory", type:"logical", cols:"OrderId, HistoryDtTm" },
+  { s:"OeOrderHistory", t:"OeRxPouchDispenserAssoc", type:"logical", cols:"OrderId, HistoryDtTm" },
+  { s:"OeOrderHistory", t:"OeRxPrefLangData", type:"logical", cols:"OrderId, HistoryDtTm" },
+  // Image cascade (via ImgRxImgAssoc bridge)
+  { s:"OeOrderHistory", t:"ImgRxImgAssoc", type:"logical", cols:"OrderId, HistoryDtTm→ImgId" },
+  { s:"ImgRxImgAssoc", t:"ImgImage", type:"logical", cols:"ImgId (IsMovedToFile=1)" },
+  { s:"ImgRxImgAssoc", t:"ImgImage_IntId", type:"logical", cols:"ImgId (IsMovedToFile=1)" },
+  // DoseSchedule cascade (via OeRxDoseSched bridge)
+  { s:"OeOrderHistory", t:"OeRxDoseSched", type:"logical", cols:"OrderId, HistoryDtTm→RxDoseSchedId" },
+  // Paperwork cascade
+  { s:"OeOrderHistory", t:"PwkPaperworkSetOrderAssoc", type:"logical", cols:"OrderId, HistoryDtTm" },
+  // Canister cascade (via OeOrderCanReplenAssoc bridge)
+  { s:"OeOrderHistory", t:"OeOrderCanReplenAssoc", type:"logical", cols:"OrderId, HistoryDtTm→CanisterSn" },
+  { s:"OeOrderCanReplenAssoc", t:"CanLotCodeHistory", type:"logical", cols:"CanisterSn, ReplenDtTm" },
+  { s:"OeOrderCanReplenAssoc", t:"CanCanisterHistory", type:"logical", cols:"CanisterSn, ReplenDtTm" },
+  { s:"OeOrderCanReplenAssoc", t:"ImgCanImgAssoc", type:"logical", cols:"CanisterSn→ImgId" },
+  { s:"ImgCanImgAssoc", t:"ImgImage", type:"logical", cols:"ImgId" },
+  { s:"ImgCanImgAssoc", t:"ImgImage_IntId", type:"logical", cols:"ImgId" },
+  // Shipment cascade (via OeOrderShipmentAssoc)
+  { s:"OeOrderHistory", t:"OeOrderShipmentAssoc", type:"logical", cols:"OrderId, HistoryDtTm→ShipmentId" },
+
+  // ===== ORPHAN DETECTION PATTERNS =====
+  // Post-OeOrderHistory deletes (OrderId only, no HistoryDtTm)
+  { s:"OeOrderHistory", t:"OeComments", type:"orphan", cols:"OrderId (orphan: no OeOrder+OH)" },
+  { s:"OeOrderHistory", t:"OeOrderPoNumAssoc", type:"orphan", cols:"OrderId (orphan: no OeOrder+OH)" },
+  { s:"OeOrderHistory", t:"OeProblemRxs", type:"orphan", cols:"OrderId (orphan: no OeOrder+OH)" },
+  { s:"OeOrderHistory", t:"OeRequireCorrespondenceRxs", type:"orphan", cols:"OrderId (orphan: no OeOrder+OH)" },
+  { s:"OeOrderHistory", t:"OeStatusTrail", type:"orphan", cols:"OrderId (orphan: no OeOrder+OH)" },
+  // Group orphan (only deleted when no OH+OeOrder+RxRequest references remain)
+  { s:"OeOrderHistory", t:"OeGroup", type:"orphan", cols:"GroupNum (orphan detection)" },
+  // Patient orphan
+  { s:"OeOrderHistory", t:"OePatientCust", type:"orphan", cols:"PatCustId (orphan detection)" },
+  { s:"OePatientCust", t:"OePatientCustSecondaryData", type:"logical", cols:"PatCustId" },
+  // Shipment/Manifest/Pallet/Load orphan chain
+  { s:"OeOrderShipmentAssoc", t:"ShpShipment", type:"orphan", cols:"ShipmentId (orphan detection)" },
+  { s:"ShpManifestShipmentAssoc", t:"ShpManifest", type:"orphan", cols:"ManifestId (orphan detection)" },
+  { s:"ShpPalletManifestAssoc", t:"ShpPallet", type:"orphan", cols:"PalletId (orphan detection)" },
+  { s:"ShpLoadPalletAssoc", t:"ShpLoad", type:"orphan", cols:"LoadId (orphan detection)" },
+  // Paperwork orphan
+  { s:"PwkPaperworkSetOrderAssoc", t:"PwkPaperworkSet", type:"orphan", cols:"PaperworkSetId (orphan detection)" },
+  // Canister orphan
+  { s:"OeOrderCanReplenAssoc", t:"CanCanisterHistory", type:"orphan", cols:"CanisterSn (orphan detection)" },
+];
+
+// =====================================================================
+// BUILD NODES
+// =====================================================================
+const nodeMap = new Map();
+
+Object.entries(tableData).forEach(([name, d]) => {
+  nodeMap.set(name, {
+    id: name, rows: d.rows, sizeMB: d.sizeMB, tier: d.tier,
+    phase: d.phase, deleteOrder: d.deleteOrder, note: d.note || null,
+    isPurge: true, isParent: d.isParent || false, isExternal: false,
+    logicalOnly: d.logicalOnly || false
+  });
+});
+
+externalTables.forEach(name => {
+  if (!nodeMap.has(name)) {
+    nodeMap.set(name, {
+      id: name, rows: 0, sizeMB: 0, tier: 0, phase: "external",
+      deleteOrder: 0, isPurge: false, isParent: false, isExternal: true, logicalOnly: false
+    });
+  }
+});
+
+const nodes = Array.from(nodeMap.values());
+
+// Filter edges to only those where both nodes exist, skip self-refs
+const links = allEdges
+  .filter(e => !e.selfRef && nodeMap.has(e.s) && nodeMap.has(e.t))
+  .map(e => ({
+    source: e.s, target: e.t, type: e.type, cols: e.cols, note: e.note || null
+  }));
+
+// =====================================================================
+// D3 VISUALIZATION
+// =====================================================================
+const width = window.innerWidth;
+const height = window.innerHeight;
+const svg = d3.select("#graph").attr("width", width).attr("height", height);
+
+const defs = svg.append("defs");
+["#30363d","#7c3aed","#f0883e","#f85149"].forEach((color, i) => {
+  const id = ["arrow-fk","arrow-logical","arrow-orphan","arrow-cascade"][i];
+  defs.append("marker").attr("id", id).attr("viewBox","0 -5 10 10")
+    .attr("refX",18).attr("refY",0).attr("markerWidth",5).attr("markerHeight",5).attr("orient","auto")
+    .append("path").attr("d","M0,-4L10,0L0,4").attr("fill", color);
+});
+
+const g = svg.append("g");
+const zoom = d3.zoom().scaleExtent([0.08, 4]).on("zoom", e => g.attr("transform", e.transform));
+svg.call(zoom);
+
+function nodeRadius(d) {
+  if (d.isExternal) return 5;
+  if (d.logicalOnly) return 7;
+  if (d.rows > 1e9) return 30;
+  if (d.rows > 1e8) return 22;
+  if (d.rows > 1e7) return 16;
+  if (d.rows > 1e6) return 12;
+  return 9;
+}
+
+function nodeColor(d) {
+  if (d.isExternal) return "#484f58";
+  if (d.logicalOnly) return "#d2a8ff";
+  if (d.phase === "dead_code") return "#f8514966";
+  if (d.tier === 1) return "#3fb950";
+  if (d.isParent) return "#f85149";
+  return "#58a6ff";
+}
+
+function linkClass(d) {
+  if (d.type === "cascade") return "link link-cascade";
+  if (d.type === "logical") return "link link-logical";
+  if (d.type === "orphan") return "link link-orphan";
+  if (d.type === "dead") return "link link-dead";
+  return "link link-fk";
+}
+
+function markerEnd(d) {
+  if (d.type === "cascade") return "url(#arrow-cascade)";
+  if (d.type === "logical") return "url(#arrow-logical)";
+  if (d.type === "orphan") return "url(#arrow-orphan)";
+  if (d.type === "dead") return "url(#arrow-cascade)";
+  return "url(#arrow-fk)";
+}
+
+const simulation = d3.forceSimulation(nodes)
+  .force("link", d3.forceLink(links).id(d => d.id).distance(d => {
+    if (d.type === "cascade") return 80;
+    if (d.type === "orphan") return 110;
+    return 100;
+  }).strength(d => d.type === "logical" ? 0.4 : 0.25))
+  .force("charge", d3.forceManyBody().strength(d => d.isExternal ? -30 : (d.logicalOnly ? -60 : -180)))
+  .force("center", d3.forceCenter(width / 2, height / 2))
+  .force("collision", d3.forceCollide().radius(d => nodeRadius(d) + 12))
+  .force("x", d3.forceX(width / 2).strength(0.025))
+  .force("y", d3.forceY(height / 2).strength(0.025));
+
+const linkGroup = g.append("g").selectAll("line").data(links).join("line")
+  .attr("class", d => linkClass(d))
+  .attr("marker-end", d => markerEnd(d));
+
+const nodeGroup = g.append("g").selectAll("g").data(nodes).join("g")
+  .call(d3.drag().on("start", dragStart).on("drag", dragging).on("end", dragEnd));
+
+nodeGroup.append("circle")
+  .attr("class", "node-circle")
+  .attr("r", d => nodeRadius(d))
+  .attr("fill", d => nodeColor(d))
+  .attr("stroke", d => {
+    if (d.phase === "dead_code") return "#f85149";
+    return d3.color(nodeColor(d))?.brighter(0.5) || "#666";
+  })
+  .attr("stroke-dasharray", d => d.phase === "dead_code" ? "3,3" : "none")
+  .attr("opacity", d => d.isExternal ? 0.35 : (d.logicalOnly ? 0.7 : 0.9))
+  .on("click", (e, d) => showInfo(d))
+  .on("mouseover", (e, d) => highlightConnected(d))
+  .on("mouseout", resetHighlight);
+
+nodeGroup.filter(d => !d.isExternal).append("text")
+  .attr("class", "node-label")
+  .attr("dy", d => -nodeRadius(d) - 4)
+  .text(d => d.id);
+
+nodeGroup.filter(d => !d.isExternal && d.rows > 0).append("text")
+  .attr("class", "node-sublabel")
+  .attr("dy", d => nodeRadius(d) + 12)
+  .text(d => formatRows(d.rows));
+
+simulation.on("tick", () => {
+  linkGroup.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+    .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+  nodeGroup.attr("transform", d => `translate(${d.x},${d.y})`);
+});
+
+// =====================================================================
+// INTERACTIONS
+// =====================================================================
+function formatRows(n) {
+  if (n >= 1e9) return (n / 1e9).toFixed(2) + "B";
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
+  return n.toString();
+}
+
+function formatSize(mb) {
+  if (mb >= 1024) return (mb / 1024).toFixed(1) + " GB";
+  return mb + " MB";
+}
+
+const phaseLabels = {
+  direct: "Phase 1: Direct child delete",
+  cascade_image: "Phase 2: Image cascade",
+  cascade_dose: "Phase 3: DoseSchedule cascade",
+  cascade_pwk: "Phase 4: Paperwork cascade",
+  cascade_can: "Phase 5: Canister cascade",
+  cascade_ship: "Phase 6: Shipment cascade",
+  cascade_mpl: "Phase 7: Manifest→Pallet→Load",
+  main: "Phase 8: OeOrderHistory delete",
+  orphan_post: "Phase 9: Post-OH orphan cleanup",
+  cascade_group: "Phase 10: Group cascade",
+  cascade_patient: "Phase 11: Patient cascade",
+  dead_code: "COMMENTED OUT (deadlock)",
+  standalone: "Phase 12: Standalone loop",
+  reference_only: "Referenced, not deleted",
+  external: "External lookup",
+  separate_proc: "Separate proc (not in this one)"
+};
+
+function showInfo(d) {
+  const panel = document.getElementById("info-panel");
+  const outEdges = allEdges.filter(e => e.s === d.id && !e.selfRef);
+  const inEdges = allEdges.filter(e => e.t === d.id && !e.selfRef);
+
+  let html = `<h3>${d.id}</h3>`;
+  if (d.note) html += `<div style="color:#f85149;font-weight:600;margin-bottom:8px">${d.note}</div>`;
+  html += `<div class="stat"><span class="stat-label">Rows</span><span class="stat-value">${d.rows > 0 ? formatRows(d.rows) : (d.isExternal ? "External" : "0")}</span></div>`;
+  html += `<div class="stat"><span class="stat-label">Size</span><span class="stat-value">${d.sizeMB > 0 ? formatSize(d.sizeMB) : "\u2014"}</span></div>`;
+  html += `<div class="stat"><span class="stat-label">Tier</span><span class="stat-value">${d.tier > 0 ? "Tier " + d.tier : (d.isExternal ? "External" : (d.logicalOnly ? "No FK" : "\u2014"))}</span></div>`;
+  html += `<div class="stat"><span class="stat-label">Delete Phase</span><span class="stat-value">${phaseLabels[d.phase] || d.phase}</span></div>`;
+  html += `<div class="stat"><span class="stat-label">Delete Order</span><span class="stat-value">${d.deleteOrder > 0 ? "#" + d.deleteOrder : "\u2014"}</span></div>`;
+
+  let relType = d.isExternal ? "Lookup" : (d.logicalOnly ? "Logical only (no FK)" : (d.isParent ? "FK Parent" : "FK Child"));
+  html += `<div class="stat"><span class="stat-label">Relationship</span><span class="stat-value">${relType}</span></div>`;
+
+  if (outEdges.length > 0) {
+    html += `<div class="fk-list"><strong style="color:#58a6ff">Depends on me (${outEdges.length}):</strong>`;
+    outEdges.forEach(e => {
+      const badge = e.type === "cascade" ? '<span class="badge badge-cascade">CASCADE</span>' :
+                    e.type === "logical" ? '<span class="badge badge-logic">LOGICAL</span>' :
+                    e.type === "orphan" ? '<span class="badge badge-orphan">ORPHAN</span>' :
+                    e.type === "dead" ? '<span class="badge badge-dead">DEAD CODE</span>' :
+                    '<span class="badge badge-fk">FK</span>';
+      html += `<div class="fk-item">\u2192 ${e.t} ${badge}<br><span style="color:#484f58;font-size:10px">${e.cols}</span></div>`;
+    });
+    html += `</div>`;
+  }
+  if (inEdges.length > 0) {
+    html += `<div class="fk-list"><strong style="color:#f0883e">I depend on (${inEdges.length}):</strong>`;
+    inEdges.forEach(e => {
+      const badge = e.type === "cascade" ? '<span class="badge badge-cascade">CASCADE</span>' :
+                    e.type === "logical" ? '<span class="badge badge-logic">LOGICAL</span>' :
+                    e.type === "orphan" ? '<span class="badge badge-orphan">ORPHAN</span>' :
+                    e.type === "dead" ? '<span class="badge badge-dead">DEAD CODE</span>' :
+                    '<span class="badge badge-fk">FK</span>';
+      html += `<div class="fk-item">\u2190 ${e.s} ${badge}<br><span style="color:#484f58;font-size:10px">${e.cols}</span></div>`;
+    });
+    html += `</div>`;
+  }
+  panel.innerHTML = html;
+  panel.style.display = "block";
+}
+
+function highlightConnected(d) {
+  const connected = new Set([d.id]);
+  links.forEach(l => {
+    const sid = typeof l.source === "object" ? l.source.id : l.source;
+    const tid = typeof l.target === "object" ? l.target.id : l.target;
+    if (sid === d.id) connected.add(tid);
+    if (tid === d.id) connected.add(sid);
+  });
+  nodeGroup.selectAll("circle").classed("dimmed", n => !connected.has(n.id));
+  nodeGroup.selectAll("text").classed("dimmed", n => !connected.has(n.id));
+  linkGroup.classed("dimmed", l => {
+    const sid = typeof l.source === "object" ? l.source.id : l.source;
+    const tid = typeof l.target === "object" ? l.target.id : l.target;
+    return !(sid === d.id || tid === d.id);
+  }).classed("link-highlight", l => {
+    const sid = typeof l.source === "object" ? l.source.id : l.source;
+    const tid = typeof l.target === "object" ? l.target.id : l.target;
+    return sid === d.id || tid === d.id;
+  });
+}
+
+function resetHighlight() {
+  nodeGroup.selectAll("circle").classed("dimmed", false);
+  nodeGroup.selectAll("text").classed("dimmed", false);
+  linkGroup.classed("dimmed", false).classed("link-highlight", false);
+}
+
+// =====================================================================
+// FILTERS
+// =====================================================================
+function setVisibility(nodeFn, linkFn) {
+  nodeGroup.selectAll("circle").attr("opacity", d => nodeFn(d) ? (d.isExternal ? 0.35 : (d.logicalOnly ? 0.7 : 0.9)) : 0.03);
+  nodeGroup.selectAll("text").attr("opacity", d => nodeFn(d) ? 1 : 0.03);
+  linkGroup.attr("opacity", d => {
+    const s = typeof d.source === "object" ? d.source : nodeMap.get(d.source);
+    const t = typeof d.target === "object" ? d.target : nodeMap.get(d.target);
+    return linkFn(d, s, t) ? 1 : 0.03;
+  });
+}
+
+function filterView(mode) {
+  document.querySelectorAll("#controls button").forEach(b => b.classList.remove("active"));
+  document.getElementById("btn-" + mode)?.classList.add("active");
+
+  if (mode === "all") {
+    setVisibility(() => true, () => true);
+  } else if (mode === "purge") {
+    setVisibility(d => d.isPurge, (l, s, t) => s.isPurge && t.isPurge);
+  } else if (mode === "nofk") {
+    const logicalNodes = new Set();
+    links.filter(l => l.type === "logical").forEach(l => {
+      logicalNodes.add(typeof l.source === "object" ? l.source.id : l.source);
+      logicalNodes.add(typeof l.target === "object" ? l.target.id : l.target);
+    });
+    setVisibility(d => logicalNodes.has(d.id), (l) => l.type === "logical");
+  } else if (mode === "orphan") {
+    const orphanNodes = new Set();
+    links.filter(l => l.type === "orphan").forEach(l => {
+      orphanNodes.add(typeof l.source === "object" ? l.source.id : l.source);
+      orphanNodes.add(typeof l.target === "object" ? l.target.id : l.target);
+    });
+    setVisibility(d => orphanNodes.has(d.id), (l) => l.type === "orphan");
+  } else if (mode === "cascade") {
+    const cascadeNodes = new Set();
+    links.filter(l => l.type === "cascade" || l.type === "dead").forEach(l => {
+      cascadeNodes.add(typeof l.source === "object" ? l.source.id : l.source);
+      cascadeNodes.add(typeof l.target === "object" ? l.target.id : l.target);
+    });
+    setVisibility(d => cascadeNodes.has(d.id), l => l.type === "cascade" || l.type === "dead");
+  } else if (mode === "shipment") {
+    const shipTables = new Set(["OeOrderHistory","OeOrderShipmentAssoc","ShpShipment","CvyPackageRoute","PwkPrinterTray",
+      "ShpShipmentPkgLabelData","ShpShipmentSpecialServiceAssoc","SrtShipToteShipmentAssoc","ShpManifestShipmentAssoc",
+      "ShpShipmentPackageLabelInstance","ShpManifest","ShpPalletManifestAssoc","ShpPallet","ShpLoadPalletAssoc","ShpLoad"]);
+    setVisibility(d => shipTables.has(d.id), (l, s, t) => shipTables.has(s.id) && shipTables.has(t.id));
+  } else if (mode === "group") {
+    const groupTables = new Set(["OeOrderHistory","OeGroup","GovOnHoldGroups","OeExceptionGroups","OeGroupCvyFillData",
+      "OeGroupOrderData","OeGroupPayment","OeGroupUserDef","OeGroupSplitCodeAssoc",
+      "OePatientCust","OePatientCustSecondaryData","PrivacySignature",
+      "OePrescriber","OeOrder","OeRxRequest"]);
+    setVisibility(d => groupTables.has(d.id), (l, s, t) => groupTables.has(s.id) && groupTables.has(t.id));
+  }
+}
+
+function resetView() {
+  svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);
+  filterView("all");
+  document.getElementById("btn-all").classList.add("active");
+}
+
+function dragStart(e, d) { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; }
+function dragging(e, d) { d.fx = e.x; d.fy = e.y; }
+function dragEnd(e, d) { if (!e.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; }
+
+// Auto-fit after settling
+setTimeout(() => {
+  const pad = 80;
+  let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+  nodes.forEach(n => { if(n.x<x0)x0=n.x;if(n.x>x1)x1=n.x;if(n.y<y0)y0=n.y;if(n.y>y1)y1=n.y; });
+  const dx=x1-x0+pad*2, dy=y1-y0+pad*2;
+  const sc=Math.min(width/dx,height/dy,1.5);
+  const tx=width/2-(x0+x1)/2*sc, ty=height/2-(y0+y1)/2*sc;
+  svg.transition().duration(1000).call(zoom.transform, d3.zoomIdentity.translate(tx,ty).scale(sc));
+}, 2500);
+</script>
+</body>
+</html>

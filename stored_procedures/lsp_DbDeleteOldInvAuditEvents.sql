@@ -12,7 +12,7 @@ Name:
    lsp_DbDeleteOldInvAuditEvents
 
 Version:
-   1
+   2
 
 Description:
    Delete Inventory Audit events that were logged prior to X days ago.
@@ -25,7 +25,6 @@ Parameters:
                              Deletions are performed in blocks of rows to prevent performing one huge transaction that would inflate the tempdb
                                and the t-log (even more than it holding the deletes themselves) and perform slowly due to broad locking.
       @MaxToDelete         - The maximum number of events to delete.
-                             If this value is not a multiple of @NumOfRowsBlockSize, the effect will be approximate.
                              Specifying a maximum prevents growing the t-log so large it uses up the disk space under a condition where a huge
                                number of "older than X days" rows exist when this action is performed.
                              The goal is to delete a "finite" amount of data between full database backups where the t-log is truncated.
@@ -40,6 +39,11 @@ Return Value:
 Comments:
    This procedure is called from the nightly maintenance procedure.
    The oldest inventory events are deleted first.
+
+Updates (v2):
+   - Narrowed CTE select from "Select *" to "Select Id" to reduce I/O per block iteration.
+   - Replaced approximate row count tracking (@NumOfRowsBlockSize) with actual @@ROWCOUNT after each delete.
+   - Added total rows deleted to both the success and failure end event log entries for observability.
 */
 
 Declare @CutoffDtTm DateTime           -- "X Days Ago" Cutoff Date/Time.
@@ -97,14 +101,14 @@ Begin Try
 
       ;With Cte As
          (
-            Select Top (@NumOfRowsBlockSize) * From EvtInvEventLog Where EventDtTm < @CutoffDtTm Order By Id
+            Select Top (@NumOfRowsBlockSize) Id From EvtInvEventLog Where EventDtTm < @CutoffDtTm Order By Id
          )
       Delete From Cte
 
       ------------------------------------
       -- Track the number of rows deleted.
       ------------------------------------
-      Set @NumOfRowsDeleted = @NumOfRowsDeleted + @NumOfRowsBlockSize
+      Set @NumOfRowsDeleted = @NumOfRowsDeleted + @@ROWCOUNT
 
    End
 
@@ -112,7 +116,7 @@ Begin Try
    -- Log a successful end event.
    -- - - - - - - - - - - - - - -
    Print 'Complete.' + '   (' + Convert(VarChar(30), GetDate(), 120) + ')'
-   Set @EvtNotes = ''
+   Set @EvtNotes = 'Total Number of rows deleted - ' + Cast(@NumOfRowsDeleted As VarChar(20))
    Exec lsp_DbLogSqlEvent 'A', 'DelOldInvEvts End', 'Successful', @EvtNotes, @Routine
 
    Return 0  -- Return Success
@@ -129,7 +133,7 @@ Begin Catch
    -- Log a failed end event.
    -- - - - - - - - - - - - -
    Print 'Failed.' + '   (' + Convert(VarChar(30), GetDate(), 120) + ')'
-   Set @EvtNotes = Left(@ErrMsg, 255)
+   Set @EvtNotes = Left('Rows deleted before failure - ' + Cast(@NumOfRowsDeleted As VarChar(20)) + '; ' + @ErrMsg, 255)
    Exec lsp_DbLogSqlEvent 'A', 'DelOldInvEvts End', 'Failed', @EvtNotes, @Routine
 
    Return @ErrNum

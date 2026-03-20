@@ -1,0 +1,112 @@
+Result set fetched
+SQLWarning:
+1) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+2) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+3) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+4) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+5) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+6) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+7) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+8) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+9) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+10) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+11) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+12) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+13) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+14) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+15) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+16) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+17) Code: 3615 SQL State: 01000 --- Table '#AA7BB7B9'. Scan count 1, logical reads 3, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+18) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 31 ms,  elapsed time = 2 ms.
+19) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+20) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+21) Code: 3615 SQL State: 01000 --- Table 'InvStationNdcAssoc'. Scan count 1, logical reads 6, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+22) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+23) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+24) Code: 3615 SQL State: 01000 --- Table 'CvyToteAtManFillStation'. Scan count 0, logical reads 2, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+25) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+26) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+27) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+28) Code: 3615 SQL State: 01000 --- Table '#totegroups_________________________________________________________________________________________________________00000037104A'. Scan count 0, logical reads 1, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+29) Code: 3615 SQL State: 01000 --- Table 'GovRx'. Scan count 0, logical reads 3, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+30) Code: 3615 SQL State: 01000 --- Table 'OeOrder'. Scan count 1, logical reads 3, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+31) Code: 3615 SQL State: 01000 --- Table 'OrderToteAssoc'. Scan count 1, logical reads 2, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+32) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+33) Code: 3615 SQL State: 01000 --- Table '#totegroups_________________________________________________________________________________________________________00000037104A'. Scan count 1, logical reads 1, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+34) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+35) Code: 3615 SQL State: 01000 --- Table 'Pharmacy'. Scan count 1, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+36) Code: 3615 SQL State: 01000 --- Table 'OePriority'. Scan count 1, logical reads 2, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+37) Code: 3615 SQL State: 01000 --- Table 'OeOrder'. Scan count 5, logical reads 3526, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+38) Code: 3615 SQL State: 01000 --- Table 'Worktable'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+39) Code: 3615 SQL State: 01000 --- Table 'OeGroup'. Scan count 0, logical reads 16165, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+40) Code: 3615 SQL State: 01000 --- Table 'Workfile'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+41) Code: 3615 SQL State: 01000 --- Table 'Worktable'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+42) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 30 ms,  elapsed time = 29 ms.
+43) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+44) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+45) Code: 3615 SQL State: 01000 --- Table 'Workfile'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+46) Code: 3615 SQL State: 01000 --- Table 'Worktable'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+47) Code: 3615 SQL State: 01000 --- Table '#OeData_____________________________________________________________________________________________________________00000037104B'. Scan count 1, logical reads 87, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+48) Code: 3615 SQL State: 01000 --- Table '#NdcInvPoolInclusionList____________________________________________________________________________________________000000371049'. Scan count 1, logical reads 1, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+49) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 2 ms.
+50) Code: 3615 SQL State: 01000 --- Table '#OeDataUserLocs_____________________________________________________________________________________________________000000371047'. Scan count 1, logical reads 3, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+51) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+52) Code: 3615 SQL State: 01000 --- Table 'Worktable'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+53) Code: 3615 SQL State: 01000 --- Table 'CfStoreDeliveryCourierCutOff'. Scan count 2, logical reads 6, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+54) Code: 3615 SQL State: 01000 --- Table 'SysEndPharmacy'. Scan count 1, logical reads 2, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+55) Code: 3615 SQL State: 01000 --- Table 'OeGroupCvyFillData'. Scan count 0, logical reads 3, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+56) Code: 3615 SQL State: 01000 --- Table 'OeWorkflowStepInProgress'. Scan count 1, logical reads 74, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+57) Code: 3615 SQL State: 01000 --- Table '#totegroups_________________________________________________________________________________________________________00000037104A'. Scan count 3, logical reads 277, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+58) Code: 3615 SQL State: 01000 --- Table 'OrderToteAssoc'. Scan count 0, logical reads 278, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+59) Code: 3615 SQL State: 01000 --- Table 'BfBatchFillRxAssoc'. Scan count 1, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+60) Code: 3615 SQL State: 01000 --- Table 'GovRx'. Scan count 0, logical reads 434, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+61) Code: 3615 SQL State: 01000 --- Table '#OeDataUserLocs_____________________________________________________________________________________________________000000371047'. Scan count 1, logical reads 3, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+62) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 16 ms,  elapsed time = 13 ms.
+63) Code: 8153 SQL State: 01003 --- Warning: Null value is eliminated by an aggregate or other SET operation.
+64) Code: 3615 SQL State: 01000 --- Table 'Worktable'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+65) Code: 3615 SQL State: 01000 --- Table 'InvFlaggedProducts'. Scan count 1, logical reads 2, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+66) Code: 3615 SQL State: 01000 --- Table 'OeOrder'. Scan count 2, logical reads 12, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+67) Code: 3615 SQL State: 01000 --- Table '#ResultTable________________________________________________________________________________________________________00000037104C'. Scan count 4, logical reads 4, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+68) Code: 3615 SQL State: 01000 --- Table 'InvMasterUserOverrides'. Scan count 0, logical reads 2, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+69) Code: 3615 SQL State: 01000 --- Table 'InvMaster'. Scan count 0, logical reads 3, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+70) Code: 3615 SQL State: 01000 --- Table 'Worktable'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+71) Code: 3615 SQL State: 01000 --- Table 'OeGroupSplitCodeAssoc'. Scan count 1, logical reads 3, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+72) Code: 3615 SQL State: 01000 --- Table 'OeGroup'. Scan count 0, logical reads 4, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+73) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+74) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 4 ms.
+75) Code: 3612 SQL State: 01000 --- SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.

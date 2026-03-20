@@ -19,7 +19,7 @@ Description:
    This process does NOT delete rows for archived images (whose ArchivedDtTm value is set (non-null) and whose image data is, therefore, "0x").
 
 Version:
-   3
+   4
 
 Parameters:
    Input:
@@ -30,9 +30,8 @@ Parameters:
                                list of content codes.
                              Example:  '1,2,3,4,5,6,7'
       @NumOfRowsBlockSize  - The images (rows) will be deleted in blocks of this many rows at a time.
-                             Deletions are performed in blocks of rows to prevent performing one huge transaction that would inflate the t-log. 
-      @MaxToDelete         - The maximum number of Workflow to delete.
-                             If this value is not a multiple of @NumOfRowsBlockSize, the effect will be approximate.
+                             Deletions are performed in blocks of rows to prevent performing one huge transaction that would inflate the t-log.
+      @MaxToDelete         - The maximum number of Workflow images to delete.
                              Specifying a maximum prevents growing the t-log so large it uses up the disk space under a condition where a huge
                                number of "older than X days" rows exist when this action is performed.
                              The goal is to delete a "finite" amount of data between full database backups where the t-log is truncated.
@@ -48,16 +47,30 @@ Comments:
        This procedure is called from the nightly maintenance procedure.
        The oldest captured images are deleted first.
 
+       NOTE: The @@Error/Return checks within the Try block (after individual operations) can bypass the
+             Catch block and temp table cleanup. These are retained for backward compatibility, but this
+             pattern should be reviewed in a future refactor to ensure proper cleanup on all exit paths.
+
+Updates (v4):
+   - Fixed #BlkIds temp table column type from Int to BigInt to match #OlderImageIds and prevent overflow.
+   - Replaced approximate row count tracking (@NumOfRowsBlockSize) with actual @@ROWCOUNT from #BlkIds insert.
+   - Added total rows deleted to the success end event log entry for observability.
+   - Added partial row count and error message to the failure end event log entry.
+   - Added missing @@Error check after ImgImage delete (between ImgImage and ImgImage_IntId deletes).
+   - Centralized procedure name into @Routine variable for consistency with related procedures.
 */
 Declare @Rc Int                        -- SQL Command Return Code.  (Saved Value of @@Error.)
 Declare @CutoffDtTm DateTime           -- "X Days Ago" Cutoff Date/Time.
 Declare @NumOfRowsDeleted Int = 0      -- Number of rows that have been deleted.
+Declare @BlockRowCount Int = 0         -- Actual number of IDs in the current block.
 
 Declare @ContentCodes Table(Code Int)  -- List of @ImgsOfContentCodes as a table.
 Declare @EvtNotes VarChar(255)         -- Logged event notes.
 Declare @ErrNum Int                    -- Error number (if error occurs).
 Declare @ErrMsg NVarChar(4000)         -- Error message (if error occurs).
+Declare @Routine VarChar(50)           -- SP Name (lsp_DbDeleteOldWorkflowImages)
 
+Set @Routine = 'lsp_DbDeleteOldWorkflowImages'
 
 If Object_Id('TempDb..#BlkIds') Is Not Null
    Drop Table #BlkIds
@@ -69,7 +82,7 @@ If Object_Id('TempDb..#OlderImageIds') Is Not Null
 Create Table #OlderImageIds (Id BigInt)
 Create Index ById On #OlderImageIds(Id)
 
-Create Table #BlkIds (Id Int)          -- Block of IDs to be deleted.
+Create Table #BlkIds (Id BigInt)       -- Block of IDs to be deleted.
 Create Index ById on #BlkIds(Id)
 
 Set NoCount On
@@ -95,7 +108,7 @@ Print 'Deleting Workflow images older than ' + Convert(VarChar(30), @CutoffDtTm,
 -- Log a begin event.
 -- - - - - - - - - - -
 Set @EvtNotes = '@OlderThanXDays=' + Cast(@OlderThanXDays As VarChar(12)) + ';@NumOfRowsBlockSize=' + Cast(@NumOfRowsBlockSize As VarChar(12)) + ';@MaxToDelete=' + Cast(@MaxToDelete As VarChar(12))
-Exec lsp_DbLogSqlEvent 'A', 'DelOldWrkFlwImgs Beg', '', @EvtNotes, 'lsp_DbDeleteOldWorkflowImages'
+Exec lsp_DbLogSqlEvent 'A', 'DelOldWrkFlwImgs Beg', '', @EvtNotes, @Routine
 
 Begin Try
 
@@ -174,8 +187,8 @@ Begin Try
                   #OlderImageIds
                Order By
                   Id
-      
-         Set @Rc = @@Error
+
+         Select @BlockRowCount = @@ROWCOUNT, @Rc = @@Error
          If @Rc <> 0
             Return @Rc  -- Return Failing R/C.
 
@@ -222,6 +235,10 @@ Begin Try
             ImgImage I
                On I.Id = B.Id
 
+         Set @Rc = @@Error
+         If @Rc <> 0
+            Return @Rc  -- Return Failing R/C.
+
          -- - - - - - - - - - - - - - -
          -- Delete ImgImage_IntId rows.
          -- - - - - - - - - - - - - - -
@@ -258,15 +275,15 @@ Begin Try
          ------------------------------------
          -- Track the number of rows deleted.
          ------------------------------------
-         Set @NumOfRowsDeleted = @NumOfRowsDeleted + @NumOfRowsBlockSize
+         Set @NumOfRowsDeleted = @NumOfRowsDeleted + @BlockRowCount
       End
 
       -- - - - - - - - - - - - - - -
       -- Log a successful end event.
       -- - - - - - - - - - - - - - -
       Print 'Complete.' + '   (' + Convert(VarChar(30), GetDate(), 120) + ')'
-      Set @EvtNotes = ''
-      Exec lsp_DbLogSqlEvent 'A', 'DelOldWrkFlwImgs End', 'Successful', @EvtNotes, 'lsp_DbDeleteOldWorkflowImages'
+      Set @EvtNotes = 'Total Number of rows deleted - ' + Cast(@NumOfRowsDeleted As VarChar(20))
+      Exec lsp_DbLogSqlEvent 'A', 'DelOldWrkFlwImgs End', 'Successful', @EvtNotes, @Routine
 
       Drop Table #OlderImageIds
       Drop Table #BlkIds
@@ -279,14 +296,14 @@ Begin Catch
 
    Set @ErrNum = ERROR_NUMBER()
    Set @ErrMsg = ERROR_MESSAGE()
-   Exec dbo.lsp_DbLogSqlError 'DelOldWrkFlwImgs Err', @ErrNum, @ErrMsg, 'lsp_DbDeleteOldWorkflowImages'
+   Exec dbo.lsp_DbLogSqlError 'DelOldWrkFlwImgs Err', @ErrNum, @ErrMsg, @Routine
 
    -- - - - - - - - - - - - -
    -- Log a failed end event.
    -- - - - - - - - - - - - -
    Print 'Failed.' + '   (' + Convert(VarChar(30), GetDate(), 120) + ')'
-   Set @EvtNotes = Left(@ErrMsg, 255)
-   Exec lsp_DbLogSqlEvent 'A', 'DelOldWrkFlwImgs End', 'Failed', @EvtNotes, 'lsp_DbDeleteOldWorkflowImages'
+   Set @EvtNotes = Left('Rows deleted before failure - ' + Cast(@NumOfRowsDeleted As VarChar(20)) + '; ' + @ErrMsg, 255)
+   Exec lsp_DbLogSqlEvent 'A', 'DelOldWrkFlwImgs End', 'Failed', @EvtNotes, @Routine
 
    Return @ErrNum
 

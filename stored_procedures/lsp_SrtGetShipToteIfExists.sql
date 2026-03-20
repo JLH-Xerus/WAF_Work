@@ -7,7 +7,7 @@ As
 --        lsp_SrtGetShipToteIfExists
 --
 -- Version:
---        26
+--        27
 --
 -- Description:
 --        Retrieve a shipping tote's data that is pertinent to the tote's display status on the Package Sorter Status form.
@@ -22,24 +22,25 @@ As
 -- Comments:
 --        This stored procedure is called by the Package Sorter Status display.
 --
+--        Updates (v27):
+--           - Collapsed double-query barcode lookup into single SELECT + NULL check
+--           - Replaced UNION with OR EXISTS for exception-package check; narrowed Select * to Select 1
+--           - Removed unused @ServiceCode variable and dead 3-table join query
+--           - Replaced correlated subquery in ShpManifest fallback with Count(*) Over()
+--           - Added missing NoLock hint on final SrtShipToteShipmentAssoc query
+--
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 Set NoCount On
 
 Declare @HasExceptionPackages Bit
-Declare @ServiceCode VarChar(50)
 Declare @ShipToteIdentifier varchar(22)
 
 
 -- If the scanned ShipToteId is an ABC Tote Id the scanned value is stored in the StaticToteBarcode fiel
-If Exists
-	(
-		Select Id From SrtShipTote With (NoLock)
-		Where StaticToteBarcode = @ShipToteId
-	)
-	Set @ShipToteIdentifier = (
-		Select Id From SrtShipTote With (NoLock)
-		Where StaticToteBarcode = @ShipToteId)	
-Else
+Select @ShipToteIdentifier = Id From SrtShipTote With (NoLock)
+Where StaticToteBarcode = @ShipToteId
+
+If @ShipToteIdentifier Is Null
 	Set @ShipToteIdentifier = @ShipToteId
 
 ---------------------------------------------------------------------------------
@@ -47,8 +48,7 @@ Else
 ---------------------------------------------------------------------------------
 If Exists
 	(
-		Select
-			*
+		Select 1
 		From
 			SrtShipToteShipmentAssoc TS With (NoLock)
 				Join
@@ -61,11 +61,10 @@ If Exists
 			TS.ShipToteId = @ShipToteIdentifier
 			And
 			O.OrderStatus = 'Problem'  -- Active Rxs in "Problem" Status are considered Exceptions.
-
-		Union
-
-		Select
-			*
+	)
+	Or Exists
+	(
+		Select 1
 		From
 			SrtShipToteShipmentAssoc TS With (NoLock)
 				Join
@@ -82,25 +81,6 @@ If Exists
 	Set @HasExceptionPackages = 1
 Else
 	Set @HasExceptionPackages = 0
-
--------------------------------------------------------------------
--- Retrieve the Service Code associated with packages in this tote.
--------------------------------------------------------------------
-Select
-	Top 1
-		@ServiceCode = S.ServiceCode
-From
-	SrtShipTote T With (NoLock)
-		Join
-	SrtShipToteShipmentAssoc TS With (NoLock)
-		On TS.ShipToteId = T.Id
-		Join
-	ShpShipment S With (NoLock)
-			On S.Id = TS.ShipmentId
-Where
-	T.Id = @ShipToteIdentifier
-	And
-	T.CarrierCode Is Not Null
 
 ------------------------------------------------
 -- Retrieve and return the Shipping Tote's Data.
@@ -152,7 +132,7 @@ Else
 			RTrim(IsNull(SM.CarrierCode, '')) As CarrierCode,
 			IsNull(SC.Name, '') as CarrierName,
 			'' As Status,
-			(Select Count(ShipToteId) From ShpManifest With (NoLock) Where ShipToteId = @ShipToteIdentifier) As NumOfPkgs,
+			Count(*) Over() As NumOfPkgs,
 			'' As SorterLocId,
 			@HasExceptionPackages As HasExceptionPackages,
 			IsNull(SM.ServiceCode, '') As ServiceCode,
@@ -170,7 +150,7 @@ Else
 Select
 	ShipmentId
 From
-	SrtShipToteShipmentAssoc
+	SrtShipToteShipmentAssoc With (NoLock)
 Where
 	ShipToteId = @ShipToteIdentifier
 
