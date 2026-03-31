@@ -1086,3 +1086,194 @@ The `dbo.fStringToTableByDelimiter` function splits the comma-delimited `@HubNam
 10. **Performance comparison:** Compare execution plans of v48 vs v49 for the same parameters. The v49 plan should show elimination of nested loop subquery operators from the delivery day logic, replaced by a single hash or merge join to the NDD CTE result.
 11. **GroupingCriteria output:** Compare `FmtdGroupingCriteriaVal` column values between v48 and v49 for groups with and without split codes. Format should be identical: plain `GroupingCriteriaVal` for unsplit groups, `GroupingCriteriaVal   (reason1; reason2)` for split groups.
 12. **Parallelism check:** Examine the v49 execution plan for the final enrichment query. With the scalar UDF removed, the plan should now be eligible for parallelism (look for Parallelism/Gather Streams operators that were absent in v48).
+
+---
+---
+
+# lsp_ImgGetListOfTopXImagesToMove — v6 to v7
+
+**Date:** 2026-03-21
+**Reviewed by:** Justin Hunter
+
+## Context
+
+Query Store identified this proc as the #4 overall offender and the highest single-plan offender:
+- **1,055,104 avg logical reads** per execution
+- **8,159 executions** in a 24-hour window
+- **8.6 billion total reads** per day
+- **2,099ms avg duration** / 1,829ms avg CPU
+
+The proc pulls a configurable batch of images that haven't been moved to the file system yet, filtering for images associated with either a Shipped Rx order or a Verified Canister. Called by a background worker process.
+
+Key discovery: `vImgImage` is a UNION ALL view over `ImgImage` (10,532,809 rows) and `ImgImage_IntId` (0 rows), compounding the plan complexity.
+
+---
+
+## Change 1: Extract TOP Subquery into Local Variable
+
+### Before (v6)
+```sql
+Select
+   Top (Select
+            Convert(Int, [Value])
+        From vCfgSystemParamVal
+        Where Section = 'Operation'
+                 And
+              Parameter = 'MaxNumberOfImagesToPullInASingleRunFromBgWk')
+     i.Id
+   , i.ContentCode
+From vImgImage As i With (NOLOCK)
+```
+
+### After (v7)
+```sql
+Declare @MaxImages Int
+
+Select @MaxImages = Convert(Int, [Value])
+From vCfgSystemParamVal
+Where Section = 'Operation'
+         And
+      Parameter = 'MaxNumberOfImagesToPullInASingleRunFromBgWk'
+
+Select Top (@MaxImages)
+      Id
+    , ContentCode
+From ( ... ) Combined
+Order By Id Asc
+```
+
+### Rationale
+With the subquery inline, the optimizer cannot determine the TOP value at compile time, which prevents effective **rowgoal optimization**. The optimizer can't estimate how few rows it needs and may choose a plan that materializes the entire result before applying TOP. By extracting to a local variable, the optimizer sniffs the value at compile time and can set an appropriate rowgoal, potentially short-circuiting execution once enough rows are found.
+
+---
+
+## Change 2: Replace LEFT JOIN + OR with UNION of Two INNER JOIN Branches
+
+### Before (v6)
+```sql
+From vImgImage As i With (NOLOCK)
+Left Join ImgRxImgAssoc As IR With (NOLOCK, FORCESEEK) On i.Id = Ir.ImgId
+Left Join OeOrderHistory As OH With (NOLOCK) On IR.OrderId = OH.OrderId
+Left Join ImgCanImgAssoc as IC With (NOLOCK, FORCESEEK) On i.Id = IC.ImgId
+Left Join CanCanister as C With (NOLOCK) On IC.CanisterSn = C.CanisterSn
+Where i.ImageData Is Not Null
+         And
+      (i.IsMovedToFile Is Null Or i.IsMovedToFile <> 1)
+         And
+      i.ArchivedDtTm Is NULL and (i.Id = IR.ImgId Or i.Id = IC.ImgId)
+         And
+      (Oh.OrderStatus = 'Shipped' or C.Status = 'Verified')
+Order By i.Id Asc
+```
+
+### After (v7)
+```sql
+From (
+    -- Branch 1: Images associated with a Shipped Rx order
+    Select i.Id, i.ContentCode
+    From vImgImage As i With (NOLOCK)
+    Join ImgRxImgAssoc As IR With (NOLOCK, FORCESEEK) On i.Id = IR.ImgId
+    Join OeOrderHistory As OH With (NOLOCK) On IR.OrderId = OH.OrderId
+    Where i.ImageData Is Not Null
+             And
+          (i.IsMovedToFile Is Null Or i.IsMovedToFile <> 1)
+             And
+          i.ArchivedDtTm Is Null
+             And
+          OH.OrderStatus = 'Shipped'
+
+    Union
+
+    -- Branch 2: Images associated with a Verified Canister
+    Select i.Id, i.ContentCode
+    From vImgImage As i With (NOLOCK)
+    Join ImgCanImgAssoc As IC With (NOLOCK, FORCESEEK) On i.Id = IC.ImgId
+    Join CanCanister As C With (NOLOCK) On IC.CanisterSn = C.CanisterSn
+    Where i.ImageData Is Not Null
+             And
+          (i.IsMovedToFile Is Null Or i.IsMovedToFile <> 1)
+             And
+          i.ArchivedDtTm Is Null
+             And
+          C.Status = 'Verified'
+) Combined
+Order By Id Asc
+```
+
+### Rationale
+This is the **headline change**. The v6 query LEFT JOINed four tables and then used OR in the WHERE clause across two different join paths (`i.Id = IR.ImgId Or i.Id = IC.ImgId` and `OH.OrderStatus = 'Shipped' Or C.Status = 'Verified'`). This pattern:
+
+1. **Prevents early elimination**: LEFT JOINs preserve all rows from the 10.5M-row base view before the WHERE clause filters. The optimizer must materialize the full outer join result set before discarding non-matches.
+
+2. **Blocks index strategy**: The OR spanning two unrelated join paths prevents the optimizer from choosing efficient seeks. It typically falls back to full scans with hash joins or produces an index union plan with high startup cost.
+
+3. **Defeats rowgoal**: With the complex OR + LEFT JOIN pattern overlaid on a UNION ALL view, the optimizer can't effectively apply the TOP rowgoal because it can't predict which branch will produce qualifying rows first.
+
+The UNION approach gives each branch **independent INNER JOINs** that the optimizer can optimize separately. Each branch only touches the tables it needs, predicates push cleanly through the UNION ALL view, and the optimizer can apply rowgoal to each branch independently.
+
+UNION (not UNION ALL) is used because an image could theoretically qualify through both paths (associated with both a shipped Rx order and a verified canister). UNION deduplicates such images.
+
+---
+
+## Change 3: LEFT JOINs Converted to INNER JOINs
+
+### Before (v6)
+```sql
+Left Join ImgRxImgAssoc As IR ...
+Left Join OeOrderHistory As OH ...
+Left Join ImgCanImgAssoc as IC ...
+Left Join CanCanister as C ...
+```
+
+### After (v7)
+```sql
+-- Branch 1
+Join ImgRxImgAssoc As IR ...
+Join OeOrderHistory As OH ...
+
+-- Branch 2
+Join ImgCanImgAssoc As IC ...
+Join CanCanister As C ...
+```
+
+### Rationale
+The v6 LEFT JOINs were semantically incorrect — the WHERE clause demanded non-NULL values from the joined tables (`OH.OrderStatus = 'Shipped'`, `C.Status = 'Verified'`, `i.Id = IR.ImgId`, `i.Id = IC.ImgId`), which implicitly converted the LEFT JOINs to INNER JOINs anyway. The optimizer may or may not recognize this simplification. Making them explicit INNER JOINs guarantees the optimizer sees the correct join type and can eliminate non-matching rows at the join step rather than carrying them through to the WHERE filter.
+
+---
+
+## What Was NOT Changed
+
+1. **vImgImage view reference retained**: The view is a UNION ALL over ImgImage (10.5M rows) and ImgImage_IntId (0 rows). ImgImage_IntId appears to be a migration target (int-based IDs). The view is kept for forward compatibility. If ImgImage_IntId is confirmed permanently empty, replacing `vImgImage` with `ImgImage` directly would simplify the plan further.
+
+2. **FORCESEEK hints retained**: Both `ImgRxImgAssoc` and `ImgCanImgAssoc` retain their FORCESEEK hints. With INNER JOINs, the optimizer should naturally choose seeks, making the hints redundant. They are kept as a safety net for initial deployment; recommend testing without them after confirming the UNION plan is stable.
+
+3. **`ImageData Is Not Null` predicate retained**: This filters on a LOB column and may require touching LOB pages. A filtered index on the base table (`WHERE ImageData IS NOT NULL AND (IsMovedToFile IS NULL OR IsMovedToFile <> 1) AND ArchivedDtTm IS NULL`) would eliminate this cost, but that is an index change, not a query change.
+
+4. **`(IsMovedToFile Is Null Or IsMovedToFile <> 1)` retained**: This non-SARGable OR on a nullable column prevents clean index seeks on IsMovedToFile. Semantically it means "not yet moved" and cannot be simplified without changing behavior. A filtered index is the appropriate solution.
+
+5. **No parameters exist**: This proc takes no input parameters, so parameter sniffing is not applicable. The only compile-time variable is @MaxImages from the config table.
+
+---
+
+## Expected Performance Impact
+
+| Metric | v6 (Baseline) | v7 (Expected) | Improvement |
+|--------|--------------|---------------|-------------|
+| Avg Logical Reads | 1,055,104 | ~100K–200K | 80–90% reduction |
+| Avg Duration | 2,099ms | ~200–400ms | 80–90% reduction |
+| Plan Shape | 4× LEFT JOIN + OR filter | 2× independent INNER JOIN branches | Seeks replace scans |
+| Rowgoal | Ineffective (subquery TOP) | Effective (variable TOP) | Early termination |
+
+Conservative estimate: 80% read reduction. At 8,159 daily executions, this saves approximately **6.9 billion logical reads per day**.
+
+---
+
+## Testing Recommendations
+
+1. **Equivalence check**: Run v6 and v7 side-by-side with `SET STATISTICS IO ON`. Compare the result sets — same rows, same order (by Id Asc). Check with `EXCEPT` in both directions.
+2. **Read comparison**: Compare total logical reads per table between v6 and v7. The vImgImage / ImgImage reads should drop dramatically. Association table reads should remain similar (FORCESEEK in both versions).
+3. **Execution plan comparison**: v7's plan should show two separate Concatenation (UNION) branches, each with nested loops or hash match joins to the association tables. v6's plan likely shows a single large hash join or index union with a Filter operator.
+4. **Rowgoal verification**: Check the v7 plan's TOP operator. The EstimatedRows on the TOP should reflect the @MaxImages value, and downstream operators should show reduced EstimatedRows from the rowgoal effect.
+5. **Empty result test**: Verify behavior when no qualifying images exist (all images already moved). Both versions should return an empty result set.
+6. **Config value edge cases**: Test with @MaxImages = 0, @MaxImages = 1, and a large value (10000+). Ensure behavior matches v6.
+7. **FORCESEEK removal test** (post-deployment): After confirming v7 is stable, test without FORCESEEK hints. If the optimizer still chooses seeks, remove the hints in a future version.
