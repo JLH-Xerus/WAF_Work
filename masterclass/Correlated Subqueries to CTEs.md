@@ -87,7 +87,7 @@ This is equivalent to "find the next delivery day this week; if none, wrap to th
 
 ## Real-World Example
 
-In [[lsp_RxfGetListOfManualFillGroups]] (v48→v49), **nine correlated subqueries** all hit `CfStoreDeliveryCourierCutOff` — one for each piece of delivery schedule information (cutoff time, day code, courier name, etc.). Each subquery ran once per row of the ~200-row result set, producing ~1,800 individual seeks against the table. The CTE refactoring collapsed all nine into a **single scan + GROUP BY**, then a **single LEFT JOIN** back to bring the CutOff row's full set of columns. The delivery table went from thousands of reads to 6.
+In [[lsp_RxfGetListOfManualFillGroups]], **nine correlated subqueries** all hit `CfStoreDeliveryCourierCutOff` — one for each piece of delivery schedule information (cutoff time, day code, courier name, etc.). Each subquery ran once per row of the ~200-row result set, producing ~1,800 individual seeks against the table. The CTE refactoring collapsed all nine into a **single scan + GROUP BY**, then a **single LEFT JOIN** back to bring the CutOff row's full set of columns. The delivery table went from thousands of reads to 6.
 
 ## When NOT to Use CTEs
 

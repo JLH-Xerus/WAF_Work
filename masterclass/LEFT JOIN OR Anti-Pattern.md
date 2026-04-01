@@ -87,7 +87,7 @@ Where i.ImageData Is Not Null
 
 In [[lsp_ImgGetListOfTopXImagesToMove]] (v6→v7), the proc LEFT JOINed four tables (ImgRxImgAssoc, OeOrderHistory, ImgCanImgAssoc, CanCanister) with an OR in the WHERE clause spanning both paths. Combined with a [[UNION ALL Views]] base table (10.5M rows), this produced **1,055,104 average logical reads per execution**. The UNION refactor splits into two focused INNER JOIN branches — one for shipped Rx images, one for verified canister images — allowing the optimizer to seek efficiently on each path independently.
 
-## Bonus: The Semantic Tell
+## The Semantic Tell
 
 If you see LEFT JOINs whose joined columns are then checked for NULL or compared in the WHERE clause, the developer almost certainly wanted conditional logic ("either path A or path B matches") but expressed it as LEFT JOINs out of caution. The UNION pattern is the correct way to express this intent.
 

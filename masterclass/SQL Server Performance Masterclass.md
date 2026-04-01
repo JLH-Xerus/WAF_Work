@@ -2,7 +2,7 @@
 
 #MOC #sql-server #performance
 
-> A hands-on collection of performance tuning techniques, learned through real-world refactoring of production stored procedures in a pharmacy fulfillment system.
+> A hands-on collection of performance tuning techniques, learned through real-world refactoring of production stored procedures across the MFCs.
 
 ---
 

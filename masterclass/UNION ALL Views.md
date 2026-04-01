@@ -78,7 +78,7 @@ In [[lsp_ImgGetListOfTopXImagesToMove]] (v6→v7), the `vImgImage` view over `Im
 
 ## Identifying UNION ALL Views
 
-Views with the `v` prefix (like `vImgImage`, `vOeOrder`) are common in pharmacy and enterprise systems. When you see unexpectedly high reads on a seemingly simple query, check the view definition:
+Views with the `v` prefix (like `vImgImage`, `vOeOrder`) are common in enterprise systems. When you see unexpectedly high reads on a seemingly simple query, check the view definition:
 
 ```sql
 -- Check if a view is a UNION ALL view

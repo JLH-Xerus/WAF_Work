@@ -146,9 +146,9 @@ Is the proc called > 1000 times/day?
         └── Query redesign (eliminate the parameter sensitivity)
 ```
 
-## Real-World Example
+## Our Real-World Example
 
-For [[lsp_SrtGetShipToteIfExists]], Francis reported [[Parameter Sniffing|parameter sniffing]] as the root cause of plan instability. We ran the skew analysis on `SrtShipToteShipmentAssoc` and found a `Max_to_Mean_Ratio` of ~2x with a tight distribution (75% of values in the 26–50 bucket). This confirmed the density vector estimate would be accurate — the data simply isn't skewed enough for sniffing to cause the observed instability. The real issue turned out to be forced plan failures visible in [[Query Store Triage]].
+For [[lsp_SrtGetShipToteIfExists]], Francis reported [[Parameter Sniffing|parameter sniffing]] as the root cause of plan instability. I ran the skew analysis on `SrtShipToteShipmentAssoc` and found a `Max_to_Mean_Ratio` of ~2x with a tight distribution (75% of values in the 26–50 bucket). This confirmed the density vector estimate would be accurate — the data simply isn't skewed enough for sniffing to cause the observed instability. The real issue turned out to be forced plan failures visible in [[Query Store Triage]].
 
 ## Related Concepts
 

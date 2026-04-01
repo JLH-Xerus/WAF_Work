@@ -10,7 +10,7 @@ Think of it as the difference between guessing which queries are slow and **know
 
 ## The Triage Query
 
-This is the query we built to rank the worst offenders by total I/O impact:
+This is the query that ranks the worst offenders by total I/O impact:
 
 ```sql
 Declare @LookbackHours Int = 24
@@ -97,7 +97,7 @@ Having Count(Distinct qsp.plan_id) > 1
 Order By ReadRatio Desc
 ```
 
-A `ReadRatio` of 100x (like we saw on `lsp_RxfGetListOfManualFillGroups` — 24K to 2.4M reads across 6 plans) is a screaming signal for [[Parameter Sniffing]] mitigation.
+A `ReadRatio` of 100x (like is shown on `lsp_RxfGetListOfManualFillGroups` — 24K to 2.4M reads across 6 plans) is a screaming signal for [[Parameter Sniffing]] mitigation.
 
 ## Forced Plan Failures
 
@@ -115,7 +115,7 @@ Where qsp.is_forced_plan = 1
 Order By qsp.force_failure_count Desc
 ```
 
-In our analysis, `lsp_RxfGetListOfManualFillGroups` had **91,401 NO_PLAN failures** — meaning someone forced a plan that can no longer be reproduced. The optimizer silently falls back to whatever plan it generates, but every fallback is a recompile with whatever parameter values happen to be current. This creates a worst-of-both-worlds scenario: the overhead of plan forcing with none of the stability benefits.
+In the analysis, `lsp_RxfGetListOfManualFillGroups` had **91,401 NO_PLAN failures** — meaning someone forced a plan that can no longer be reproduced. The optimizer silently falls back to whatever plan it generates, but every fallback is a recompile with whatever parameter values happen to be current. This creates a worst-of-both-worlds scenario: the overhead of plan forcing with none of the stability benefits.
 
 ## The Systematic Workflow
 

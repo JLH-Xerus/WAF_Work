@@ -11,10 +11,14 @@
             "id": "78c1d5240f1e7d4d",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "UNION ALL Views.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "UNION ALL Views"
             }
           }
         ]
@@ -178,9 +182,18 @@
   },
   "active": "78c1d5240f1e7d4d",
   "lastOpenFiles": [
+    "TOP with ORDER BY Semantics.md",
     "Table Variables vs Temp Tables.md",
+    "SQL Server Performance Masterclass.md",
+    "Query Store Triage.md",
+    "Parameter Sniffing.md",
+    "Non-SARGable Predicates.md",
+    "NOLOCK Strategy.md",
+    "LEFT JOIN OR Anti-Pattern.md",
+    "FORCESEEK Hints.md",
     "Density Vector.md",
-    "Scalar UDF Parallelism Barrier.md",
-    "Correlated Subqueries to CTEs.md"
+    "Correlated Subqueries to CTEs.md",
+    "UNION ALL Views.md",
+    "Scalar UDF Parallelism Barrier.md"
   ]
 }
