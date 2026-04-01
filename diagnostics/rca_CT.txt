@@ -1,0 +1,69 @@
+
+Below is the root cause analysis on the blocking issue that was impacting lsp_TcdInsertTcdCountLauncherAlreadyConsideredRxsRow. I've included the backstory because the chain of events leading up to this matters.
+ 
+ 
+BACKGROUND
+ 
+Change Tracking has been enabled on 192 tables in this database for a while now. Around March 1st, we started seeing CHECKPOINT operations getting blocked by a COMMIT_TABLE wait type on the Mansfield server (pwd-masymph01). SQL Server was also logging Error 22123, indicating CT auto-cleanup was blocked on the side table of SrtShipTote.
+ 
+We opened a case with Microsoft (TrackingID#2603020040000204). After reviewing a minidump, their engineer identified that multiple threads were stuck trying to acquire a Read-Write lock (RWLOCK) on the internal SYSCOMMITTAB and DM_TRAN_COMMIT_TABLE structures during CHECKPOINT. Their assessment was that a thread likely acquired the RWLOCK but crashed without releasing it properly, which prevented other sessions from obtaining the lock. Microsoft confirmed this is a very rare scenario with no match in their internal knowledge base.
+ 
+As part of the remediation, Microsoft recommended enabling Trace Flags 8286 and 8287 as startup parameters. Per KB5022375, TF 8286 forces the CT auto-cleanup query to use a FORCE ORDER hint and TF 8287 adds FORCESEEK both intended to improve the cleanup query plan and reduce COMMIT_TABLE wait contention. We are still waiting on Microsoft to complete their full analysis on this and will share findings as they come in.
+ 
+ 
+WHAT CHANGED ON MARCH 27
+ 
+We made two changes on production that day:
+ 
+1. Enabled TF 8286 and TF 8287 as startup parameters
+2. Reduced the CT retention period from 3 days to 2 days
+ 
+The retention reduction meant the cleanup process immediately had an extra day's worth of expired change records to purge on its next cycle, on top of whatever had already been accumulating.
+ 
+ 
+TIMELINE
+ 
+March 1:COMMIT_TABLE wait type blocking CHECKPOINT on Mansfield. Error 22123 logged for SrtShipTote CT side table. Microsoft case opened.
+ 
+March 12: Microsoft delivers minidump analysis confirming RWLOCK contention on SYSCOMMITTAB during CHECKPOINT. Recommends TF 8286/8287 and retention review.
+ 
+March 27: TF 8286/8287 enabled and CT retention reduced from 3 days to 2 days.
+ 
+March 27: onward Periodic blocking every ~30 minutes on TcdCountLauncherAlreadyConsideredRxs. The blocker showed up under the SA account with command "Task Manager" and NULL query text. We initially couldn't identify the blocking source this is because the CT auto-cleanup is an internal system thread that doesn't expose its query through standard DMVs.
+ 
+March 30: Confirmed that the CT cleanup job timing matched exactly with the blocking and timeouts we were capturing. Our cancelled query monitoring system in XADMINDB recorded multiple aborted executions of lsp_TcdInsertTcdCountLauncherAlreadyConsideredRxsRow. Every one showed zero CPU, zero logical reads textbook lock wait victims. The wait type was LCK_M_IX on the CT side table (object 7:709681676:3), with wait times of 16+ seconds before hitting the 30-second application timeout.
+ 
+March 30: After coordinating with the Databricks team, I disabled CT on TcdCountLauncherAlreadyConsideredRxs. Blocking stopped immediately.
+ 
+ 
+ROOT CAUSE
+ 
+Two factors came together on March 27:
+ 
+1. The retention reduction from 3 to 2 days created an immediate backlog of one extra day's worth of expired change records that the cleanup process needed to purge.
+ 
+2. TcdCountLauncherAlreadyConsideredRxs has only 465 rows at any given time, but the application inserts, updates, and deletes those rows at an extremely high rate. We confirmed the CT side table (change_tracking_1085246921) had accumulated 63,093,668 rows consuming 4,292 MB that's roughly 135,000 change tracking records per base table row. When the auto-cleanup thread kicked in every 30 minutes to purge those expired records, it held IX locks on the CT side table for an extended period. During that window, every INSERT from the application's stored procedure sat in LCK_M_IX wait until it timed out.
+ 
+The Query Store execution plan for query 51746 (plan 34864951) further confirmed this each INSERT into TcdCountLauncherAlreadyConsideredRxs carried a 50% cost for the Clustered Index Insert on the CT side table (change_tracking_108524...), meaning half of every INSERT's work was maintaining the change tracking overhead.
+ 
+The trace flags (8286/8287) did what Microsoft intended they optimized the cleanup query plan. But even an optimized plan running against 63 million side table records still takes time and still holds locks while doing it.
+ 
+For the other 191 CT-enabled tables, we don't see this issue cleanup was working fine and no blocking was observed. This table is the outlier due to the extreme churn relative to its row count.
+ 
+ 
+REMEDIATION
+ 
+Completed March 30: Temporarily disabled Change Tracking on the affected table:
+ 
+ALTER TABLE TcdCountLauncherAlreadyConsideredRxs DISABLE CHANGE_TRACKING;
+ 
+Blocking stopped immediately. No application data was affected. If CT is not permanently required for this table, we will keep it disabled. We are coordinating with the Databricks Ingestion team to confirm.
+ 
+ 
+ 
+NEXT STEPS
+ 
+1. If CT is confirmed as not required for this table, it stays permanently disabled. If it is required, we will evaluate alternatives.
+2. Reviewing all 192 CT-enabled tables for similar high-churn patterns to get ahead of any potential recurrence.
+3. Continuing to monitor through XADMINDB for any new CT-related blocking.
+4. Waiting on Microsoft to complete their full analysis on the original COMMIT_TABLE/RWLOCK contention and for Blocking issue due to cleanup (TrackingID#2603020040000204). We will have a meeting tomorrow with MSFT engineer to discuss for the recent issue.
