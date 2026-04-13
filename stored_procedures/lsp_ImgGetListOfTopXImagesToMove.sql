@@ -1,5 +1,5 @@
 --/
-CREATE PROCEDURE lsp_ImgGetListOfTopXImagesToMove
+ALTER PROCEDURE [dbo].[lsp_ImgGetListOfTopXImagesToMove]
 As
 Begin
 /*
@@ -27,23 +27,31 @@ Return Value:
 
 Comments:
    v7 - Performance refactoring:
-      1. Extracted TOP subquery into local variable for rowgoal optimization
+      1. Extracted TOP subquery into local variable for rowgoal optimization.
+         The original TOP (SELECT ... FROM vCfgSystemParamVal) subquery prevented
+         the optimizer from estimating cardinality for the rowgoal operator; a local
+         variable allows it to sniff the actual value.
       2. Replaced LEFT JOIN + OR across two join paths with UNION of two
-         focused INNER JOIN branches (Shipped Rx path / Verified Canister path)
-      3. UNION (not UNION ALL) deduplicates images that qualify through both paths
+         focused INNER JOIN branches (Shipped Rx path / Verified Canister path).
+         The original pattern (LEFT JOIN all four association tables, then filter
+         with OR on OrderStatus/Status) forced the optimizer into a single plan
+         that could not seek efficiently on either path independently.
+      3. UNION (not UNION ALL) deduplicates images that qualify through both paths.
       4. Retained FORCESEEK hints on association tables pending post-deployment
-         validation; optimizer should now choose seeks naturally with INNER JOINs
+         validation; optimizer should now choose seeks naturally with INNER JOINs.
       5. Retained vImgImage view reference (UNION ALL over ImgImage + ImgImage_IntId)
          for forward compatibility; view can be replaced with ImgImage directly
-         if ImgImage_IntId remains empty
+         if ImgImage_IntId remains empty.
 */
 
+Set NoCount On
+
 -- Pull the configured batch size into a local variable so the optimizer
--- can sniff the value and apply rowgoal optimization to the TOP operator
+-- can sniff the value and apply rowgoal optimization to the TOP operator.
 Declare @MaxImages Int
 
 Select @MaxImages = Convert(Int, [Value])
-From vCfgSystemParamVal
+From vCfgSystemParamVal With (NoLock)
 Where Section = 'Operation'
          And
       Parameter = 'MaxNumberOfImagesToPullInASingleRunFromBgWk'
@@ -62,9 +70,9 @@ From (
     Select
           i.Id
         , i.ContentCode
-    From vImgImage As i With (NOLOCK)
-    Join ImgRxImgAssoc As IR With (NOLOCK, FORCESEEK) On i.Id = IR.ImgId
-    Join OeOrderHistory As OH With (NOLOCK) On IR.OrderId = OH.OrderId
+    From vImgImage As i With (NoLock)
+    Inner Join ImgRxImgAssoc As IR With (NoLock, FORCESEEK) On i.Id = IR.ImgId
+    Inner Join OeOrderHistory As OH With (NoLock) On IR.OrderId = OH.OrderId
     Where i.ImageData Is Not Null
              And
           (i.IsMovedToFile Is Null Or i.IsMovedToFile <> 1)
@@ -81,9 +89,9 @@ From (
     Select
           i.Id
         , i.ContentCode
-    From vImgImage As i With (NOLOCK)
-    Join ImgCanImgAssoc As IC With (NOLOCK, FORCESEEK) On i.Id = IC.ImgId
-    Join CanCanister As C With (NOLOCK) On IC.CanisterSn = C.CanisterSn
+    From vImgImage As i With (NoLock)
+    Inner Join ImgCanImgAssoc As IC With (NoLock, FORCESEEK) On i.Id = IC.ImgId
+    Inner Join CanCanister As C With (NoLock) On IC.CanisterSn = C.CanisterSn
     Where i.ImageData Is Not Null
              And
           (i.IsMovedToFile Is Null Or i.IsMovedToFile <> 1)
@@ -95,6 +103,5 @@ From (
 Order By Id Asc
 
 End
-
-
+GO
 /
