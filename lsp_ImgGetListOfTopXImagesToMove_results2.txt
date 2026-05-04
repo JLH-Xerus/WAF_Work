@@ -144,3 +144,98 @@ Table 'ImgRxImgAssoc'. Scan count 62520, logical reads 266470, physical reads 0,
    CPU time = 0 ms,  elapsed time = 0 ms.
 
 Completion time: 2026-05-04T09:36:40.0018050-05:00
+
+refactor b (dropped forceseek):
+use pharmassist
+go
+
+set statistics io on
+set statistics time on
+
+set nocount on
+-- Pull the configured batch size into a local variable so the optimizer
+-- can sniff the value and apply rowgoal optimization to the TOP operator.
+Declare @MaxImages Int
+
+Select @MaxImages = Convert(Int, [Value])
+From vCfgSystemParamVal With (NoLock)
+Where Section = 'Operation'
+         And
+      Parameter = 'MaxNumberOfImagesToPullInASingleRunFromBgWk'
+
+-- Two INNER JOIN branches replace the original LEFT JOIN + OR pattern.
+-- Each branch independently seeks through its association table, and
+-- the optimizer can apply rowgoal to each branch via the TOP value.
+
+Select Top (@MaxImages)
+      Id
+    , ContentCode
+From (
+    ------------------------------------------------------------------
+    -- Branch 1: Images associated with a Shipped Rx order
+    ------------------------------------------------------------------
+    Select
+          i.Id
+        , i.ContentCode
+    From vImgImage As i With (NoLock)
+    Inner Join ImgRxImgAssoc As IR With (NoLock) On i.Id = IR.ImgId
+    Inner Join (select orderid from dbo.oeorderhistory With (NoLock) where orderstatus = 'Shipped') As OH  On IR.OrderId = OH.OrderId 
+    Where i.ImageData Is Not Null
+             And
+          (i.IsMovedToFile Is Null Or i.IsMovedToFile <> 1)
+             And
+          i.ArchivedDtTm Is Null
+          --   And
+          --OH.OrderStatus = 'Shipped'
+
+    Union
+
+    ------------------------------------------------------------------
+    -- Branch 2: Images associated with a Verified Canister
+    ------------------------------------------------------------------
+    Select
+          i.Id
+        , i.ContentCode
+    From vImgImage As i With (NoLock)
+    Inner Join ImgCanImgAssoc As IC With (NoLock) On i.Id = IC.ImgId
+    Inner Join CanCanister As C With (NoLock) On IC.CanisterSn = C.CanisterSn
+    Where i.ImageData Is Not Null
+             And
+          (i.IsMovedToFile Is Null Or i.IsMovedToFile <> 1)
+             And
+          i.ArchivedDtTm Is Null
+             And
+          C.Status = 'Verified'
+) Combined
+Order By Id Asc
+
+set statistics io off
+set statistics time off
+
+
+
+results:
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+Table 'CfgSystemParamVal'. Scan count 0, logical reads 2, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'CfgSystemParamDef'. Scan count 0, logical reads 2, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+Table 'CanCanister'. Scan count 0, logical reads 155, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'ImgCanImgAssoc'. Scan count 68169, logical reads 217688, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'ImgImage_IntId'. Scan count 2, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'ImgImage'. Scan count 2, logical reads 227904, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 136338, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'Worktable'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'OeOrderHistory'. Scan count 68098, logical reads 291028, physical reads 72, page server reads 0, read-ahead reads 7805, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'ImgRxImgAssoc'. Scan count 68169, logical reads 290625, physical reads 0, page server reads 0, read-ahead reads 16, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 3406 ms,  elapsed time = 3505 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+Completion time: 2026-05-04T09:39:50.6835402-05:00
+
