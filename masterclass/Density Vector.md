@@ -6,9 +6,9 @@
 
 Every statistics object in SQL Server has two components:
 
-1. **The Histogram**: Up to 200 steps showing the distribution of values — how many rows have value X, how many fall between X and Y, etc. This is what the optimizer uses when it knows the exact value being searched (i.e., when it can sniff a parameter).
+1. The Histogram. Up to 200 steps showing the distribution of values: how many rows have value X, how many fall between X and Y, and so on. This is what the optimizer uses when it knows the exact value being searched (when it can sniff a parameter).
 
-2. **The Density Vector**: A single number per column (or column combination) representing `1 / CountOfDistinctValues`. This is what the optimizer uses when it **doesn't know** the search value — for example, when you use [[Parameter Sniffing|local variables]] instead of parameters.
+2. The Density Vector. A single number per column (or column combination) representing `1 / CountOfDistinctValues`. This is what the optimizer uses when it doesn't know the search value, for example when you use [[Parameter Sniffing|local variables]] instead of parameters.
 
 ```
 -- Density for a column with 1,000 distinct values:
@@ -24,18 +24,19 @@ When you mitigate [[Parameter Sniffing]] by assigning parameters to local variab
 EstimatedRows = TotalRowsInTable × Density
 ```
 
-This is the **average number of rows per distinct value**. For uniformly distributed data, this is accurate. For skewed data, it can be wildly wrong.
+This is the average number of rows per distinct value. For uniformly distributed data, this is accurate. For skewed data, it can be wildly wrong.
 
 ## The Skew Problem
 
 Consider a `ShipToteId` column where:
-- Most totes have 2–5 shipments
-- But a few "mega-totes" have 500+ shipments
-- 370 distinct tote values across 1,300 rows
-- Density = 1/370 = 0.0027
-- Estimated rows = 1,300 × 0.0027 ≈ 3.5 rows
 
-The optimizer builds a plan expecting ~4 rows (nested loop, small memory grant). If the actual call hits a mega-tote with 500 rows, the plan is catastrophically wrong — but this time it's wrong on **every** call, not just some calls. You've traded intermittent bad plans (sniffing) for a consistently mediocre plan (density).
+- Most totes have 2 to 5 shipments.
+- A few mega-totes have 500 or more shipments.
+- 370 distinct tote values across 1,300 rows.
+- Density = 1/370 = 0.0027.
+- Estimated rows = 1,300 × 0.0027, which is about 3.5 rows.
+
+The optimizer builds a plan expecting about 4 rows (nested loop, small memory grant). If the actual call hits a mega-tote with 500 rows, the plan is catastrophically wrong. This time it's wrong on every call, not just some calls. You've traded intermittent bad plans (sniffing) for a consistently mediocre plan (density).
 
 ## Measuring Skew
 
@@ -81,11 +82,11 @@ Cross Join Pctls P
 
 | Metric | Healthy | Concerning | Dangerous |
 |--------|---------|------------|-----------|
-| **Max_to_Mean_Ratio** | < 5x | 5–20x | > 20x |
-| **P99 / P50** | < 3x | 3–10x | > 10x |
-| **Stdev / Mean (CV)** | < 1.0 | 1.0–3.0 | > 3.0 |
+| Max_to_Mean_Ratio | < 5x | 5 to 20x | > 20x |
+| P99 / P50 | < 3x | 3 to 10x | > 10x |
+| Stdev / Mean (CV) | < 1.0 | 1.0 to 3.0 | > 3.0 |
 
-If the data is healthy (low skew), density-based estimation is safe and the local variable mitigation works well. If the data is skewed, you may need `OPTION (RECOMPILE)` or plan guides instead.
+If the data is healthy (low skew), density-based estimation is safe and the local variable mitigation works well. If the data is skewed, you may need OPTION (RECOMPILE) or plan guides instead.
 
 ### Bucket Histogram
 
@@ -146,12 +147,12 @@ Is the proc called > 1000 times/day?
         └── Query redesign (eliminate the parameter sensitivity)
 ```
 
-## Our Real-World Example
+## Real-World Example
 
-For [[lsp_SrtGetShipToteIfExists]], Francis reported [[Parameter Sniffing|parameter sniffing]] as the root cause of plan instability. I ran the skew analysis on `SrtShipToteShipmentAssoc` and found a `Max_to_Mean_Ratio` of ~2x with a tight distribution (75% of values in the 26–50 bucket). This confirmed the density vector estimate would be accurate — the data simply isn't skewed enough for sniffing to cause the observed instability. The real issue turned out to be forced plan failures visible in [[Query Store Triage]].
+For lsp_SrtGetShipToteIfExists, Francis reported [[Parameter Sniffing]] as the root cause of plan instability. I ran the skew analysis on `SrtShipToteShipmentAssoc` and found a Max_to_Mean_Ratio of about 2x with a tight distribution (75% of values in the 26 to 50 bucket). This confirmed the density vector estimate would be accurate. The data simply isn't skewed enough for sniffing to cause the observed instability. The real issue turned out to be forced plan failures visible in [[Query Store Triage]].
 
 ## Related Concepts
 
-- [[Parameter Sniffing]] — the density vector is the optimizer's fallback when sniffing is prevented
-- [[Query Store Triage]] — use Query Store to validate whether the density-based plan performs consistently
-- [[Table Variables vs Temp Tables]] — table variables essentially have "density = 1 row always"
+- [[Parameter Sniffing]]: the density vector is the optimizer's fallback when sniffing is prevented.
+- [[Query Store Triage]]: use Query Store to validate whether the density-based plan performs consistently.
+- [[Table Variables vs Temp Tables]]: table variables essentially have density of "1 row always".
