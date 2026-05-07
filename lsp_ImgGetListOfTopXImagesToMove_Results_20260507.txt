@@ -1,0 +1,141 @@
+original (2026-05-07):
+use pharmassist
+go
+
+set statistics io on
+set statistics time on
+
+Select 
+   Top (Select 
+            Convert(Int, [Value])
+        From vCfgSystemParamVal
+        Where Section = 'Operation'
+                 And
+              Parameter = 'MaxNumberOfImagesToPullInASingleRunFromBgWk')
+     i.Id
+   , i.ContentCode
+From vImgImage As i With (NOLOCK)
+Left Join ImgRxImgAssoc As IR With (NOLOCK, FORCESEEK) On i.Id = Ir.ImgId 
+Left Join OeOrderHistory As OH With (NOLOCK) On IR.OrderId = OH.OrderId 
+Left Join ImgCanImgAssoc as IC With (NOLOCK, FORCESEEK) On i.Id = IC.ImgId
+Left Join CanCanister as C With (NOLOCK) On IC.CanisterSn = C.CanisterSn
+Where i.ImageData Is Not Null
+         And
+      (i.IsMovedToFile Is Null Or i.IsMovedToFile <> 1)
+         And
+      i.ArchivedDtTm Is NULL and (i.Id = IR.ImgId Or i.Id = IC.ImgId)
+		 And 
+	  (Oh.OrderStatus = 'Shipped' or C.Status = 'Verified')
+Order By i.Id Asc
+
+set statistics io off
+set statistics time off
+
+results:
+
+(10 rows affected)
+Table 'CanCanister'. Scan count 0, logical reads 138, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'OeOrderHistory'. Scan count 62742, logical reads 272725, physical reads 0, page server reads 0, read-ahead reads 3862, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'ImgCanImgAssoc'. Scan count 62808, logical reads 200577, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'ImgRxImgAssoc'. Scan count 62808, logical reads 267703, physical reads 0, page server reads 0, read-ahead reads 289, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'ImgImage_IntId'. Scan count 1, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'ImgImage'. Scan count 1, logical reads 114022, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 62808, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'CfgSystemParamVal'. Scan count 0, logical reads 2, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'CfgSystemParamDef'. Scan count 0, logical reads 2, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+(1 row affected)
+
+ SQL Server Execution Times:
+   CPU time = 2766 ms,  elapsed time = 3122 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+Completion time: 2026-05-07T08:07:11.0296922-05:00
+
+refactored:
+set statistics io on
+set statistics time on
+
+Declare @MaxImages Int
+
+Select @MaxImages = Convert(Int, [Value])
+From vCfgSystemParamVal With (NoLock)
+Where Section = 'Operation'
+And Parameter = 'MaxNumberOfImagesToPullInASingleRunFromBgWk'
+
+select
+	i.id,i.contentcode
+into #qualifyingImages
+from vImgImage i with (nolock)
+where 1 = 1
+--and i.ImageData is not null
+and (i.IsMovedToFile is null or i.IsMovedToFile <> 1)
+and i.ArchivedDtTm is null
+
+create clustered index byQIId on #qualifyingImages (id)
+
+select top (@maxImages) id, contentcode
+from #qualifyingImages qi
+where exists (
+		select 1 from dbo.ImgRxImgAssoc ir with (nolock)
+		inner join dbo.oeorderhistory oh With (NoLock) on ir.OrderId = oh.OrderId
+		where ir.ImgId = qi.id
+		and oh.orderstatus = 'Shipped'
+	)
+or exists (
+		select 1 from ImgCanImgAssoc ic with (nolock)
+		inner join CanCanister c with (nolock) on ic.CanisterSn = c.CanisterSn
+		where ic.ImgId = qi.Id and c.status = 'Verified'
+	)
+
+drop table #qualifyingImages
+
+set statistics io off
+set statistics time off
+
+results:
+Table 'CfgSystemParamVal'. Scan count 0, logical reads 2, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'CfgSystemParamDef'. Scan count 0, logical reads 2, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+(1 row affected)
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+Table 'ImgImage_IntId'. Scan count 1, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'ImgImage'. Scan count 5, logical reads 114070, physical reads 0, page server reads 0, read-ahead reads 3, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'Worktable'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+(66813 rows affected)
+
+(1 row affected)
+
+ SQL Server Execution Times:
+   CPU time = 875 ms,  elapsed time = 2247 ms.
+Table 'Worktable'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table '#qualifyingImages___________________________________________________________________________________________________000000F15B53'. Scan count 1, logical reads 159, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 63 ms,  elapsed time = 100 ms.
+SQL Server parse and compile time: 
+   CPU time = 31 ms, elapsed time = 38 ms.
+
+(10 rows affected)
+Table 'OeOrderHistory'. Scan count 9053, logical reads 36259, physical reads 4555, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'ImgRxImgAssoc'. Scan count 9069, logical reads 36402, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'CanCanister'. Scan count 0, logical reads 32, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'ImgCanImgAssoc'. Scan count 9069, logical reads 27244, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table '#qualifyingImages___________________________________________________________________________________________________000000F15B53'. Scan count 1, logical reads 22, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+(1 row affected)
+
+ SQL Server Execution Times:
+   CPU time = 250 ms,  elapsed time = 2265 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+Completion time: 2026-05-07T08:03:48.8717919-05:00
