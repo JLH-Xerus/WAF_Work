@@ -30,6 +30,22 @@ A new query plan that picks a different index will show physical reads on its fi
 
 A test that returns 0 rows can't exercise rowgoal optimization. The TOP operator can't stop early when there's nothing to find, so both the original and refactored plans do worst-case work and you learn nothing about how the refactor performs when it matters. Stage test data so the result set has rows, or pull a window from production where the proc was actually returning data.
 
+### A near-empty driver state hides FOR XML PATH consolidation wins
+
+The lsp_ShpGetOrdersForTopReadyToShipGroup refactor (v24→v25) collapsed three repeated FOR XML PATH expressions into one. When the driver temp tables held effectively zero qualifying rows on the test run, the FOR XML PATH inner work was barely exercised in either version, and v25 actually showed +5.8% logical reads because of the fixed-overhead cost of materializing #MultiVialReadyParents that v24 did not pay. The plan-shape comparison was still meaningful (operator count 140 → 87, UDX 6 → 2), but the cost comparison was inconclusive. When the win mechanism scales with driver row count, validate against a state where the driver is non-trivial.
+
+### Verify the deployed body matches the tested body
+
+The Tolleson 2026-05-07 v25 test had `Option (Maxdop 1)` commented out, while the v25 body committed in the repo had it active. Same version label, different bodies. Always diff the tested SQL against the committed SQL before drawing conclusions, and resolve any discrepancy before deployment. A "fast" test result against a body that isn't what's being deployed is worse than no test at all.
+
+### STATS IO/TIME captures should include result-set row counts
+
+Captures with `Set NoCount On` (which the proc itself sets) hide the `(N rows affected)` lines, which makes identical-result-set verification impossible from the text output alone. For comparison runs, either capture the result grid alongside, or run with `Set NoCount Off` at the session level, so row counts are visible.
+
+### Query hints attached to a SELECT do not translate into a CTE branch
+
+`Option (Maxdop 1)`, `Option (Recompile)`, and the rest of the OPTION family are statement-level hints. They can only appear at the very end of a complete top-level SELECT/INSERT/UPDATE/DELETE/MERGE statement. When v24 of lsp_ShpGetOrdersForTopReadyToShipGroup had `Option (Maxdop 1)` at the end of the Part 1 SELECT INTO, that was syntactically legal because Part 1 was its own statement. v25's CTE consolidation collapsed Parts 1, 2, 3 into branches inside `;With QualifyingGroups As (...)`, and the hint had nowhere syntactically valid to live — the committed v25 had it sitting between `Group By` and `Union All`, which is a parse error. The fix is structural, not syntactic: either keep the hinted query as its own statement and append the others via INSERT, or move the hint to the outer SELECT (which broadens its scope to all branches). Whenever consolidating multiple SELECTs into a CTE or UNION ALL, audit the original SELECTs for OPTION clauses and decide explicitly how each hint should translate.
+
 ---
 
 ## Workflow

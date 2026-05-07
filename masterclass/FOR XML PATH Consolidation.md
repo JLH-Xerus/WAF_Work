@@ -84,6 +84,18 @@ The wins are elsewhere:
 
 The biggest practical win usually comes from the cardinality estimate improvement on the consolidated form. The optimizer plans the inner lookup once, with the full cardinality of the consolidated driver set in view, and chooses the right join order for that cardinality. The branch-by-branch form forced three independent decisions on smaller driver sets, each of which could land on a different (and often worse) join order.
 
+## Watch Out for Query Hints on the Original Branches
+
+Before you consolidate, scan each original SELECT for trailing `Option (...)` clauses. `Option (Maxdop 1)`, `Option (Recompile)`, `Option (Optimize For ...)`, and the rest of the OPTION family are statement-level hints. They can only sit at the end of a complete top-level statement. The moment you wrap a SELECT in a CTE branch, the hint has no legal place to live, and the consolidated query will fail to parse if you leave the hint inline.
+
+You have three choices for translating each hint, ordered from closest-to-original to furthest:
+
+1. Keep the hinted SELECT as its own standalone statement that creates the temp table, then `INSERT INTO ... SELECT ... UNION ALL ...` the other branches into it without hints. Preserves the original constraint precisely.
+2. Move the hint onto the outer SELECT that materializes the CTE into the temp table. Broadens the scope of the hint to all branches. Acceptable when the additional branches are small and the broader hint scope does no harm.
+3. Drop the hint. Only acceptable when you can articulate why the original reason for the hint no longer applies in the consolidated plan, and you can monitor for the absence after deployment.
+
+The default move is option 1. Option 2 is a deliberate decision to expand scope, not a free simplification. Option 3 needs a written justification.
+
 ## When NOT to Consolidate
 
 - The branches produce different column shapes. If branch A returns 4 columns and branch B returns 6, you can't UNION ALL them without padding NULLs, and the FOR XML PATH expressions probably differ as well.

@@ -23,7 +23,23 @@
 - `OeOrderPoNumAssoc` (4 columns; joined inside the FOR XML PATH expression in Part 4)
 - `vCfgSystemParamVal` (the system-parameter view, read once at the top to retrieve `PartialShipmentsTimeoutInMinutes`)
 
-**Indexes used:** to be confirmed against actual execution plans during validation. The proc relies on seeks against `OeOrder` by `GroupNum` and by `OrderId`, plus seeks against `OeOrderShipmentAssoc` by `(OrderId, HistoryDtTm)`. The new `#MultiVialReadyParents` temp table introduces a clustered index on `OrderId` to support the `EXISTS` lookups in Parts 2 and 3.
+**Indexes used (extracted from the v25 plan file):**
+
+| Table | Index | Used by |
+|---|---|---|
+| `OeOrder` | `PK_OeOrder` (clustered, `(OrderId, HistoryDtTm)`) | 6 references — Part 4 lookups, key lookups |
+| `OeOrder` | `ByGroupNum` (nonclustered, key shape unknown) | 1 reference — FOR XML PATH inner |
+| `OeOrder` | `ByOrderId` (nonclustered, key shape unknown) | 1 reference |
+| `OeOrder` | `ByOrderStatus` (nonclustered, key shape unknown) | 1 reference — `#MultiVialReadyParents` build |
+| `OeOrderHistory` | `ByGroupNum` (nonclustered, key shape unknown) | 1 reference — Part 1 NOT EXISTS, the 4,223-scan loop |
+| `OeOrderCurrHistoryDtTm` | `PK_OeOrderCurrHistoryDtTm` (clustered) | 1 reference — Part 1 NOT EXISTS |
+| `OeGroup` | `PK_OeGroup` (clustered, `(GroupNum)`) | 1 reference |
+| `OeOrderShipmentAssoc` | `PK_OeOrderShipmentAssoc` (clustered) | 4 references — every LEFT JOIN |
+| `OeOrderPoNumAssoc` | `PK_OeOrderPoNumAssoc` (clustered) | 1 reference — FOR XML PATH inner |
+
+The new `#MultiVialReadyParents` temp table introduces a clustered index `IX_MVRP` on `OrderId` to support the EXISTS lookups in Parts 2, 3, and 4 (the v25 plan shows 274 scans / 549 logical reads on this index).
+
+**Index DDL gap.** `MFCs/Tolleson/Tolleson_PA_tables.sql` contains only clustered primary keys. The four nonclustered indexes above (`OeOrder.ByGroupNum`, `ByOrderId`, `ByOrderStatus`, and `OeOrderHistory.ByGroupNum`) are visible in the execution plan but their key column orders and INCLUDE lists are not in the workspace. Specific index recommendations (covering, filtered, key-column reordering) require pulling this DDL via `sys.indexes`/`sys.index_columns` against Tolleson before they can be made with confidence.
 
 **Callers:** Auto Shipper job. The proc is called frequently during shipment processing.
 
@@ -76,23 +92,42 @@ v25 consolidates the three driver sets into one, materializes the multi-vial par
 - **No forced plans, no plan failures.** The `forcedplan` and `planfailures` columns are NULL for every row, so we don't have a forced-plan rollback to manage. Clean ground to work on.
 - **Kent is an outlier.** Three distinct `query_ids` in top 50 (the only site with this pattern), but at very low avg reads/exec (~1,700) and very high exec count (5.1M). Kent's call volume is the highest in the fleet by a wide margin, but each call is cheap. The dominant cost driver at Kent will be exec count, not per-exec work. v25 will help here too but the win shape will be different (modest per-exec reduction × very high call count).
 
-### 3.2 SET STATISTICS IO, TIME — representative warm-cache run of v24
+### 3.2 SET STATISTICS IO, TIME — Tolleson run, 2026-05-07 14:18 CT
 
-*Justin pastes the output of the following block, run after a single warm-up execution to populate cache.*
+Source: `lsp_ShpGetOrdersForTopReadyToShipGroup_results_Tolleson_20260507.txt` (paired with `lsp_ShpGetOrdersForTopReadyToShipGroup_original_plan.sqlplan`).
 
-```sql
-Set Statistics IO On
-Set Statistics Time On
-Exec dbo.lsp_ShpGetOrdersForTopReadyToShipGroup
-Set Statistics IO Off
-Set Statistics Time Off
-```
+Per-table aggregated logical reads across all 4 statements (Parts 1, 2, 3, 4):
 
-*Paste here:*
+| Table | Logical reads | Scan count |
+|-------|---------------|------------|
+| `CfgSystemParamVal` | 2 | 0 |
+| `CfgSystemParamDef` | 2 | 0 |
+| `OeOrderShipmentAssoc` | 19,258 | 0 |
+| `OeOrderHistory` | 16,823 | 4,187 |
+| `OeGroup` | 17,368 | 0 |
+| `OeOrder` | 13,054 | 1 + 230 + 892 = 1,123 |
+| `OrdWillCallBin` | 7 | 1 |
+| `OrderToteAssoc` | 24 | 2 |
+| `OeOrderPoNumAssoc` | 0 | 0 |
+| `#GroupsHavingAllReadyToShipRx` | 1 | 1 |
+| `#GroupsHavingTimedOutInLocRx` | 1 | 1 |
+| `#GroupsHavingTimedOutInToteRx` | 1 | 1 |
+| **Total logical reads** | **~66,541** | |
 
-```
-(STATS IO + STATS TIME output for v24 goes here)
-```
+Time per statement:
+
+| Statement | CPU (ms) | Elapsed (ms) | Notes |
+|-----------|----------|--------------|-------|
+| Parse/compile (statement 1) | 120 | 120 | First-call compile |
+| Part 1 build | 63 | 74 | `#GroupsHavingAllReadyToShipRx` |
+| Part 2 build | 16 | 1 | `#GroupsHavingTimedOutInLocRx` |
+| Part 3 build | 0 | 4 | `#GroupsHavingTimedOutInToteRx` |
+| Part 4 build | 15 | 14 | (statement boundary) |
+| Parse/compile (Part 4 select) | 31 | 37 | |
+| Part 4 select | 0 | 25 | UNION of 3x FOR XML PATH |
+| **Total execution** (excluding compile) | **94** | **118** | |
+
+Plan shape from `_original_plan.sqlplan`: 140 RelOp operators total, including 6 UDX (XML PATH) nodes, 3 TOP, 5 Concatenation (UNION), 36 Nested Loops, 24 Clustered Index Seeks, 7 Index Seeks.
 
 ---
 
@@ -308,50 +343,118 @@ For the first 24 hours after deployment, watch:
 
 ## 8. Evidence of Refactor (v25)
 
-*Justin pastes the warm-cache STATS IO + STATS TIME from v25 against the same data state used for the v24 capture.*
+Source: same results file as Section 3.2, second half. Tolleson run, 2026-05-07 14:20 CT (about 2.5 minutes after the v24 capture). Paired with `lsp_ShpGetOrdersForTopReadyToShipGroup_refactor_plan.sqlplan`.
 
-```
-(STATS IO + STATS TIME output for v25 goes here)
-```
+**Important deployment-vs-test discrepancy.** The v25 body that was tested has the `Option (Maxdop 1)` hint on Part 1 commented out (`--Option (Maxdop 1)`). The body committed in `Refactored.sql` has the hint active. We need to align these before deployment — see Section 9 for implications.
+
+Per-table aggregated logical reads across all 5 statements (#MVRP build, index, CTE consolidation, Part 4 select):
+
+| Table | Logical reads | Scan count |
+|-------|---------------|------------|
+| `CfgSystemParamVal` | 2 | 0 |
+| `CfgSystemParamDef` | 2 | 0 |
+| `OeOrder` (build #MVRP) | 4,751 | 1 |
+| `#MultiVialReadyParents` (index create) | 1 | 1 |
+| `OeOrderShipmentAssoc` | 19,266 | 0 |
+| `OeOrderHistory` | 16,967 | 4,223 |
+| `OeGroup` | 17,514 | 0 |
+| `OeOrder` (CTE + Part 4) | 11,330 | 802 + 1 = 803 |
+| `OrdWillCallBin` | 7 | 1 |
+| `OrderToteAssoc` | 24 | 2 |
+| `OeOrderPoNumAssoc` | 4 | 0 |
+| `#MultiVialReadyParents` (EXISTS probes) | 549 | 274 |
+| `#AllQualifyingGroups` | 1 | 1 |
+| **Total logical reads** | **~70,418** | |
+
+Time per statement:
+
+| Statement | CPU (ms) | Elapsed (ms) | Notes |
+|-----------|----------|--------------|-------|
+| Build `#MultiVialReadyParents` | 16 | 16 | Scan of OeOrder filtered to Split/MV |
+| Create clustered index on #MVRP | 0 | 2 | |
+| Parse/compile (CTE build) | 147 | 147 | First compile of consolidated CTE |
+| Build `#AllQualifyingGroups` | 78 | 84 | UNION ALL of 3 branches into temp |
+| Parse/compile (Part 4 select) | 19 | 19 | |
+| Part 4 select | 0 | 0 | Single FOR XML PATH |
+| **Total execution** (excluding compile) | **94** | **102** | |
+
+Plan shape from `_refactor_plan.sqlplan`: 87 RelOp operators total, including 2 UDX (XML PATH) nodes, 1 TOP, 3 Concatenation (UNION ALL), 21 Nested Loops, 16 Clustered Index Seeks, 4 Index Seeks. Operator count is 38% lower than v24 and UDX count is 67% lower (6 → 2). The plan-shape prediction is exactly what we expected.
 
 ---
 
 ## 9. Comparison & Improvement
 
-*Filled in once both v24 and v25 STATS IO/TIME outputs are pasted above. Numbers are warm-cache, second-run only.*
+### 9.1 Verdict — this run is structurally promising but not conclusive on cost
 
-| Metric | v24 | v25 | Delta | % Change |
-|--------|-----|-----|-------|----------|
-| Logical reads — `OeOrder` | | | | |
-| Logical reads — `OeOrderPoNumAssoc` | | | | |
-| Logical reads — `OeOrderShipmentAssoc` | | | | |
-| Logical reads — `OeOrder` (multi-vial) | | | | |
-| Logical reads — `#MultiVialReadyParents` | n/a | | | |
-| Logical reads — `#AllQualifyingGroups` | n/a | | | |
-| Total logical reads | | | | |
-| CPU time (ms) | | | | |
-| Elapsed time (ms) | | | | |
-| Result row count | | | | (must match) |
+The plan-shape changes match the prediction precisely: operator count dropped from 140 to 87 (–38%), UDX (FOR XML PATH builder) operators dropped from 6 to 2 (–67%), TOP operators from 3 to 1, UNION Concatenation from 5 to 3. The structural refactor landed exactly as designed.
 
-**Plan-shape verification:**
+The cost numbers, however, **cannot support a "v25 is faster" claim from this single run**, and per `tasks/lessons.md` we do not declare a winner from non-representative data. Two issues with the evidence:
 
-- v24 should show three `STUFF` operators in Part 4, each with its own correlated index seek/scan tree against `OeOrder`, `OeOrderPoNumAssoc`, and `OeOrderShipmentAssoc`.
-- v25 should show one `STUFF` operator in Part 4, plus a small clustered-index seek against `#MultiVialReadyParents` from the EXISTS probes in Parts 2, 3, and 4.
-- v25 should show a UNION ALL (not UNION) operator inside the consolidation.
+1. **The result set was effectively empty.** Both v24 and v25 produced essentially zero work on Part 4 (the FOR XML PATH execution). v24's Part 4 cost only 25 ms elapsed with no reads on `OeOrder`, `OeOrderPoNumAssoc`, or `OeOrderShipmentAssoc` from inside the FOR XML PATH expressions — meaning the driver temp tables held zero or near-zero qualifying rows. The dominant cost driver of v24, namely the triple-repeated FOR XML PATH inner work, was never exercised. From production Query Store we know Tolleson averages ~46K reads per execution over 30 days, so 70K total reads in this test run is below the per-call average — the test caught a quiet moment.
+2. **The Maxdop hint is commented out in the test version but active in `Refactored.sql`.** This is a real divergence we need to resolve before deployment. Either (a) the hint should be removed from `Refactored.sql`, or (b) the test should be re-run with the hint active. The Part 1 build subtree is the largest cost in the consolidated CTE (cost 30.09 of the 34.83 v25 plan), so the hint's effect on that subtree matters.
+
+### 9.2 What the data does support
+
+| Metric | v24 | v25 | Delta |
+|--------|-----|-----|-------|
+| Plan operators total | 140 | 87 | **–38%** |
+| UDX (XML PATH builder) | 6 | 2 | **–67%** |
+| TOP operators | 3 | 1 | –67% |
+| Concatenation operators | 5 | 3 | –40% |
+| Nested Loops | 36 | 21 | –42% |
+| Statements in plan | 5 | 5 | tie |
+| Estimated subtree cost (sum) | ~33.5 | ~34.8 | +4% |
+
+The plan is structurally simpler in exactly the ways v25 was supposed to make it simpler. The estimated subtree costs are nearly identical, which is a feature: for a near-empty driver state, both plans should compile to roughly equal cost, because the dominant savings of v25 come from collapsing repeated work that scales with driver row count.
+
+### 9.3 Per-table comparison on this run
+
+| Table / object | v24 reads | v25 reads | Delta | Note |
+|----------------|-----------|-----------|-------|------|
+| `OeOrder` (driver builds) | 13,054 | 16,075 | +3,021 | v25 includes 4,751-read scan to materialize #MVRP |
+| `OeOrderShipmentAssoc` | 19,258 | 19,266 | +8 | flat |
+| `OeOrderHistory` | 16,823 | 16,967 | +144 | flat (Part 1 logic unchanged) |
+| `OeGroup` | 17,368 | 17,514 | +146 | flat (Part 1 logic unchanged) |
+| `OrdWillCallBin` | 7 | 7 | 0 | tie |
+| `OrderToteAssoc` | 24 | 24 | 0 | tie |
+| `OeOrder` (Part 4) | 0 | 6 | +6 | both effectively zero — empty driver |
+| `OeOrderPoNumAssoc` (Part 4) | 0 | 4 | +4 | both effectively zero — empty driver |
+| `#MultiVialReadyParents` | n/a | 549 | +549 | EXISTS probes (274 scans) |
+| 3 v24 driver temp tables | 3 | n/a | –3 | |
+| `#AllQualifyingGroups` | n/a | 1 | +1 | |
+| **Total logical reads** | **66,541** | **70,418** | **+3,877 (+5.8%)** | |
+| **CPU time (ms)** | **94** | **94** | tie | |
+| **Elapsed time (ms)** | **118** | **102** | **–14%** | wall clock |
+
+The +5.8% reads on v25 are explained almost entirely by two new costs that are paid up front and that v24 didn't pay: the 4,751 reads to scan `OeOrder` and build `#MultiVialReadyParents`, and the 549 reads of `#MultiVialReadyParents` from the EXISTS probes. These are fixed-overhead costs that v25 takes regardless of driver row count. The win — the FOR XML PATH consolidation — only shows up when the driver row count is non-trivial. With ~0 driver rows, the consolidation can't save anything because there was nothing to repeat.
+
+### 9.4 Result-set verification
+
+The output text file does not include the `(N rows affected)` lines for either run, so I can't confirm row count parity from this evidence alone. Need to add `Set NoCount Off` to the test harness, or capture the result grid alongside, before declaring identical-result-set.
+
+### 9.5 What we need next
+
+To close out the comparison cleanly, one of:
+
+1. **Re-run on a representative driver state.** Either capture during a busy window when the proc has many qualifying groups, or stage data so Part 4 has a meaningful driver row count. Targets: at least 50-100 driver rows total across the three branches, so the FOR XML PATH inner work runs at scale. Run both v24 and v25 back to back, both warm cache, against the same data state.
+2. **Deploy v25 to a single MFC and measure in production.** Watch Query Store avg reads/exec for the proc over 24-48 hours post-deployment. The cross-MFC numbers in Section 3.1 give a strong baseline (Tolleson at 45,803 avg reads/exec) — a meaningful drop in that number will validate the refactor at scale. The plan-shape evidence above is enough to justify the production deployment as a measured experiment.
+3. **Resolve the Maxdop discrepancy.** Decide whether the v25 deployment includes `Option (Maxdop 1)` on Part 1 or not. If yes, re-test with the hint active. If no, remove the commented line from `Refactored.sql`.
 
 ---
 
 ## 10. Validation Checklist
 
-Per `tasks/lessons.md`. Mark each check pass or fail before declaring the refactor done.
+Per `tasks/lessons.md`. Marked against the Tolleson 2026-05-07 run.
 
-- [ ] **Same data state** — both v24 and v25 captures taken against the same data, ideally back-to-back without intervening writes to the touched tables.
-- [ ] **Warm cache only** — both captures are the second of two consecutive runs. Cold-cache numbers are discarded.
-- [ ] **Non-zero result set** — both runs returned at least one row. A 0-row run does not exercise the FOR XML PATH consolidation.
-- [ ] **Identical result set** — v24 and v25 returned the same row count and the same `(GroupType, GroupNum, PriInternal, DateFilled, Orders)` tuples. Order may differ if `DateFilled` ties exist; that's acceptable.
-- [ ] **Plan shape matches prediction** — v25 plan shows one FOR XML PATH operator, not three. UNION ALL appears, UNION does not. EXISTS probes hit `#MultiVialReadyParents` clustered-index seeks.
-- [ ] **No new error or warning messages** — neither run produced subquery cardinality errors, conversion warnings, or excessive memory grant warnings.
-- [ ] **Warm-cache elapsed time is at or below v24** — the refactor has not regressed wall-clock performance, even if read counts changed in unexpected ways.
+- [⚠️] **Same data state** — captures taken ~2.5 minutes apart on the same instance, no explicit data freeze. Probably close to identical, but not guaranteed. Acceptable for this exploratory run; should be tightened for the re-run.
+- [⚠️] **Warm cache only** — uncertain. The output does not show whether a warm-up execution preceded each capture. Physical reads were zero on both, which suggests warm cache (or cached pages from prior workload), but not strict proof. Tighten in the re-run with an explicit warm-up step.
+- [❌] **Non-zero result set** — fails. Part 4 effectively returned zero qualifying groups, evidenced by zero reads on `OeOrder` / `OeOrderPoNumAssoc` / `OeOrderShipmentAssoc` from inside the v24 FOR XML PATH expressions and a 25 ms elapsed Part 4 statement. The dominant cost driver of v24 was not exercised, so the comparison cannot speak to the FOR XML PATH consolidation win.
+- [?] **Identical result set** — cannot verify from this output. The `(N rows affected)` lines are not present. Need `Set NoCount Off` or a result-grid capture in the re-run.
+- [✅] **Plan shape matches prediction** — passes cleanly. v25 plan has 2 UDX operators (vs v24's 6), 1 TOP (vs 3), 3 Concatenation operators (vs 5 — and the v25 ones are UNION ALL inside the CTE rather than the v24 UNION at the top). EXISTS probes against `#MultiVialReadyParents` are visible in the v25 plan as 274 scans / 549 logical reads. This was the biggest single-checkpoint risk on the refactor and it passed.
+- [✅] **No new error or warning messages** — neither run produced cardinality errors, conversion warnings, or excessive memory grant warnings.
+- [✅] **Warm-cache elapsed time is at or below v24** — v25 is 102 ms vs v24's 118 ms (–14%), even with the 5.8% read overhead and an extra parse/compile pass for the CTE. CPU is a tie at 94 ms each. The wall-clock improvement on a near-empty driver state is consistent with the operator-count reduction translating into less coordination overhead.
+
+**Net call:** plan shape and structural refactor are validated. Cost numbers are inconclusive due to the empty driver state. Two clean paths forward are listed in Section 9.5.
 
 ---
 
