@@ -10,7 +10,7 @@ Name:
    lsp_ShpGetOrdersForTopReadyToShipGroup
 
 Version:
-   25
+   26
 
 Description:
    Retrieve a list of qualifying Groups with Rxs that qualify as 'Ready' for a shipment id
@@ -36,6 +36,22 @@ Return Value:
    List of Groups with OrderId ready for a shipment id
 
 Comments:
+   v26 - Part 1 NOT EXISTS pulled out into a materialized temp table:
+      1. Pre-computed #GroupsWithRecentHistoryRx, the set of GroupNums whose
+         most recent OeOrderCurrHistoryDtTm row points to an OeOrderHistory row
+         with HistoryDtTm in the last minute. This replaces the per-row
+         2-table correlated NOT EXISTS that v25 evaluated for every outer row
+         of Part 1 (4,223 scans of OeOrderHistory.ByGroupNum on the 5/7
+         Tolleson capture).
+      2. Rewrote DateAdd(Minute, 1, OH.HistoryDtTm) > GetDate() to
+         OH.HistoryDtTm > DateAdd(Minute, -1, GetDate()). The new form is
+         semantically identical and SARGable, which lets the optimizer apply
+         the date filter via index seek when OeOrderHistory.ByGroupNum is
+         keyed on (GroupNum, HistoryDtTm).
+      3. Maxdop 1 hint on Part 1 remains commented out (same state as the v25
+         test build). Resolution is deferred until the impact of the hint
+         and the original reason for it have been investigated.
+
    v25 - Performance refactoring:
       1. Consolidated 3 separate temp tables (#GroupsHavingAllReadyToShipRx,
          #GroupsHavingTimedOutInLocRx, #GroupsHavingTimedOutInToteRx) into a
@@ -47,7 +63,7 @@ Comments:
       3. Collapsed the triple-repeated FOR XML PATH correlated subquery into a
          single execution against #AllQualifyingGroups. The original ran the
          identical 3-table correlated join (OeOrder + OeOrderPoNumAssoc +
-         OeOrderShipmentAssoc) with the same WHERE clause 3 times — once per
+         OeOrderShipmentAssoc) with the same WHERE clause 3 times, once per
          UNION branch. Now it runs once.
       4. Replaced legacy Object_Id temp table checks with DROP TABLE IF EXISTS.
       5. Added WITH (NoLock) consistently.
@@ -80,6 +96,45 @@ Where OrderStatus = 'Split/MV'
 Create Clustered Index IX_MVRP On #MultiVialReadyParents (OrderId)
 
 ------------------------------------------------------------------------------------------
+-- v26: Pre-compute the set of GroupNums that have a recent history-only Rx
+-- (within the last minute). This replaces the per-row 2-table NOT EXISTS that
+-- v25 evaluated for every outer row of Part 1.
+--
+-- v25 form (per-row, repeated for each outer OeOrder row in Part 1):
+--   Not Exists (
+--      Select 1
+--      From OeOrderCurrHistoryDtTm OC
+--      Inner Join OeOrderHistory OH On OH.OrderId = OC.OrderId And OH.HistoryDtTm = OC.HistoryDtTm
+--      Where OH.GroupNum = O.GroupNum
+--      And DateAdd(Minute, 1, OH.HistoryDtTm) > GetDate()  -- non-SARGable
+--   )
+--
+-- v26 form (one materialization, then a clustered-index-seek probe per outer row):
+--   Materialize matching GroupNums once into #GroupsWithRecentHistoryRx with a
+--   clustered index. Part 1 then does Not Exists (Select 1 From #...) which
+--   is a single seek per outer row against a small temp table.
+--
+-- The DateAdd predicate is rewritten to put HistoryDtTm bare on the left side,
+-- making it SARGable so the optimizer can apply the date filter via index seek
+-- if OeOrderHistory.ByGroupNum is keyed on (GroupNum, HistoryDtTm). On the
+-- existing (GroupNum)-only index it still seeks by GroupNum and filters
+-- HistoryDtTm afterward, but with one materialization this only happens once
+-- per call instead of once per outer Part 1 row.
+------------------------------------------------------------------------------------------
+Drop Table If Exists #GroupsWithRecentHistoryRx
+
+Select Distinct OH.GroupNum
+Into #GroupsWithRecentHistoryRx
+From OeOrderCurrHistoryDtTm As OC With (NoLock)
+Inner Join OeOrderHistory As OH With (NoLock)
+   On OH.OrderId = OC.OrderId
+  And OH.HistoryDtTm = OC.HistoryDtTm
+Where OH.HistoryDtTm > DateAdd(Minute, -1, GetDate())
+
+-- Index for fast NOT EXISTS probes from Part 1
+Create Clustered Index IX_GWRH On #GroupsWithRecentHistoryRx (GroupNum)
+
+------------------------------------------------------------------------------------------
 -- Collect all qualifying groups into a single temp table.
 -- Three branches, each producing the same shape: GroupType, GroupNum, PriInternal, DateFilled
 ------------------------------------------------------------------------------------------
@@ -88,7 +143,7 @@ Drop Table If Exists #AllQualifyingGroups
 ;With QualifyingGroups As
 (
     --====================================================
-    -- Part 1: Happy-path — all-ready-Rxs Group.
+    -- Part 1: Happy path. All-ready-Rxs Group.
     --====================================================
     -- Groups where Status = 'Ready' for >5 seconds, all Rxs are 'Ready To Ship',
     -- no existing shipment, and no recent history-only Rx in the group.
@@ -103,16 +158,15 @@ Drop Table If Exists #AllQualifyingGroups
        And OS.ShipmentId Is Null
        And G.Status = 'Ready'
        And G.LastStatusChgDtTm < DateAdd(Second, -5, GetDate())
+       -- v26: probe the materialized #GroupsWithRecentHistoryRx instead of the per-row 2-table NOT EXISTS
        And Not Exists (
           Select 1
-          From OeOrderCurrHistoryDtTm As OC With (NoLock)
-          Inner Join OeOrderHistory As OH With (NoLock) On OH.OrderId = OC.OrderId And OH.HistoryDtTm = OC.HistoryDtTm
-          Where OH.GroupNum = O.GroupNum
-          And DateAdd(Minute, 1, OH.HistoryDtTm) > GetDate()
+          From #GroupsWithRecentHistoryRx R
+          Where R.GroupNum = O.GroupNum
        )
     Group By
        O.GroupNum
-    Option (Maxdop 1)
+    --Option (Maxdop 1)   -- v25 test had this commented out; v26 leaves it in the same state pending hint-resolution decision
 
     Union All
 
@@ -197,6 +251,7 @@ Order By GRx.DateFilled Asc
 -- Cleanup
 Drop Table If Exists #AllQualifyingGroups
 Drop Table If Exists #MultiVialReadyParents
+Drop Table If Exists #GroupsWithRecentHistoryRx
 
 End
 GO

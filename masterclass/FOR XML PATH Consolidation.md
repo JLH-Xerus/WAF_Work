@@ -73,7 +73,7 @@ Order By GRx.DateFilled
 
 You haven't changed the FOR XML PATH expression itself, and the per-row cost of executing it is unchanged. What you've changed is the multiplier in front of that cost. The engine now evaluates the inner correlated lookup once per total driver row across all branches, not once per driver row per branch.
 
-If the three branches each had 1,000 rows and the FOR XML PATH inner cost was 100 logical reads per execution, the original was doing 3 × 1,000 × 100 = 300,000 reads on the inner tables. The consolidated form does 3,000 × 100 = 300,000 reads — but only if the rows from all three branches survive into the final select. In the typical case, they all do, so the read count looks similar at the leaf level.
+If the three branches each had 1,000 rows and the FOR XML PATH inner cost was 100 logical reads per execution, the original was doing 3 × 1,000 × 100 = 300,000 reads on the inner tables. The consolidated form does 3,000 × 100 = 300,000 reads, but only if the rows from all three branches survive into the final select. In the typical case, they all do, so the read count looks similar at the leaf level.
 
 The wins are elsewhere:
 
@@ -99,7 +99,7 @@ The default move is option 1. Option 2 is a deliberate decision to expand scope,
 ## When NOT to Consolidate
 
 - The branches produce different column shapes. If branch A returns 4 columns and branch B returns 6, you can't UNION ALL them without padding NULLs, and the FOR XML PATH expressions probably differ as well.
-- The FOR XML PATH expressions are not actually identical. Read carefully — sometimes the WHERE clause has a subtle difference per branch (a different filter on OS.ShipmentId, or a different status value). If they truly differ, consolidating loses the per-branch logic.
+- The FOR XML PATH expressions are not actually identical. Read carefully, since sometimes the WHERE clause has a subtle difference per branch (a different filter on OS.ShipmentId, or a different status value). If they truly differ, consolidating loses the per-branch logic.
 - The driver sets are tiny (under ~50 rows each). The consolidation overhead of an extra temp table outweighs the savings, and three small FOR XML PATH executions at 50 rows each are not worth optimizing.
 - The branches have wildly different data distributions and the optimizer is choosing meaningfully different plans for each. In rare cases, three plans tuned independently can beat one plan tuned for the combined cardinality.
 

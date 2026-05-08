@@ -1,0 +1,59 @@
+--/
+CREATE PROCEDURE lsp_PmssIwebGetTopQueuedTrx
+As
+
+/*
+Object Type:
+   Stored Procedure
+
+Name:
+   lsp_PmssIwebGetTopQueuedTrx
+
+Version:
+   2
+
+Description:
+   Get the oldest Queued Fill or Cancel [Rx/Order] request from the PMSS Captured XML Transactions table.
+
+Parameters:
+   Input:
+      None
+
+   Output:
+      None
+
+Return Value:
+   None
+
+Comments:
+   For use with PMSS IA Web Services interface only.
+
+Refactor Notes (2026-05-07):
+   The proc body is intentionally unchanged from v2. Section 9 of Analysis.md documents the
+   reasoning. The structural fix for this proc lives entirely at the index layer: a filtered
+   index on PmssCapturedXmlTrxs supporting the (TrxStateCode = 'Q' And Trx In (...)) predicate
+   with Id as the seek key and the four returned columns as INCLUDE entries reduces per-call
+   reads from the cross-MFC fleet average of roughly 338K to single digits. See
+   Section 11.1 for the full CREATE INDEX statement and rationale. No proc-body change
+   is required to capture that win; the optimizer will use the new index automatically once
+   it exists, because the query shape already matches the index shape exactly.
+
+   The longer-horizon change is in Section 11.3: the IA Web Services interface drives roughly
+   825 million executions per month fleet-wide against this single statement, which is a
+   tight polling pattern. A Service Broker queue or a WAITFOR / SignalEvent based handoff
+   would eliminate the polling entirely and dwarf the index-level win, but it requires
+   application-side change and is out of scope for this version.
+*/
+
+Select Top 1
+  Id, TrxKey, Trx, TrxStream
+From
+  PmssCapturedXmlTrxs With (NoLock)
+Where
+  TrxStateCode = 'Q' And
+  Trx In ('fillRequest','cancelRxRequest','cancelOrderRequest')
+Order By
+  Id
+
+
+/

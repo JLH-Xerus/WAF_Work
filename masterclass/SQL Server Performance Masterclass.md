@@ -51,6 +51,8 @@ Understanding the database objects and hints you encounter during refactoring.
 Subtle behaviors that can bite you during refactoring if you are not careful.
 
 - [[TOP with ORDER BY Semantics]]: ORDER BY on SELECT INTO is meaningless, unless TOP is present, in which case it determines which rows are selected.
+- [[Ambiguous Self-Comparison Predicates]]: a column name that exists in both inner and outer scope resolves to the inner one. `Where Col = Col` inside a subquery is silently always true. A correctness bug, not a performance bug, but it lurks inside performance refactors.
+- [[STRING_SPLIT vs WHILE Loop CSV Parsing]]: the canonical replacement for the legacy WHILE-loop CSV parser. Set-based, idiomatic, and pairs naturally with a #temp table for downstream filtering.
 
 ---
 

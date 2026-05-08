@@ -1,0 +1,212 @@
+--/
+CREATE PROCEDURE lsp_SrtGetNumOfStoresWithAndWithoutSorterLocs
+   @StoreNum VarChar(19),
+   @NextDayOrderStartTime VarChar(10)
+As
+/*
+Object Type:
+   Stored Procedure
+
+Name:
+   lsp_SrtGetNumOfStoresWithAndWithoutSorterLocs
+
+Version:
+   7
+
+Description:
+   Retrieves the number of stores with and without sorter locations,
+   bucketed into four priority tiers.
+
+Parameters:
+   Input:
+      @StoreNum                  -
+      @NextDayOrderStartTime     -
+   Output:
+      None
+
+Return Value:
+   None
+
+Comments:
+   v7 refactor (2026-05-07):
+      1. Pre-trim the @StoreNum parameter into a local variable so the WHERE
+         clause can compare a bare column to the parameter and use the
+         StoreNum index. v6 wrapped O.StoreNum and SEP.StoreNum in TRIM() on
+         every row, which made the predicate non-SARGable.
+      2. Materialize the SrtSorterLoc -> SysEndPharmacyShpCarrierAssoc ->
+         SysEndPharmacy three-table assignment chain ONCE into a small temp
+         table at the top of the proc. v6 ran this same chain four times,
+         once per UNION branch. Replacing those four executions with one
+         build plus four EXISTS / NOT EXISTS probes against an indexed temp
+         table eliminates the bulk of the work.
+      3. Replace v6's NOT IN subqueries (priorities 1 and 4) with NOT EXISTS.
+         NOT IN is unsafe when the inner column can be NULL: a single NULL
+         poisons the entire predicate and the priority returns zero rows.
+         NOT EXISTS is the canonical NULL-safe form.
+      4. Replace v6's UNION (which forces a dedup sort) with UNION ALL. The
+         Priority column carries a distinct integer per branch, so the rows
+         from different branches cannot overlap and the dedup is wasted work.
+*/
+Set NoCount On
+
+Drop Table If Exists #StoreForCurrentDayOrders
+Drop Table If Exists #SorterLocStores
+
+Declare @CurrentDate    DateTime
+Declare @StoreNumTrimmed VarChar(19)
+
+Set @CurrentDate    = Convert(Date, GetDate())
+
+-- Pre-trim the parameter once. Every downstream comparison can now hit a bare
+-- StoreNum column and remain SARGable. See [[Non-SARGable Predicates]].
+-- An empty-string parameter still flags "all stores" by leaving @StoreNumTrimmed
+-- as an empty string after the TRIM.
+Set @StoreNumTrimmed = LTrim(RTrim(IsNull(@StoreNum, '')))
+
+Begin
+
+   -----------------------------------------------------------------------------------------------------------------------------------
+   -- #StoreForCurrentDayOrders
+   -- Stores that have at least one non-refrigerated, active "current day" Order. Driver for priorities 1 and 4.
+   -- Logic unchanged from v6. The only changes are: TRIM moved off the WHERE clause via the pre-trimmed local variable, and
+   -- modern Drop Table If Exists handled at the top of the proc.
+   -----------------------------------------------------------------------------------------------------------------------------------
+   Select Distinct O.StoreNum
+   Into #StoreForCurrentDayOrders
+   From OeOrder As O With (NoLock)
+      Inner Join OeOrderSecondaryData As O2 With (NoLock)
+         On O.OrderId = O2.OrderId And O.HistoryDtTm = O2.HistoryDtTm
+      Left Join vInvMasterWithUserOverrides As I With (NoLock)
+         On O.ProductId = I.ProductId
+   Where
+      (@StoreNumTrimmed = '' Or O.StoreNum = @StoreNumTrimmed)
+      And I.StorageCondCode <> 'R'
+      And O2.PlanPickUpDtTm < DateAdd(Day, 1, @CurrentDate) + @NextDayOrderStartTime
+      And O.OrderStatus In
+         (
+            'Pending', 'Scheduled', 'Problem',
+            'Out For Central Fill', 'Split-DD', 'Split-MV',
+            'Split/MV', 'Counting', 'Suspended', 'Partial Counted',
+            'Counted', 'Vial Wait', 'Partial Filled', 'Filled',
+            'Checked', 'Verifying', 'Verified', 'In Bin',
+            'Ready For Pick Up', 'Ready To Ship', 'Ship Pending'
+         )
+      And Not (O.OrderStatus = 'Pending' And O.StatusReason <> 'Awaiting Governor Allocation')
+
+   -----------------------------------------------------------------------------------------------------------------------------------
+   -- #SorterLocStores
+   -- The store-to-sorter-loc assignment chain, materialized once. Holds one row per (SrtSorterLoc, SysEndPharmacy) pairing.
+   -- v6 ran this same SrtSorterLoc -> SysEndPharmacyShpCarrierAssoc -> SysEndPharmacy three-table join inside four separate
+   -- UNION branches (priorities 1, 2, 3, and 4). v7 builds it once and probes via EXISTS / NOT EXISTS from each branch.
+   -- HasTote and IsFull are carried so priorities 2 and 3 can filter on them without re-joining SrtSorterLoc.
+   -- See [[FOR XML PATH Consolidation]] for the materialize-once principle and [[Correlated Subqueries to CTEs]] for the
+   -- general "if you reference the same lookup in multiple places, materialize it" guideline.
+   -----------------------------------------------------------------------------------------------------------------------------------
+   Select Distinct
+      SEP.StoreNum,
+      SL.HasTote,
+      SL.IsFull
+   Into #SorterLocStores
+   From SrtSorterLoc As SL With (NoLock)
+      Inner Join SysEndPharmacyShpCarrierAssoc As SPSC With (NoLock)
+         On SPSC.CarrierCode = SL.CarrierCode
+      Inner Join SysEndPharmacy As SEP With (NoLock)
+         On SEP.Id = SPSC.SysEndPharmacyId
+   Where
+      SL.CarrierCode Is Not Null
+      And SEP.StoreNum Is Not Null
+
+   -- Index the temp table on StoreNum to support the EXISTS / NOT EXISTS probes from the four priority queries.
+   Create Clustered Index IX_SLS On #SorterLocStores (StoreNum)
+
+   --------------------------------------------------------------------------------
+   -- Main Query
+   --   Get number of stores per priority. UNION ALL is correct because the
+   --   Priority column carries a distinct integer per branch, guaranteeing
+   --   rows from different branches cannot overlap.
+   --------------------------------------------------------------------------------
+   Select Priority, NumOfStores
+   From
+   (
+      -- Priority 1: Unassigned store, active Orders in the system (VERY HIGH PRIORITY)
+      -- v6 used NOT IN against a subquery that could contain NULL StoreNums. v7 uses NOT EXISTS to be NULL-safe.
+      -- See [[NOT IN vs NOT EXISTS]].
+      Select 1 As Priority, Count(*) As NumOfStores
+      From
+      (
+         Select Distinct SEP.StoreNum
+         From SysEndPharmacy As SEP With (NoLock)
+         Where
+            (@StoreNumTrimmed = '' Or SEP.StoreNum = @StoreNumTrimmed)
+            And Exists
+               (
+                  Select 1 From #StoreForCurrentDayOrders C
+                  Where C.StoreNum = SEP.StoreNum
+               )
+            And Not Exists
+               (
+                  Select 1 From #SorterLocStores S
+                  Where S.StoreNum = SEP.StoreNum
+               )
+      ) As T1
+
+      Union All
+
+      -- Priority 2: Assigned store, no tote (HIGH PRIORITY)
+      -- Reads from the materialized #SorterLocStores. v6 re-ran the SrtSorterLoc -> SPSC -> SEP join chain here.
+      Select 2 As Priority, Count(*) As NumOfStores
+      From
+      (
+         Select Distinct S.StoreNum
+         From #SorterLocStores S
+         Where
+            (@StoreNumTrimmed = '' Or S.StoreNum = @StoreNumTrimmed)
+            And S.HasTote = 0
+      ) As T2
+
+      Union All
+
+      -- Priority 3: Assigned store, full tote (MEDIUM PRIORITY)
+      Select 3 As Priority, Count(*) As NumOfStores
+      From
+      (
+         Select Distinct S.StoreNum
+         From #SorterLocStores S
+         Where
+            (@StoreNumTrimmed = '' Or S.StoreNum = @StoreNumTrimmed)
+            And S.IsFull = 1
+      ) As T3
+
+      Union All
+
+      -- Priority 4: Unassigned store, no active Orders (LOW PRIORITY)
+      -- Two NOT EXISTS probes replace v6's two NOT IN subqueries.
+      Select 4 As Priority, Count(*) As NumOfStores
+      From
+      (
+         Select Distinct SEP.StoreNum
+         From SysEndPharmacy As SEP With (NoLock)
+         Where
+            (@StoreNumTrimmed = '' Or SEP.StoreNum = @StoreNumTrimmed)
+            And Not Exists
+               (
+                  Select 1 From #StoreForCurrentDayOrders C
+                  Where C.StoreNum = SEP.StoreNum
+               )
+            And Not Exists
+               (
+                  Select 1 From #SorterLocStores S
+                  Where S.StoreNum = SEP.StoreNum
+               )
+      ) As T4
+   ) As MainQuery
+   Order By Priority
+
+End
+
+-- Explicit cleanup. Session-scoped temp tables are auto-dropped at session end,
+-- but rapid back-to-back invocations of the proc benefit from immediate release.
+Drop Table If Exists #StoreForCurrentDayOrders
+Drop Table If Exists #SorterLocStores
+
+/

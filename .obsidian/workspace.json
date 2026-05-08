@@ -1,0 +1,201 @@
+{
+  "main": {
+    "id": "c51b4300bfbb21a0",
+    "type": "split",
+    "children": [
+      {
+        "id": "db11ab31a0287e38",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "2da5303de65cc0db",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "QueryStoreTriage_AndRefactorProgram.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "QueryStoreTriage_AndRefactorProgram"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "260b4f2f1e4c7507",
+    "type": "split",
+    "children": [
+      {
+        "id": "20a9b5ea33a35798",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ecf0d969f4faab68",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "2fd63bcc7b8af6c4",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "caca8e5c91938750",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "7363382775ae946e",
+    "type": "split",
+    "children": [
+      {
+        "id": "fcf302e90dab2d5e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0288c879defb0a96",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "QueryStoreTriage_AndRefactorProgram.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for QueryStoreTriage_AndRefactorProgram"
+            }
+          },
+          {
+            "id": "8170ea3c08276ce7",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "QueryStoreTriage_AndRefactorProgram.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from QueryStoreTriage_AndRefactorProgram"
+            }
+          },
+          {
+            "id": "f8760dd6976e8c99",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "108bc72cf4f9dbcc",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "ab0785f2da168487",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "QueryStoreTriage_AndRefactorProgram.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of QueryStoreTriage_AndRefactorProgram"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "2da5303de65cc0db",
+  "lastOpenFiles": [
+    "print-tables.css",
+    "program_pdfs/ScalabilityRoadmap_PartitioningAndArchitecture.pdf",
+    "program_pdfs/QueryStoreTriage_AndRefactorProgram.pdf",
+    "program_pdfs/PharmAssist_PerformanceAndScalability_ProgramCharter.pdf",
+    "program_pdfs/MaintenanceOperations_Plan.pdf",
+    "program_pdfs",
+    "masterclass/pdf-export/QueryStoreTriageAndRefactor.pdf",
+    "PharmAssist_PerformanceAndScalability_ProgramCharter.md",
+    "NightlyMaintenance_PerformanceAssessment.md",
+    "MaintenanceOperations_Plan.md",
+    "masterclass/pdf-export/MaintenanceOperations_Plan.pdf",
+    "masterclass/pdf-export/PharmAssist_PerformanceAndScalability_ProgramCharter.pdf"
+  ]
+}

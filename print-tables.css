@@ -1,0 +1,106 @@
+/* ============================================================
+   print-tables.css
+   Targets Obsidian's PDF export. Forces tables to fit the page
+   width with proper word wrapping, sets Helvetica Neue, and
+   tightens margins for dense reference documents.
+   ============================================================ */
+
+/* ---------- @page: page size, margins, page numbers ---------- */
+@page {
+  size: Letter;
+  margin: 0.85in 0.85in 0.95in 0.85in;
+}
+
+/* Print-only rules. Editing/preview view in the app is untouched. */
+@media print {
+
+  /* Body typography */
+  body,
+  .markdown-preview-view,
+  .markdown-rendered {
+    font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.5;
+    color: #111;
+  }
+
+  /* Headings stay in the same family, with proportional sizing */
+  .markdown-rendered h1 { font-size: 22pt; font-weight: 700; letter-spacing: -0.012em; border-bottom: 2px solid #222; padding-bottom: 6pt; }
+  .markdown-rendered h2 { font-size: 14pt; font-weight: 700; border-bottom: 1px solid #999; padding-bottom: 3pt; margin-top: 22pt; }
+  .markdown-rendered h3 { font-size: 11.5pt; font-weight: 700; margin-top: 14pt; }
+  .markdown-rendered h4 { font-size: 10.5pt; font-weight: 700; margin-top: 10pt; }
+
+  /* ---------- TABLES: this is the actual fix ---------- */
+  /* table-layout: fixed makes the renderer honor column widths instead
+     of expanding columns to fit the longest cell content. Combined with
+     word-break + overflow-wrap, long procedure names wrap inside the
+     cell rather than blowing past the right margin. */
+  .markdown-rendered table,
+  table.dataview {
+    width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: collapse;
+    font-size: 8.5pt;
+    margin: 8pt 0 12pt 0;
+    page-break-inside: auto;
+  }
+
+  .markdown-rendered thead { display: table-header-group; }
+  .markdown-rendered tr    { page-break-inside: avoid; }
+
+  .markdown-rendered th,
+  .markdown-rendered td {
+    border: 1px solid #999 !important;
+    padding: 4pt 5pt !important;
+    text-align: left;
+    vertical-align: top;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.35;
+    white-space: normal !important;
+  }
+
+  .markdown-rendered th {
+    background: #ececec !important;
+    font-weight: 700;
+    font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  }
+
+  /* Inline code in cells (procedure names) needs to break inside the
+     identifier, not just at spaces. */
+  .markdown-rendered td code,
+  .markdown-rendered th code {
+    font-family: "Menlo", "SF Mono", "Consolas", monospace;
+    font-size: 7.5pt;
+    background: transparent;
+    padding: 0;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+  }
+
+  /* Inline code outside tables stays normal-sized */
+  .markdown-rendered p code,
+  .markdown-rendered li code {
+    font-family: "Menlo", "SF Mono", "Consolas", monospace;
+    font-size: 0.86em;
+    background: #f4f4f4;
+    padding: 1pt 3pt;
+    border-radius: 2pt;
+  }
+
+  /* Code blocks */
+  .markdown-rendered pre,
+  .markdown-rendered pre code {
+    font-family: "Menlo", "SF Mono", "Consolas", monospace;
+    font-size: 8.5pt;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .markdown-rendered pre {
+    background: #f6f6f6 !important;
+    border: 1px solid #ddd;
+    padding: 6pt 8pt;
+    page-break-inside: avoid;
+  }
+}
