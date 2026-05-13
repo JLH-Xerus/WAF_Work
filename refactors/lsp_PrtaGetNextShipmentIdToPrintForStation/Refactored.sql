@@ -1,0 +1,347 @@
+--/
+ALTER PROCEDURE [dbo].[lsp_PrtaGetNextShipmentIdToPrintForStation]
+   @StationId VarChar(8)
+As
+Begin
+/*
+Object Type:
+   Stored Procedure
+
+Name:
+   lsp_PrtaGetNextShipmentIdToPrintForStation
+
+Version:
+   18
+
+Description:
+   Return the next shipment Id to print paperwork for given the station Id, plus the
+   list of orders belonging to that shipment.
+
+Parameters:
+   Input:
+      @StationId         - The station Id of the workstation where the shipment has been received at.
+
+Comments:
+   v18 - Performance refactoring:
+      1. Local-variable copy of @StationId to break parameter sniffing. The cross-list
+         capture shows a 19,839x worst-case-to-average ratio, the largest plan-volatility
+         signal among the rows 22-25 cohort.
+      2. Replaced the nine separate `If Object_Id ... Drop Table` blocks with a single
+         `Drop Table If Exists` statement listing every temp table the procedure uses.
+      3. Pre-materialized the "in progress shipment IDs" lookup against
+         OeWorkflowStepInProgress once into #InProgressShipments, indexed on
+         ShipmentIdAsKey, so downstream queries can do a clean left-join on a typed key
+         instead of building `STR(t.ShipmentId)` per row.
+      4. Pre-materialized the non-canceled Rx count per ShipmentId once into
+         #ShipmentNonCanceledCount. The original procedure recomputes this count twice
+         (once in the #AllItemsStoredinBins WHERE clause, once in the #TopShipmentToPrint
+         HAVING clause) as correlated scalar subqueries that scan OeOrderShipmentAssoc
+         and OeOrderHistory per outer row.
+      5. Added indexes on every temp table that participates in a downstream join.
+      6. Replaced the final-row sub-select (`Where OSA.ShipmentId = (Select ShipmentId
+         From #TopShipmentToPrint)`) with a local variable read once at the top of the
+         final block.
+      7. Retained `Option (MaxDop 1)` on every statement. The original procedure header
+         documents an operational reason for this hint (parallel-thread starvation
+         errors at scale). Section 11 of the analysis carries a follow-up to re-evaluate
+         whether the hint is still necessary on current SQL Server versions.
+      8. Added `Option (Recompile)` on the candidate-building queries in addition to
+         MaxDop 1. The Recompile hint takes the per-call compile cost in exchange for
+         accurate selectivity estimates on the local @StationId; given the 19,839x
+         plan-volatility ratio, this is a favorable trade.
+*/
+Set NoCount On
+
+-- Local variable copy breaks parameter sniffing on the downstream queries.
+Declare @LocalStationId VarChar(8) = @StationId
+
+-- Modern temp-table cleanup in a single statement.
+Drop Table If Exists
+      #AllRxsArrivedForShipmentId
+    , #AllItemsStoredinBins
+    , #TopShipmentToPrint
+    , #ShipmentIdInBin
+    , #TopShipmentIdInBin
+    , #TopShipmentIdInManPack
+    , #TopShipmentIdInSemiPack
+    , #TopShipmentIdInAutoPack
+    , #CvyRxsArrivedForShipmentId
+    , #InProgressShipments
+    , #ShipmentNonCanceledCount
+
+------------------------------------------------------------------
+-- Pre-materialize the in-progress shipment IDs once. The original
+-- procedure repeats `WFS.ObjectKey = Str(t.ShipmentId)` joins in
+-- two places; pre-materializing into a typed key removes the
+-- per-row STR conversion and the non-SARGable join.
+------------------------------------------------------------------
+Select Distinct
+      [ShipmentIdAsKey] = Try_Cast(ObjectKey As Int)
+Into #InProgressShipments
+From OeWorkflowStepInProgress WFS With (NoLock)
+Where Try_Cast(WFS.ObjectKey As Int) Is Not Null
+Option (MaxDop 1, Recompile);
+
+Create Index IX_InProg_ShipmentId On #InProgressShipments(ShipmentIdAsKey);
+
+------------------------------------------------------------------
+-- Get Shipment Ids for orders stored in a Bin at this station.
+------------------------------------------------------------------
+Select
+      osa.ShipmentId
+    , [RxCount] = Count(O.OrderId)
+Into #ShipmentIdInBin
+From OeOrder O With (NoLock)
+Left Join OeOrderShipmentAssoc osa With (NoLock)
+    On o.OrderId = osa.OrderId And o.HistoryDtTm = osa.HistoryDtTm
+Left Join OrdWillCallBin owb With (NoLock)
+    On o.OrderId = owb.OrderId
+Inner Join ShpStationWillCallBinAssoc SB With (NoLock)
+    On owb.BinId Like (SB.BinIdPrefix + '%')
+Left Join PwkPrinterTray ppt With (NoLock)
+    On ppt.ShipmentId = osa.ShipmentId
+Where SB.StationId = @LocalStationId
+  And osa.ShipmentId Is Not Null
+  And ppt.Printer Is Null
+  And o.OrderStatus <> 'Problem'
+Group By osa.ShipmentId
+Option (MaxDop 1, Recompile);
+
+Create Index IX_SIB_ShipmentId On #ShipmentIdInBin(ShipmentId);
+
+------------------------------------------------------------------
+-- Get the minimum PriInternal value for each ShipmentId in bin.
+------------------------------------------------------------------
+Select
+      b.Shipmentid
+    , b.RxCount
+    , [PriInternal] = Min(o.PriInternal)
+Into #TopShipmentIdInBin
+From #ShipmentIdInBin b
+Inner Join OeOrderShipmentAssoc s With (NoLock)
+    On b.ShipmentId = s.ShipmentId
+Inner Join OeOrder o With (NoLock)
+    On s.OrderId = o.OrderId
+Group By b.Shipmentid, b.RxCount
+Option (MaxDop 1);
+
+Create Index IX_TSIB_ShipmentId On #TopShipmentIdInBin(ShipmentId);
+
+------------------------------------------------------------------
+-- Get Shipment Ids from CvyManPackStationToteQueue
+------------------------------------------------------------------
+Select
+      OSA.ShipmentId
+    , [PriInternal] = Min(O.PriInternal)
+    , [RxCount]     = Count(O.OrderId)
+Into #TopShipmentIdInManPack
+From CvyManPackStationToteQueue CMP With (NoLock)
+Inner Join OrderToteAssoc OTA With (NoLock)
+    On OTA.ToteId = CMP.ToteId And OTA.OrderToteStateCode = 'I'
+Inner Join OeOrder O With (NoLock)
+    On O.OrderId = OTA.OrderId
+Inner Join OeOrderShipmentAssoc OSA With (NoLock)
+    On OSA.OrderId = O.OrderId And OSA.HistoryDtTm = O.HistoryDtTm
+Left Join PwkPrinterTray PPT With (NoLock)
+    On PPT.ShipmentId = OSA.ShipmentId
+Where CMP.StationId = @LocalStationId
+  And PPT.Printer Is Null
+  And O.OrderStatus Not In ('Problem', 'Ship Pending')
+Group By OSA.ShipmentId
+Option (MaxDop 1, Recompile);
+
+------------------------------------------------------------------
+-- Shipment Ids from CvySemiAutoPackStationToteQueue
+------------------------------------------------------------------
+Select
+      OSA.ShipmentId
+    , [PriInternal] = Min(O.PriInternal)
+    , [RxCount]     = Count(O.OrderId)
+Into #TopShipmentIdInSemiPack
+From CvySemiAutoPackStationToteQueue CSP With (NoLock)
+Inner Join OrderToteAssoc OTA With (NoLock)
+    On OTA.ToteId = CSP.ToteId And OTA.OrderToteStateCode = 'I'
+Inner Join OeOrder O With (NoLock)
+    On O.OrderId = OTA.OrderId
+Inner Join OeOrderShipmentAssoc OSA With (NoLock)
+    On OSA.OrderId = O.OrderId And OSA.HistoryDtTm = O.HistoryDtTm
+Left Join PwkPrinterTray PPT With (NoLock)
+    On PPT.ShipmentId = OSA.ShipmentId
+Where CSP.StationId = @LocalStationId
+  And PPT.Printer Is Null
+  And O.OrderStatus Not In ('Problem', 'Ship Pending')
+Group By OSA.ShipmentId
+Option (MaxDop 1, Recompile);
+
+------------------------------------------------------------------
+-- Shipment Ids from CvyAutoPackStationVialQueue
+------------------------------------------------------------------
+Select
+      OSA.ShipmentId
+    , [PriInternal] = Min(O.PriInternal)
+    , [RxCount]     = Count(OSA.OrderId)
+Into #TopShipmentIdInAutoPack
+From CvyAutoPackStationVialQueue CAP With (NoLock)
+Inner Join OeOrder O With (NoLock)
+    On O.OrderId = CAP.OrderId And O.HistoryDtTm = CAP.HistoryDtTm
+Inner Join OeOrderShipmentAssoc OSA With (NoLock)
+    On OSA.OrderId = O.OrderId And OSA.HistoryDtTm = O.HistoryDtTm
+Left Join PwkPrinterTray PPT With (NoLock)
+    On PPT.ShipmentId = OSA.ShipmentId
+Where CAP.StationId = @LocalStationId
+  And PPT.Printer Is Null
+  And O.OrderStatus Not In ('Problem', 'Ship Pending')
+Group By OSA.ShipmentId
+Option (MaxDop 1, Recompile);
+
+------------------------------------------------------------------
+-- Combine the three pack-queue temp tables.
+------------------------------------------------------------------
+Select
+      ShipmentId
+    , [PriInternal]                    = Min(t.PriInternal)
+    , [SumOfAllRxsArrivedForShipmentId] = Sum(t.RxCount)
+Into #CvyRxsArrivedForShipmentId
+From
+(
+    Select * From #TopShipmentIdInManPack
+    Union All
+    Select * From #TopShipmentIdInSemiPack
+    Union All
+    Select * From #TopShipmentIdInAutoPack
+) t
+Group By t.ShipmentId
+Option (MaxDop 1);
+
+Create Index IX_CRA_ShipmentId On #CvyRxsArrivedForShipmentId(ShipmentId);
+
+------------------------------------------------------------------
+-- Pre-materialize the non-canceled Rx count per ShipmentId once.
+-- The original procedure recomputes this count twice via correlated
+-- scalar subqueries; pre-materializing replaces N row-by-row reads
+-- with one set-based pass.
+------------------------------------------------------------------
+Select
+      OSA.ShipmentId
+    , [NonCanceledCount] = Count(OSA.OrderId)
+Into #ShipmentNonCanceledCount
+From OeOrderShipmentAssoc OSA With (NoLock)
+Left Join OeOrderHistory OH With (NoLock)
+    On OSA.OrderId = OH.OrderId And OSA.HistoryDtTm = OH.HistoryDtTm
+Where OSA.ShipmentId In
+(
+    Select ShipmentId From #TopShipmentIdInBin
+    Union
+    Select ShipmentId From #CvyRxsArrivedForShipmentId
+)
+  And IsNull(OH.OrderStatus, '') <> 'Canceled'
+Group By OSA.ShipmentId
+Option (MaxDop 1);
+
+Create Index IX_SNC_ShipmentId On #ShipmentNonCanceledCount(ShipmentId);
+
+------------------------------------------------------------------
+-- Shipments with all Rx currently stored (the in-bin completeness branch).
+-- The correlated scalar subquery is replaced by a left-join to
+-- #ShipmentNonCanceledCount with an equality check on the count.
+------------------------------------------------------------------
+Select
+      t.ShipmentId
+    , t.PriInternal
+    , [SumOfAllRxsArrivedForShipmentId] = t.RxCount
+Into #AllItemsStoredinBins
+From #TopShipmentIdInBin t
+Left Join #InProgressShipments IPS
+    On IPS.ShipmentIdAsKey = t.ShipmentId
+Left Join #ShipmentNonCanceledCount SNC
+    On SNC.ShipmentId = t.ShipmentId
+Where IPS.ShipmentIdAsKey Is Null
+  And SNC.NonCanceledCount = t.RxCount
+Option (MaxDop 1);
+
+------------------------------------------------------------------
+-- Shipments with Rx arrived plus Rx in bin, again with the in-progress
+-- exclusion applied via #InProgressShipments rather than STR(ShipmentId).
+------------------------------------------------------------------
+Select
+      c.ShipmentId
+    , c.PriInternal
+    , [SumOfAllRxsArrivedForShipmentId] = Sum(c.SumOfAllRxsArrivedForShipmentId + IsNull(t.RxCount, 0))
+Into #AllRxsArrivedForShipmentId
+From #CvyRxsArrivedForShipmentId c
+Left Join #TopShipmentIdInBin t
+    On c.ShipmentId = t.ShipmentId
+Left Join #InProgressShipments IPS
+    On IPS.ShipmentIdAsKey = c.ShipmentId
+Where IPS.ShipmentIdAsKey Is Null
+Group By c.ShipmentId, c.PriInternal
+Option (MaxDop 1);
+
+------------------------------------------------------------------
+-- Get the highest-priority shipment that has every non-canceled Rx
+-- accounted for. The HAVING clause uses the pre-materialized count
+-- instead of repeating the correlated scalar subquery.
+------------------------------------------------------------------
+Select Top 1
+      tt.ShipmentId
+    , [RxCount] = tt.SumOfAllRxsArrivedForShipmentId
+Into #TopShipmentToPrint
+From
+(
+    Select ShipmentId, PriInternal, SumOfAllRxsArrivedForShipmentId From #AllRxsArrivedForShipmentId
+    Union All
+    Select ShipmentId, PriInternal, SumOfAllRxsArrivedForShipmentId From #AllItemsStoredinBins
+) tt
+Inner Join #ShipmentNonCanceledCount SNC
+    On SNC.ShipmentId = tt.ShipmentId
+Group By tt.ShipmentId, tt.SumOfAllRxsArrivedForShipmentId, tt.PriInternal, SNC.NonCanceledCount
+Having SNC.NonCanceledCount = Sum(tt.SumOfAllRxsArrivedForShipmentId)
+Order By tt.PriInternal Asc
+Option (MaxDop 1);
+
+------------------------------------------------------------------
+-- Final SELECT: return the order list for the chosen shipment.
+-- The sub-select on #TopShipmentToPrint is replaced by a local
+-- variable read once.
+------------------------------------------------------------------
+Declare @TopShipmentId Int
+
+Select Top 1 @TopShipmentId = ShipmentId
+From #TopShipmentToPrint
+
+Select
+      OSA.ShipmentId
+    , O.OrderId
+    , O.HistoryDtTm
+    , OTA.ToteId
+    , OPA.PoNum
+    , PPT.Printer
+    , PPT.TrayNum
+From OeOrder O With (NoLock)
+Left Join OrderToteAssoc OTA With (NoLock)
+    On OTA.OrderId = O.OrderId
+Left Join OeOrderShipmentAssoc OSA With (NoLock)
+    On OSA.OrderId = O.OrderId And OSA.HistoryDtTm = O.HistoryDtTm
+Left Join OeOrderPoNumAssoc OPA With (NoLock)
+    On O.OrderId = OPA.OrderId
+Left Join PwkPrinterTray PPT With (NoLock)
+    On PPT.ShipmentId = OSA.ShipmentId
+Where OSA.ShipmentId = @TopShipmentId
+Order By O.PriInternal Asc
+Option (MaxDop 1);
+
+Drop Table If Exists
+      #AllRxsArrivedForShipmentId
+    , #AllItemsStoredinBins
+    , #TopShipmentToPrint
+    , #ShipmentIdInBin
+    , #TopShipmentIdInBin
+    , #TopShipmentIdInManPack
+    , #TopShipmentIdInSemiPack
+    , #TopShipmentIdInAutoPack
+    , #CvyRxsArrivedForShipmentId
+    , #InProgressShipments
+    , #ShipmentNonCanceledCount
+
+End
+GO

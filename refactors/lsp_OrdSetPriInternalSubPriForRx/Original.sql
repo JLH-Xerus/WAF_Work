@@ -1,0 +1,150 @@
+/****** Object:  StoredProcedure [dbo].[lsp_OrdSetPriInternalSubPriForRx]    Script Date: 4/5/2026 8:50:32 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+Create   Procedure [dbo].[lsp_OrdSetPriInternalSubPriForRx]
+   @OrderId VarChar(30)
+As
+/*
+Object Type:
+   Stored Procedure
+
+Name:
+   lsp_OrdSetPriInternalSubPriForRx
+
+Version:
+   1
+
+Description:
+   Set an incrementing 6-digit decimal sub priority at the end of PriInternal for an Rx.
+   This is to ensure Rxs for different groups do not have the same PriInternal value.
+   
+   Example:
+      A PriInternal value of 995020150204082641 will become 995020150204082641000001
+
+Parameters:
+   Input:
+      @OrderId   - The Rx Order ID for which to set the Sub-Priority value.
+   Output:
+      None
+
+Return Value:
+   0     = Success
+   < 0   = Value of @@Error
+
+Comments:
+   None
+*/
+Set NoCount On
+Declare @SubPriority varchar(6) = ''
+
+-- Save off the value of "System-wide [RxPriority] MaxNumEnabledPriorityPreferences"
+Declare @CfgMaxNumEnabledPriorityPreferences int
+Select @CfgMaxNumEnabledPriorityPreferences = Convert(int, Value)
+From vCfgSystemParamVal with (nolock)
+Where Section = 'RxPriority' And Parameter = 'MaxNumEnabledPriorityPreferences'
+
+-- Set the length of the PriInternal string without the appended sub-priority
+Declare @PriInternalLengthWithoutSubPri int
+Set @PriInternalLengthWithoutSubPri = 18 + (@CfgMaxNumEnabledPriorityPreferences * 2)
+
+If (Select Len(PriInternal) From OeOrder with (nolock) where OrderId = @OrderId) > @PriInternalLengthWithoutSubPri
+   -- Nothing to do here (already has appended sub-priority)
+   Return 0
+
+-- Save off the FIFO/LIFO sequence portion of the Rxs PriInternal
+Declare @FifoLifoSeq varchar(14), @GroupNum varchar(10), @DateEntered datetime
+Select
+   @FifoLifoSeq = SubString(PriInternal, 5, 14),
+   @GroupNum = GroupNum,
+   @DateEntered = DateEntered
+From
+   OeOrder with (nolock)
+Where
+   OrderId = @OrderId
+
+-- Save off the sub-priority of a group Rx with the same left PriInternal portion that already has a sub-priority assigned
+Select Top 1
+   @SubPriority = Right(PriInternal, 6)
+From
+   OeOrder with (nolock)
+Where
+   GroupNum = @GroupNum
+   And PriInternal Like '%' + @FifoLifoSeq + '%'
+   And Len(PriInternal) > @PriInternalLengthWithoutSubPri
+
+-- If no group Rx existed with an assigned sub-priority
+If @SubPriority Is Null Or @SubPriority = ''
+   Begin
+
+      -- Derive the sub-priority value based on how many groups exist that were submitted previously with the same left PriInternal portion
+      Select @SubPriority = Right('000000' + Cast(Count(Distinct GroupNum) As VarChar(6)), 6)
+      From OeOrder with (nolock)
+      Where DateEntered < @DateEntered
+      And PriInternal Like '%' + @FifoLifoSeq + '%'
+
+   End
+
+-- Begin a transaction
+Begin Tran
+
+Declare @ComputerName as VarChar(50) = (IsNull(HOST_NAME(), ''))
+
+Begin Try
+
+   -- Update the Rxs PriInternal
+   Update OeOrder Set PriInternal = PriInternal + @SubPriority Where OrderId = @OrderId
+
+   -- Log an Rx prioritizatin event for each Rx in the group
+   Insert Into
+      EvtRxPrioritizationEvents (Event, OprId, EventDtTm, Notes, SubRoutine, ComputerName, OrderId, PriInternal)
+   Select
+      'SetRxPriority',
+      Null,
+      GetDate(),
+      Null,
+      'lsp_OrdSetPriInternalSubPriForRx',
+      @ComputerName,
+      OrderId,
+      PriInternal
+   From
+      OeOrder with (nolock)
+   Where
+      OrderId = @OrderId
+
+   -- Commit the transaction
+   Commit Tran
+
+End Try
+
+Begin Catch
+
+   -- Error occurred, rollback the transaction
+   Rollback Tran
+
+   Declare
+      @ErrCode Int,
+      @ErrDesc VarChar(6500)
+
+   Select
+      @ErrCode = ERROR_NUMBER(),
+      @ErrDesc = ERROR_MESSAGE()
+
+   -- Log the error
+   Exec lsp_DbLogError
+         @ModulePrefix = 'SqlS',
+         @Event = 'SetRxPriority',
+         @OprId = '',
+         @ErrCode = @ErrCode,
+         @ErrDesc = @ErrDesc,
+         @Source = 'lsp_OrdSetPriInternalSubPriForRx',
+         @Routine = 'lsp_OrdSetPriInternalSubPriForRx',
+         @ComputerName = @ComputerName,
+         @ExeCode = 'Q'
+
+End Catch
+
+Return @@Error
+
+GO

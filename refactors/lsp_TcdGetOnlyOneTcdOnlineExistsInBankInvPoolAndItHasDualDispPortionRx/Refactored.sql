@@ -1,0 +1,83 @@
+--/
+ALTER PROCEDURE [dbo].[lsp_TcdGetOnlyOneTcdOnlineExistsInBankInvPoolAndItHasDualDispPortionRx]
+   @ProductId VarChar(11),
+   @InvPool   TinyInt,
+   @AddrBank  VarChar(2),
+   @OnlyOneTcdOnlineExistsInBankInvPoolAndItHasDualDispPortionRx TinyInt Output
+As
+Begin
+/*
+Object Type:
+   Stored Procedure
+
+Object Name:
+   lsp_TcdGetOnlyOneTcdOnlineExistsInBankInvPoolAndItHasDualDispPortionRx
+
+Version:
+   (next)
+
+Description:
+   Set the OUTPUT bit to 1 when exactly one online dispenser exists for the product
+   within the specified bank and inventory pool, and that dispenser actively contains
+   a dual-dispenser portion Rx (OrderId matching '%<[1-2]>'). Otherwise set it to 0.
+
+Comments:
+   v_next - Performance refactoring:
+      1. Replaced the temp-table-and-recheck pattern with a single SELECT into two
+         local variables (count of matching dispensers, plus an OrderId snapshot
+         when the count is exactly 1). The original procedure built a temp table
+         via SELECT INTO, read @@ROWCOUNT, and then re-read the temp table for the
+         single OrderId. The condensed form returns both values in one pass and
+         keeps the work in-memory.
+      2. Replaced the catch-all `(InvPool = @InvPool Or @InvPool = 0)` predicate
+         with a conditional shape `(@LocalInvPool = 0 Or InvPool = @LocalInvPool)`
+         that Option (Recompile) simplifies at compile time.
+      3. Local-variable copies of all three input parameters. The cross-list
+         capture's "high-volume / sub-ms" classification means the procedure is
+         called frequently enough that plan stability matters even though no single
+         call is expensive.
+      4. Removed the legacy `If Object_Id('TempDb..#X') Is Not Null Drop Table #X`
+         block; no temp table is needed in v_next.
+      5. Added Option (Recompile) on the SELECT.
+*/
+
+Set NoCount On
+
+------------------------------------------------------------------------------------------
+-- Local variables.
+------------------------------------------------------------------------------------------
+Declare @LocalProductId VarChar(11) = @ProductId
+Declare @LocalInvPool   TinyInt     = IsNull(@InvPool, 0)
+Declare @LocalAddrBank  VarChar(2)  = @AddrBank
+
+------------------------------------------------------------------------------------------
+-- Single SELECT: count the matching dispensers and capture the single OrderId at the
+-- same time. The Max(OrderId) projection is only meaningful when MatchCount = 1; in
+-- the multi-row case the value is unused.
+------------------------------------------------------------------------------------------
+Declare @MatchCount   Int
+Declare @SingleOrderId VarChar(30)
+
+Select
+      @MatchCount    = Count(*)
+    , @SingleOrderId = Max(OrderId)
+From TcdStatus With (NoLock)
+Where AddrBank    = @LocalAddrBank
+  And ProductId   = @LocalProductId
+  And AddrCabinet > 0
+  And TcdSn       > 0
+  And Status      = 'Online'
+  And (@LocalInvPool = 0 Or InvPool = @LocalInvPool)
+Option (Recompile);
+
+------------------------------------------------------------------------------------------
+-- Set the OUTPUT bit. The condition is true iff MatchCount = 1 and that single OrderId
+-- ends in the dual-dispenser portion marker pattern.
+------------------------------------------------------------------------------------------
+If @MatchCount = 1 And @SingleOrderId Like '%<[1-2]>'
+    Set @OnlyOneTcdOnlineExistsInBankInvPoolAndItHasDualDispPortionRx = 1
+Else
+    Set @OnlyOneTcdOnlineExistsInBankInvPoolAndItHasDualDispPortionRx = 0
+
+End
+GO

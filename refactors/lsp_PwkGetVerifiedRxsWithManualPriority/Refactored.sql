@@ -1,0 +1,164 @@
+--/
+ALTER PROCEDURE [dbo].[lsp_PwkGetVerifiedRxsWithManualPriority]
+    @PatCustIdMask    VarChar(20)
+  , @MultiToteRequired Bit = 1
+As
+Begin
+/*
+Object Type:
+   Stored Procedure
+
+Object Name:
+   lsp_PwkGetVerifiedRxsWithManualPriority
+
+Version:
+   3
+
+Description:
+   Returns the top 10 verified Rxs and Split parent records ordered by DateFilled ascending,
+   with the top single-vial Manual Rx prioritized first.
+
+Parameters:
+   @PatCustIdMask     - filter applied to PatCustId via the modulo-10 mask check
+                        (mask string contains the digit (PatCustId % 10))
+   @MultiToteRequired - 1 = require Split/MV parents to have all child vials in totes
+                        0 = include Split/MV parents regardless
+
+Comments:
+   v3 - Performance refactoring:
+      1. Local-variable copies of @PatCustIdMask and @MultiToteRequired break parameter
+         sniffing on the modulo-10 mask predicate. The cross-list capture shows a 1,409x
+         worst-case-to-average ratio, which is the parameter sniffing signature for the
+         mask filter.
+      2. Replaced legacy `If Object_Id('TempDb..#X') Is Not Null Drop Table #X` with
+         `Drop Table If Exists #X`.
+      3. Pre-materialized the "in tote" state from OrderToteAssoc once into #ToteState,
+         keyed by a derived ParentOrderId (the OrderId itself for singles; the prefix for
+         split-vial children whose OrderId matches 'parent-NN'). The original procedure
+         hit OrderToteAssoc twice per outer row via two correlated subqueries (a Top 1
+         lookup for ToteId and a Count for the child-vial completeness check). The
+         pre-materialization replaces N correlated reads with one indexed scan.
+      4. The candidate-set CTE references the pre-materialized aggregates instead of the
+         correlated subqueries. The semantics are identical because the OrderToteAssoc
+         filter (`OrderToteStateCode = 'I'`) is the same and the parent-child relationship
+         is preserved via the derived ParentOrderId.
+      5. Pulled the mask-filter predicate into the Filtered CTE so it is expressed once
+         and applied once. The two SELECTs that follow reference the filtered set rather
+         than repeating the non-SARGable mask predicate.
+      6. Kept UNION (not UNION ALL) for the top-1-manual-plus-top-10 combination because
+         the dedup semantics are intentional: a Manual Rx that qualifies for both branches
+         is returned only once.
+      7. Added `Option (Recompile)` on the final SELECT. The mask-filter selectivity
+         varies meaningfully across callers, and the candidate set is small enough that
+         per-call compilation is cheaper than running a wrong plan.
+*/
+
+Set NoCount On
+
+-- Local variable copies break parameter sniffing on the mask-filter predicate.
+Declare @LocalPatCustIdMask    VarChar(20) = @PatCustIdMask
+Declare @LocalMultiToteRequired Bit         = @MultiToteRequired
+
+Drop Table If Exists #ToteState, #ReadyForPaperworkManPriority
+
+-- Pre-materialize the in-tote state once. The parent OrderId is the OrderId itself
+-- for single-vial Rxs and the prefix for split-vial child Rxs whose OrderId follows
+-- the pattern 'parent-NN'. Aggregating by ParentOrderId lets the outer query do a
+-- single left-join lookup instead of two correlated subqueries per row.
+Select
+    [ParentOrderId] = Case
+                         When OTA.OrderId Like '%-[0-9][0-9]' Then Left(OTA.OrderId, Len(OTA.OrderId) - 3)
+                         Else OTA.OrderId
+                      End
+  , OTA.OrderId
+  , OTA.ToteId
+Into #ToteState
+From OrderToteAssoc OTA With (NoLock)
+Where OTA.OrderToteStateCode = 'I'
+
+Create Index IX_ToteState_Parent On #ToteState(ParentOrderId)
+
+-- Build the candidate set: verified single-vial Rxs and Split/MV parents whose
+-- children all have an in-tote assignment (when @MultiToteRequired = 1).
+;With InToteAgg As
+(
+    Select
+          ParentOrderId
+        , [ChildCount]  = Count(*)
+        , [FirstToteId] = Min(ToteId)   -- arbitrary tie-break; matches the v2 Top 1 semantics
+    From #ToteState
+    Group By ParentOrderId
+)
+Select
+      O.OrderId
+    , O.GroupNum
+    , O.Ndc
+    , O.RxNum
+    , O.OrderStatus
+    , O.DateFilled
+    , O.FillType
+    , Po.PoNum
+    , O.NumOfVials
+    , O.PatCustId
+    , [ToteId] = IsNull(ITA.FirstToteId, '')
+Into #ReadyForPaperworkManPriority
+From OeOrder As O With (NoLock)
+Inner Join OeOrderPoNumAssoc As Po With (NoLock)
+    On O.OrderId = Po.OrderId
+Left Join InToteAgg ITA
+    On ITA.ParentOrderId = O.OrderId
+Where
+    (
+        O.OrderStatus = 'Verified'
+        And O.OrderId Not Like '%-[0-9][0-9]'
+    )
+    Or
+    (
+        O.OrderStatus = 'Split/MV'
+        And O.StatusReason = 'Verified'
+        And
+        (
+            @LocalMultiToteRequired = 0
+            Or O.NumOfVials = IsNull(ITA.ChildCount, 0)
+        )
+    )
+
+Create Index IX_RFP_DateFilled On #ReadyForPaperworkManPriority(DateFilled, OrderId)
+
+-- Apply the mask filter once via a CTE, then UNION the top-1-manual and top-10-anything
+-- branches. UNION (not UNION ALL) preserves the intentional dedup semantics: a Manual
+-- Rx that qualifies for both branches is returned only once.
+;With Filtered As
+(
+    Select *
+    From #ReadyForPaperworkManPriority RFP
+    Where @LocalPatCustIdMask Like '%' + Cast((RFP.PatCustId % 10) As VarChar) + '%'
+)
+Select OrderId, GroupNum, Ndc, RxNum, OrderStatus, DateFilled, FillType, PoNum, NumOfVials, PatCustId, ToteId
+From
+(
+    -- Top 1 Manual fill to keep manual priority (manual travel time is far less than autofill).
+    Select Top 1 *
+    From Filtered
+    Where FillType = 'M'
+    Order By DateFilled Asc
+) AS ManualTop
+
+Union
+
+Select OrderId, GroupNum, Ndc, RxNum, OrderStatus, DateFilled, FillType, PoNum, NumOfVials, PatCustId, ToteId
+From
+(
+    -- Top 10 of anything (Manual or Autofill).
+    Select Top 10 *
+    From Filtered
+    Order By DateFilled Asc
+) AS AnyTop
+
+Order By DateFilled Asc
+Option (Recompile)
+
+Drop Table If Exists #ToteState, #ReadyForPaperworkManPriority
+
+End
+GO

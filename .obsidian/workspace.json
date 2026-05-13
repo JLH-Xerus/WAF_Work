@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "QueryStoreTriage_AndRefactorProgram.md",
+                "file": "refactors/lsp_RxfGetListOfManualFillGroups/Analysis.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "QueryStoreTriage_AndRefactorProgram"
+              "title": "Analysis"
             }
           }
         ]
@@ -78,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 482.5
   },
   "right": {
     "id": "7363382775ae946e",
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "QueryStoreTriage_AndRefactorProgram.md",
+                "file": "PharmAssist_PerformanceAndScalability_ProgramCharter.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for QueryStoreTriage_AndRefactorProgram"
+              "title": "Backlinks for PharmAssist_PerformanceAndScalability_ProgramCharter"
             }
           },
           {
@@ -113,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "QueryStoreTriage_AndRefactorProgram.md",
+                "file": "PharmAssist_PerformanceAndScalability_ProgramCharter.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from QueryStoreTriage_AndRefactorProgram"
+              "title": "Outgoing links from PharmAssist_PerformanceAndScalability_ProgramCharter"
             }
           },
           {
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "QueryStoreTriage_AndRefactorProgram.md",
+                "file": "PharmAssist_PerformanceAndScalability_ProgramCharter.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of QueryStoreTriage_AndRefactorProgram"
+              "title": "Outline of PharmAssist_PerformanceAndScalability_ProgramCharter"
             }
           }
         ]
@@ -183,19 +183,30 @@
       "bases:Create new base": false
     }
   },
-  "active": "2da5303de65cc0db",
+  "active": "ecf0d969f4faab68",
   "lastOpenFiles": [
-    "print-tables.css",
-    "program_pdfs/ScalabilityRoadmap_PartitioningAndArchitecture.pdf",
-    "program_pdfs/QueryStoreTriage_AndRefactorProgram.pdf",
-    "program_pdfs/PharmAssist_PerformanceAndScalability_ProgramCharter.pdf",
-    "program_pdfs/MaintenanceOperations_Plan.pdf",
-    "program_pdfs",
-    "masterclass/pdf-export/QueryStoreTriageAndRefactor.pdf",
+    "refactors/lsp_TcdGetOnlyOneTcdOnlineExistsInBankInvPoolAndItHasDualDispPortionRx/Analysis.md",
+    "refactors/lsp_TcdGetOnlyOneTcdOnlineExistsInBankInvPoolAndItHasDualDispPortionRx/Refactored.sql",
+    "refactors/lsp_TcdGetOnlyOneTcdOnlineExistsInBankInvPoolAndItHasDualDispPortionRx/Original.sql",
+    "refactors/lsp_TcdGetOnlyOneTcdOnlineExistsInBankInvPoolAndItHasDualDispPortionRx",
+    "refactors/lsp_OeOrderTextDocumentsClassify/Analysis.md",
+    "refactors/lsp_OeOrderTextDocumentsClassify/Refactored.sql",
+    "refactors/lsp_OeOrderTextDocumentsClassify/Original.sql",
+    "refactors/lsp_OeOrderTextDocumentsClassify",
+    "refactors/lsp_OrdSetPriInternalSubPriForRx/Analysis.md",
+    "refactors/lsp_OrdSetPriInternalSubPriForRx/Refactored.sql",
+    "refactors/lsp_BnkGetNextRxToAssignToBank_DispenserBalancing/Analysis.md",
+    "refactors/lsp_OrdSetPriInternalSubPriForRx/Original.sql",
+    "refactors/lsp_OrdSetPriInternalSubPriForRx",
+    "refactors/lsp_BnkGetNextNonAssignableRx/Analysis.md",
+    "refactors/lsp_BnkGetNextNonAssignableRx/Refactored.sql",
+    "refactors/lsp_DbDeleteNonLeafletOeOrderTextDocument/Analysis.md",
     "PharmAssist_PerformanceAndScalability_ProgramCharter.md",
+    "refactors/lsp_SrtGetNumOfStoresWithAndWithoutSorterLocs/Analysis.md",
+    "refactors/lsp_SrtGetSortationItems/Analysis.md",
+    "refactors/lsp_ShpGetOrdersForTopReadyToShipGroup/Analysis.md",
+    "QueryStoreTriage_AndRefactorProgram.md",
     "NightlyMaintenance_PerformanceAssessment.md",
-    "MaintenanceOperations_Plan.md",
-    "masterclass/pdf-export/MaintenanceOperations_Plan.pdf",
-    "masterclass/pdf-export/PharmAssist_PerformanceAndScalability_ProgramCharter.pdf"
+    "MaintenanceOperations_Plan.md"
   ]
 }

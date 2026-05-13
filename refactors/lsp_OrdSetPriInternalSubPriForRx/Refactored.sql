@@ -1,0 +1,142 @@
+--/
+ALTER PROCEDURE [dbo].[lsp_OrdSetPriInternalSubPriForRx]
+   @OrderId VarChar(30)
+As
+Begin
+/*
+Object Type:
+   Stored Procedure
+
+Name:
+   lsp_OrdSetPriInternalSubPriForRx
+
+Version:
+   2
+
+Comments:
+   v2 - Performance refactoring:
+      1. Local-variable copy of @OrderId.
+      2. Consolidated the three reads of OeOrder for the same OrderId (one for the
+         length check, one for FIFO/LIFO sequence + GroupNum + DateEntered, and one
+         after the UPDATE for the event log) into a single initial read into local
+         variables. The post-update PriInternal is then computed in-memory by
+         concatenating @PriInternal + @SubPriority, eliminating the post-UPDATE read.
+      3. Added the early-return short-circuit at the top so the procedure exits before
+         declaring the rest of the local variables when the Rx already has a sub-
+         priority. The v1 form declared local variables, executed the length check,
+         and then conditionally returned; the order is the same logically but the
+         consolidated read at the top makes the short-circuit cleaner.
+      4. Added Option (Recompile) on the two reads that depend on the non-SARGable
+         LIKE-with-leading-wildcard predicate. Recompile lets the optimizer plan
+         against the actual @FifoLifoSeq selectivity for the current Rx.
+      5. The two LIKE-with-leading-wildcard predicates remain non-SARGable; see
+         Section 11 of Analysis.md for the architectural recommendation.
+*/
+
+Set NoCount On
+
+Declare @LocalOrderId VarChar(30) = @OrderId
+
+Declare @SubPriority   VarChar(6)  = ''
+Declare @ComputerName  VarChar(50) = IsNull(HOST_NAME(), '')
+
+Declare @CfgMaxNumEnabledPriorityPreferences Int
+Declare @PriInternalLengthWithoutSubPri      Int
+
+Select @CfgMaxNumEnabledPriorityPreferences = Convert(Int, Value)
+From vCfgSystemParamVal With (NoLock)
+Where Section = 'RxPriority'
+  And Parameter = 'MaxNumEnabledPriorityPreferences'
+
+Set @PriInternalLengthWithoutSubPri = 18 + (@CfgMaxNumEnabledPriorityPreferences * 2)
+
+------------------------------------------------------------------------------------------
+-- Consolidated initial read of OeOrder. One row, four columns; the v1 form read this
+-- row three times.
+------------------------------------------------------------------------------------------
+Declare @PriInternal     VarChar(50)
+Declare @FifoLifoSeq     VarChar(14)
+Declare @GroupNum        VarChar(10)
+Declare @DateEntered     DateTime
+Declare @PriInternalLen  Int
+
+Select
+      @PriInternal    = PriInternal
+    , @PriInternalLen = Len(PriInternal)
+    , @FifoLifoSeq    = SubString(PriInternal, 5, 14)
+    , @GroupNum       = GroupNum
+    , @DateEntered    = DateEntered
+From OeOrder With (NoLock)
+Where OrderId = @LocalOrderId
+
+If @PriInternalLen > @PriInternalLengthWithoutSubPri
+    Return 0    -- Already has a sub-priority appended; nothing to do.
+
+------------------------------------------------------------------------------------------
+-- Look up the sub-priority of a same-group Rx that already has one.
+------------------------------------------------------------------------------------------
+Select Top 1
+      @SubPriority = Right(PriInternal, 6)
+From OeOrder With (NoLock)
+Where GroupNum = @GroupNum
+  And PriInternal Like '%' + @FifoLifoSeq + '%'
+  And Len(PriInternal) > @PriInternalLengthWithoutSubPri
+Option (Recompile);
+
+------------------------------------------------------------------------------------------
+-- Fall back to a count-based sub-priority derivation if no group Rx had one already.
+------------------------------------------------------------------------------------------
+If @SubPriority Is Null Or @SubPriority = ''
+Begin
+    Select @SubPriority = Right('000000' + Cast(Count(Distinct GroupNum) As VarChar(6)), 6)
+    From OeOrder With (NoLock)
+    Where DateEntered < @DateEntered
+      And PriInternal Like '%' + @FifoLifoSeq + '%'
+    Option (Recompile);
+End
+
+------------------------------------------------------------------------------------------
+-- Apply the update and log the event in one transaction. The post-update PriInternal is
+-- computed in-memory rather than re-read from OeOrder.
+------------------------------------------------------------------------------------------
+Declare @NewPriInternal VarChar(56) = @PriInternal + @SubPriority
+
+Begin Tran
+
+Begin Try
+
+    Update OeOrder
+    Set PriInternal = @NewPriInternal
+    Where OrderId = @LocalOrderId;
+
+    Insert Into EvtRxPrioritizationEvents (Event, OprId, EventDtTm, Notes, SubRoutine, ComputerName, OrderId, PriInternal)
+    Values ('SetRxPriority', Null, GetDate(), Null, 'lsp_OrdSetPriInternalSubPriForRx', @ComputerName, @LocalOrderId, @NewPriInternal);
+
+    Commit Tran
+
+End Try
+
+Begin Catch
+
+    Rollback Tran
+
+    Declare @ErrCode Int           = ERROR_NUMBER()
+    Declare @ErrDesc VarChar(6500) = ERROR_MESSAGE()
+
+    Exec lsp_DbLogError
+            @ModulePrefix = 'SqlS',
+            @Event        = 'SetRxPriority',
+            @OprId        = '',
+            @ErrCode      = @ErrCode,
+            @ErrDesc      = @ErrDesc,
+            @Source       = 'lsp_OrdSetPriInternalSubPriForRx',
+            @Routine      = 'lsp_OrdSetPriInternalSubPriForRx',
+            @ComputerName = @ComputerName,
+            @ExeCode      = 'Q'
+
+End Catch
+
+Return @@Error
+
+End
+GO

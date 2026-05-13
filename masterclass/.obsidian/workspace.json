@@ -13,13 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "UNION ALL Views.md",
-                "file": "FOR XML PATH Consolidation.md",
+                "file": "Ambiguous Self-Comparison Predicates.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "FOR XML PATH Consolidation"
+              "title": "Ambiguous Self-Comparison Predicates"
             }
           }
         ]
@@ -183,22 +182,38 @@
   },
   "active": "aa5930ad64fac2c8",
   "lastOpenFiles": [
-    "Density Vector.md",
     "Correlated Subqueries to CTEs.md",
-    "LEFT JOIN OR Anti-Pattern.md",
-    "FOR XML PATH Consolidation.md",
-    "Index Key Columns vs Included Columns.md",
-    "FORCESEEK Hints.md",
-    "Master Fund Accounting.md",
+    "CTE Delete Projection.md",
+    "pdf-export/QueryStoreTriageAndRefactor.pdf",
+    "pdf-export/MaintenanceOperations_Plan.pdf",
+    "pdf-export/PharmAssist_PerformanceAndScalability_ProgramCharter.pdf",
+    "pdf-export/font-preview/Query Store Triage (Helvetica preview).pdf",
+    "pdf-export/font-preview/SQL Server Performance Masterclass (Helvetica preview).pdf",
+    "pdf-export/font-preview",
+    "pdf-export/export-to-pdf.py",
+    "pdf-export/UNION ALL Views.pdf",
+    "pdf-export/Table Variables vs Temp Tables.pdf",
+    "pdf-export/TOP with ORDER BY Semantics.pdf",
+    "Density Vector.md",
     "UNION ALL Views.md",
-    "GAP Session 6.md",
     "TOP with ORDER BY Semantics.md",
     "Table Variables vs Temp Tables.md",
+    "STRING_SPLIT vs WHILE Loop CSV Parsing.md",
     "SQL Server Performance Masterclass.md",
+    "Scalar UDF Parallelism Barrier.md",
     "Query Store Triage.md",
     "Parameter Sniffing.md",
+    "NOT IN vs NOT EXISTS.md",
     "Non-SARGable Predicates.md",
     "NOLOCK Strategy.md",
-    "Scalar UDF Parallelism Barrier.md"
+    "LEFT JOIN OR Anti-Pattern.md",
+    "Index Key Columns vs Included Columns.md",
+    "FORCESEEK Hints.md",
+    "FOR XML PATH Consolidation.md",
+    "Conditional Aggregation Consolidation.md",
+    "Catch-All Query Anti-Pattern.md",
+    "Ambiguous Self-Comparison Predicates.md",
+    "Master Fund Accounting.md",
+    "GAP Session 6.md"
   ]
 }

@@ -1,0 +1,296 @@
+/****** Object:  StoredProcedure [dbo].[lsp_OrdGetReadyForDispenseRxsInBank]    Script Date: 4/5/2026 8:50:32 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+Create   Procedure [dbo].[lsp_OrdGetReadyForDispenseRxsInBank]
+   @AddrBank VarChar(2),
+   @ReturnFillingRelatedData Bit = 0
+As
+/*
+Object Type:
+   Stored Procedure
+
+Name:
+   lsp_OrdGetReadyForDispenseRxsInBank
+
+Version:
+   20
+
+Description:
+   Return all auto-fill Rxs ready for dispense in the specified dispenser cabinet bank.
+      - Order the Rxs in the "derived priority" sequence where an Rx's "derived priority" is the highest of the following priorities:
+      - The priority of the counted Rx itself
+      - The highest priority of all, same-product as the counted Rx, Rxs queued in the robot and queued in the robot-unassigned pool
+        (but with special comparison handling of the internal "group priority boost" value).
+   
+         When the system is configured with [RxPriority] BoostInternalPriOfRxsInGroupWhenRxGoesCountingAndFilled set to True,
+         the internal priority of Rxs within a group is "boosted" each time the first Rx in the group moves to the Counting, then Filled,
+         then Collating states.  Because the logic is comparing the internal priority of not-yet-counting Rxs with counted Rxs, the
+         comparison logic acts on the priority of all not-yet-counted Rx having a not-yet-boosted priority as boosted-to-the-counting-level
+         (when the system is configured to do this internal priority boosting).
+
+Parameters:
+   Input:
+      @AddrBank                   - Dispenser Cabinet Bank within which to return the Ready for Dispense Rxs.
+      @ReturnFillingRelatedData   - Flag that determines whether or not to return all filling related data for the Rxs.
+   Output:
+      None
+
+Return Values:
+   None
+
+Comments:
+   None
+*/
+
+Set NoCount On
+
+----------------------------------
+-- Retrieve a list of Counted Rxs.
+----------------------------------
+If Object_Id('TempDb..#CountedRxs') Is Not Null
+   Drop Table #CountedRxs
+
+Select
+   OrderId,
+   ProductId,
+   PriInternal,
+   QtyOrdered
+Into
+   #CountedRxs
+From
+   OeOrder As O With (Nolock)
+Where
+   AddrBank = @AddrBank                                        -- Specified Bank
+   And
+   FillType = 'A'                                              -- Auto-Fill
+   And
+   OrderId Not Like '%<[1-2]>'                                 -- Ignore Dual-Dispenser Portion/Children Rxs
+   And
+   Not OrderStatus Like 'Split_MV'                             -- Ignore Multi-Vial Parent Rxs
+   And                                                         -- (Multi-Vial Portion/Children Rxs are returned.  The portions for these are dispensed as independent Rxs.)
+   (
+      OrderStatus In ('Counted', 'Partial Counted')            -- Counted Auto-Fill
+      Or
+      (OrderStatus = 'Split-DD' And StatusReason = 'Counted')  -- Dual-Dispenser Parent Rxs with both portions Counted
+   )
+
+---------------------------------------
+-- Retrieve a list of Counted Products.
+---------------------------------------
+If Object_Id('TempDb..#CountedProducts') Is Not Null
+   Drop Table #CountedProducts
+
+Select
+   Distinct ProductId
+Into
+   #CountedProducts
+From
+   #CountedRxs
+
+----------------------------------------------------------------------------------------------------------
+-- For each Counted Product:
+--   Retrieve the Rx and its internal priority
+--     for the top priority same-product Rx in the robot's Scheduled queue or in the Unassigned Bank pool.
+----------------------------------------------------------------------------------------------------------
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- First, retrieve a list of all same-as-Counted-product Rxs in the robot's Scheduled queue.
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+If Object_Id('TempDb..#UnassignedAndScheduledRxsBehindCountedRxs') Is Not Null
+   Drop Table #UnassignedAndScheduledRxsBehindCountedRxs
+
+Select
+   O.ProductId,
+   O.PriInternal,
+   O.OrderId
+Into
+   #UnassignedAndScheduledRxsBehindCountedRxs
+From
+   #CountedProducts P
+      Join
+   OeOrder As O With (Nolock)
+      On O.ProductId = P.ProductId
+Where
+   AddrBank = @AddrBank                                           -- Specified Bank
+   And
+   FillType = 'A'                                                 -- Auto-Fill
+   And
+   OrderId Not Like '%<[1-2]>'                                    -- Ignore Dual-Dispenser Portion/Children Rxs
+   And                                                            -- (Multi-Vial Portion/Children Rxs are returned.  The portions for these are dispensed as independent Rxs.)
+   (
+      OrderStatus = 'Scheduled' -- Queued Scheduled Auto-Fill
+      Or
+      (OrderStatus = 'Split-DD' And (StatusReason = 'Scheduled'))  -- Dual-Dispenser Parent Rxs with both portions Queued Scheduled Auto-Fill
+   )
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- Next, fold-in the list of all same-as-Counted-product Rxs in the Unassigned Bank pool.
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Insert Into
+   #UnassignedAndScheduledRxsBehindCountedRxs
+Select
+   O.ProductId,
+   O.PriInternal,
+   O.OrderId
+From
+   #CountedProducts P
+      Join
+   OeOrder As O With (Nolock)
+      On O.ProductId = P.ProductId
+Where
+   AddrBank = '-'                                                 -- Unassigned Bank
+   And
+   FillType = 'A'                                                 -- Auto-Fill
+   And
+   (
+      OrderStatus = 'Scheduled' -- Queued Scheduled Auto-Fill
+      Or
+      (OrderStatus = 'Split-DD' And (StatusReason = 'Scheduled'))  -- Dual-Dispenser Parent Rxs with both portions Queued Scheduled Auto-Fill
+   )
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- Next, retrieve the top robot Scheduled queue Rx PriInternal value per Counted product.
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+If Object_Id('TempDb..#TopUnassignedOrScheduledBehindCountedRxPriInternalPerProduct') Is Not Null
+   Drop Table #TopUnassignedOrScheduledBehindCountedRxPriInternalPerProduct
+
+Select
+   ProductId,
+   Min(PriInternal) As TopPriInternal
+Into
+   #TopUnassignedOrScheduledBehindCountedRxPriInternalPerProduct
+From
+   #UnassignedAndScheduledRxsBehindCountedRxs
+Group By
+   ProductId
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- Finally, retrieve the top robot Scheduled queue Rx per Counted product.
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+If Object_Id('TempDb..#TopUnassignedOrScheduledBehindCountedRxPerProduct') Is Not Null
+   Drop Table #TopUnassignedOrScheduledBehindCountedRxPerProduct
+
+Select
+   R.ProductId,
+   R.PriInternal,
+   Min(OrderId) As OrderId
+Into
+   #TopUnassignedOrScheduledBehindCountedRxPerProduct
+From
+   #TopUnassignedOrScheduledBehindCountedRxPriInternalPerProduct P
+      Join
+   #UnassignedAndScheduledRxsBehindCountedRxs R
+      On R.ProductId = P.ProductId And R.PriInternal = P.TopPriInternal
+Group By
+   R.ProductId,
+   R.PriInternal
+
+---------------------------------------------------------------------
+-- Generate a list of the Counted Rxs
+--   along with each Rx's top priority upstream same-product Rx data.
+---------------------------------------------------------------------
+-- If the system is configured with [RxPriority] BoostInternalPriOfRxsInGroupWhenRxGoesCountingAndFilled = True:
+--   For each upstream Rx PriInternal, adjust it to be comparable to a group-boosted, Counted Rx level.
+--     - If the Rx's group-boost value is "9" (group does not yet have an Rx counting/counted), act on it as "7" (group has an Rx counting/counted).
+--     - If the Rx's group-boost value is "7" (group has an Rx filled) or "3" (group has an Rx collated), act on it the "7" or "3" value as is.
+--       Let these be acted on as higher priority.
+--
+If Object_Id('TempDb..#CountedRxsWithTopUpstreamRxData01') Is Not Null
+   Drop Table #CountedRxsWithTopUpstreamRxData01
+
+Declare @UpstreamQueuedRxGroupNotYetCountedAdjustedBoostVal Char(1)
+
+If Exists(Select * From vCfgSystemParamVal Where Section = 'RxPriority' And Parameter = 'BoostInternalPriOfRxsInGroupWhenRxGoesCountingAndFilled' And Value = 'True')
+   Set @UpstreamQueuedRxGroupNotYetCountedAdjustedBoostVal = '7'
+Else
+   Set @UpstreamQueuedRxGroupNotYetCountedAdjustedBoostVal = '9'
+
+Select
+   C.OrderId,
+   C.ProductId,
+   C.QtyOrdered,
+   C.PriInternal,
+   IsNull(B.OrderId, 'None') As TopPriUpstreamQueuedRxOrderId,
+   IsNull(Left(B.PriInternal, 1) +
+          Case SubString(B.PriInternal, 2, 1) When '9' Then @UpstreamQueuedRxGroupNotYetCountedAdjustedBoostVal Else SubString(B.PriInternal, 2, 1) End +
+          SubString(B.PriInternal, 3, 22), '999999999999999999') As TopPriUpstreamQueuedRxAdjustedPriInternal
+Into
+   #CountedRxsWithTopUpstreamRxData01
+From
+   #CountedRxs C
+      Left Join
+   #TopUnassignedOrScheduledBehindCountedRxPerProduct B
+      On B.ProductId = C.ProductId
+
+--------------------------------------------------------------------------------------------------------------------------------------
+-- For each Counted Rx, fold in:
+--   - An "Act On As PriInternal" value.
+--       - This is the higher of the Counted Rx's PriInternal vs. the top-most same-product upstream Rx PriInternal.
+--   - The Order ID of the top-most same-product, upstream Rx having higher priority (if it has a higher priority than the Counted Rx)
+--------------------------------------------------------------------------------------------------------------------------------------
+If Object_Id('TempDb..#CountedRxsWithTopUpstreamRxData02') Is Not Null
+   Drop Table #CountedRxsWithTopUpstreamRxData02
+
+Select
+   OrderId,
+   ProductId,
+   QtyOrdered,
+   PriInternal,
+   Case When TopPriUpstreamQueuedRxAdjustedPriInternal < PriInternal Then TopPriUpstreamQueuedRxAdjustedPriInternal Else PriInternal End As ActOnAsPriInternal,
+   Case When TopPriUpstreamQueuedRxAdjustedPriInternal < PriInternal Then TopPriUpstreamQueuedRxOrderId Else Null End As FillToMakeWayForUpstreamRxOrderId
+Into
+   #CountedRxsWithTopUpstreamRxData02
+From
+   #CountedRxsWithTopUpstreamRxData01
+
+----------------------------------------------------------------------------------------------------------------------------------
+-- Finally, return the list of Counted Rxs sequencing them by their "Act On PriInternal" value (followed by the Rx's PriInternal).
+----------------------------------------------------------------------------------------------------------------------------------
+-- Return Rx data columns based on the passed-in flag @ReturnFillingRelatedData.
+--
+Set NoCount Off
+
+If @ReturnFillingRelatedData = 0
+   Begin
+
+      Select
+         F.OrderId,
+         F.ProductId,
+         F.FillToMakeWayForUpstreamRxOrderId,
+         F.QtyOrdered,
+         INV.QtyPer100Cc,
+         CAST(((F.QtyOrdered * 100.0) / INV.QtyPer100Cc) * 0.2705 As Decimal(9,3)) As ProductVolumeInDrams,
+         CASE WHEN OFR.IsFlaggedFor = 'Prt Ovrflw Lbl' Then 1 Else 0 End As OverFlowLabelRequired,
+         F.ActOnAsPriInternal,
+         F.PriInternal
+      From
+         #CountedRxsWithTopUpstreamRxData02 As F
+         INNER JOIN
+         vInvMasterWithUserOverrides As INV With (NoLock)
+            ON INV.ProductId = F.ProductId
+         LEFT JOIN 
+         OeFlaggedRxs As OFR With (NOLOCK)
+            ON OFR.OrderId = F.OrderId
+   End
+
+Else  -- @ReturnFillingRelatedData = 1
+   Begin
+
+      Select
+         C.OrderId, C.FillToMakeWayForUpstreamRxOrderId,
+         O.RxNum, O.OrderStatus, dbo.fSqlFormatDecimalValueForDisplay(O.QtyOrdered) As QtyOrdered, O.AddrBank, O.RefillNum, O.PriInternal,
+         O.Ndc, O.ProductId, O.Medication, O.StatusReason, O.FillType, O.NumLabelsPrinted, O.GroupNum, O.PriCodeSys
+      From
+         #CountedRxsWithTopUpstreamRxData02 C
+            Join
+         OeOrder As O With (NoLock)
+            On O.OrderId = C.OrderId
+      Order By
+         ActOnAsPriInternal,
+         PriInternal
+
+   End
+
+GO

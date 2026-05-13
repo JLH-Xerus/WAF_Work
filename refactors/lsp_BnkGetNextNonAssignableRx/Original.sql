@@ -1,0 +1,211 @@
+/****** Object:  StoredProcedure [dbo].[lsp_BnkGetNextNonAssignableRx]    Script Date: 4/5/2026 8:50:32 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+Create   Procedure [dbo].[lsp_BnkGetNextNonAssignableRx]
+As
+Begin
+/*
+Object Type:
+   Stored Procedure
+
+Object Name:
+   lsp_BnkGetNextNonAssignableRx
+
+Version:
+   11
+
+Description:
+   Retrieve the top-priority Rx that cannot be assigned to a cabinet bank.
+   This will be the 
+      Top-Priority Scheduled, 
+      Auto-Fill, 
+   Yet Unassigned Rx whose product is no longer assigned to any dispenser (with the appropriate fill method)
+   or whose product is only in Excluded Banks.
+
+Parameters:
+   None
+
+Return Value:
+   A single-row recordset with the Order ID (OrderId) and Non-Assignable Reason
+     (NonAssignableReason) for the top-priority Rx that cannot be assigned.
+
+Comments:
+   None
+
+*/
+-- Multiple temporary sub-queries are used build up to final results.
+
+--------------------------------------------
+-- Scheduled, Auto-Fill, Bank-Unassigned Rxs
+--------------------------------------------
+Drop Table If Exists #BankUnassignedRxs
+
+Select 
+     O.OrderId
+   , PriInternal
+   , ProductId
+   , RequestedFillMethodCode
+Into #BankUnassignedRxs
+From OeOrder As O With (NoLock)
+Inner Join OeOrderSecondaryData O2 With (NoLock)
+   On O2.OrderId = O.OrderId
+Where 
+   (O.OrderStatus = 'Scheduled' OR (OrderStatus = 'Problem' AND O.PendingOrderStatus = 'Scheduled' AND Not StatusReason Like '%Filling method not available')) 
+      And
+   O.FillType = 'A' 
+      And 
+   O.AddrBank = '-'
+      And
+   (O2.RequestedFillMethodCode in ('A','S') or O2.RequestedFillMethodCode is Null)   -- Bank assigner only handles these fill methods.      
+      And 
+   O.LastStatusChgDtTm < DateAdd(Second, -10, GetDate()) -- Don't include any Rxs that were changed in the last 10 seconds (to prevent race conditions)
+
+
+
+--------------------------------------------------------------------------------------------------------------
+-- Scheduled, Auto-Fill, Bank-Unassigned Rxs
+--   whose product (and Inv. Pool) does reside in any Cabinet Bank dispenser (with the requested fill method).
+--    (The bank may be excluded.)
+--------------------------------------------------------------------------------------------------------------
+Drop Table If Exists #RxsInAnyBank
+
+Select *
+Into #RxsInAnyBank
+From (Select
+          O.OrderId
+        , O.PriInternal
+        , T.AddrBank
+        , [SupportedFillMethod] = Case BA.AutoFillTypeCode
+                                    When 'O' Then 'A'     -- Omni-directional Robot is fill method Auto-Fill
+                                    When 'H' Then 'S'     -- Human Fill Type Code is Fill Method Semi-Auto-Fill
+                                  Else Null End
+        , O.RequestedFillMethodCode
+        , T.TcdSn
+      From #BankUnassignedRxs As O With (NoLock)
+      Inner Join TcdStatus As T With (NoLock)
+         On O.ProductId = T.ProductId
+      Inner Join BnkAllBanks BA on BA.AddrBank=T.AddrBank
+      Group by O.OrderId, O.PriInternal, T.AddrBank, BA.AutoFillTypeCode, O.RequestedFillMethodCode, TcdSn
+     ) temp
+Where SupportedFillMethod = RequestedFillMethodCode
+         OR
+      RequestedFillMethodCode is Null
+
+-------------------------------------------------------------------------------------------------------------------------------------
+-- Scheduled, Auto-Fill, Bank-Unassigned Rxs
+--   whose product (and Inv. Pool) does NOT reside in any Cabinet Bank dispenser (with the appropriate filling method).
+-- In other words, the product is not assigned to any dispenser (the dispenser may or may not be installed in a bank [AddrCabinet=0])
+--    or it is assigned to a dispenser, but the dispenser is assigned to a bank that doesn't support the requested filling method.
+-------------------------------------------------------------------------------------------------------------------------------------
+Drop Table If Exists #RxsNotInAnyBank
+Select 
+      O.OrderId,
+      [NonAssignableReason] = 'NotInAnyBank',     -- Actually, Not Assigned to Any Bank (rather than installed in)
+      O.PriInternal,
+      O.RequestedFillMethodCode
+Into #RxsNotInAnyBank
+From #BankUnassignedRxs As O With (NoLock) 
+Left Join #RxsInAnyBank As InAny With (NoLock)
+   On InAny.OrderId = O.OrderId
+Where TcdSn is Null    -- i.e., no record returned from Join (product is not in a dispenser/bank that supports filling method)
+
+-----------------------------------------------------------------
+-- Products that are assigned to a non-excluded bank
+-----------------------------------------------------------------
+Drop Table If Exists #IncludedBankProducts
+
+Select
+     T.ProductId
+   , [SupportedFillMethod] = Case BA.AutoFillTypeCode
+                             When 'O' Then 'A'     -- Omni-directional Robot is fill method Auto-Fill
+                             When 'H' Then 'S'     -- Human Fill Type Code is Fill Method Semi-Auto-Fill
+                             Else Null End
+   , T.AddrBank
+Into #IncludedBankProducts
+From TcdStatus As T With (NoLock)
+Inner Join BnkConfiguredBanks As B With (NoLock)
+   On T.AddrBank = B.AddrBank
+Inner Join BnkAllBanks As BA With (NoLock)
+   On BA.AddrBank = T.AddrBank
+Where T.ProductId Is Not Null
+         And
+      B.IsExcluded = 0
+Group By ProductId, T.AddrBank, BA.AutoFillTypeCode
+
+
+-------------------------------------------------
+-- Products that are assigned to an excluded bank
+-------------------------------------------------
+Drop Table If Exists #ExcludedBankProducts
+Select
+     T.ProductId
+   , [SupportedFillMethod] = Case BA.AutoFillTypeCode
+                             When 'O' Then 'A'     -- Omni-directional Robot is fill method Auto-Fill
+                             When 'H' Then 'S'     -- Human Fill Type Code is Fill Method Semi-Auto-Fill
+                             Else Null End
+   , T.AddrBank
+Into #ExcludedBankProducts
+From TcdStatus As T With (NoLock)
+Inner Join BnkConfiguredBanks As B With (NoLock)
+   On T.AddrBank = B.AddrBank
+Inner Join BnkAllBanks As BA With (NoLock)
+   On BA.AddrBank = T.AddrBank
+Where T.ProductId Is Not Null
+         And
+      B.IsExcluded = 1
+Group By ProductId, T.AddrBank, BA.AutoFillTypeCode
+
+----------------------------------------------------------------------------------------------------------------------
+-- Scheduled, Auto-Fill, Bank-Unassigned Rxs
+--   whose product (and Inv. Pool) only resides in an Excluded Cabinet Bank (that supports the requested fill method).
+----------------------------------------------------------------------------------------------------------------------
+Drop Table If Exists #RxsOnlyInExclBank
+Select
+     O.OrderId
+   , [NonAssignableReason] = 'OnlyInExcludedBank'
+   , O.PriInternal
+   , O.RequestedFillMethodCode
+Into #RxsOnlyInExclBank
+From #BankUnassignedRxs As O With (NoLock)
+Left Join #ExcludedBankProducts As Ex
+   On O.ProductId = Ex.ProductId
+Left Join #IncludedBankProducts As Incl
+   On O.ProductId = Incl.ProductId
+Where 
+   Not ((Incl.AddrBank is Not Null And RequestedFillMethodCode = Incl.SupportedFillMethod)    -- Rx is in online bank that supports requested fill method
+            Or
+        (Ex.AddrBank is Null)        -- Rx is not in any excluded bank
+            Or
+        (Ex.AddrBank is not Null And RequestedFillMethodCode is not Null And RequestedFillMethodCode <> Ex.SupportedFillMethod)      -- Excluded bank doesn't support requested fill method
+       ) -- End Not
+      And
+   Ex.AddrBank is not Null
+
+----------------------------------------------------------------------
+-- The final query:
+--   Get the top-priority Rx that cannot be assigned to a cabinet bank.
+----------------------------------------------------------------------
+
+Select Top 1
+     OrderId
+   , NonAssignableReason
+   , PriInternal
+From
+   (Select * From #RxsNotInAnyBank
+    Union
+    Select * From #RxsOnlyInExclBank
+   ) As NonAssignableRxs
+Order By
+   PriInternal, OrderId
+
+Drop Table If Exists #BankUnassignedRxs
+                   , #RxsInAnyBank
+                   , #RxsNotInAnyBank
+                   , #IncludedBankProducts
+                   , #ExcludedBankProducts
+                   , #RxsOnlyInExclBank
+
+End
+GO

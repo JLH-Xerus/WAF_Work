@@ -1,0 +1,101 @@
+/****** Object:  StoredProcedure [dbo].[lsp_OeOrderTextDocumentsClassify]    Script Date: 4/5/2026 8:50:32 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+
+CREATE   PROCEDURE [dbo].[lsp_OeOrderTextDocumentsClassify]
+    @BatchSize INT = 100,
+    @MaxRecords INT = 1000
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @CutoffDate DATETIME = DATEADD(DAY, -28, GETDATE());
+    DECLARE @TotalProcessed INT = 0;
+    DECLARE @LastProcessedId INT;
+
+    DECLARE @ErrorMessage NVARCHAR(4000);
+    DECLARE @ErrorSeverity INT;
+    DECLARE @ErrorState INT;
+	Declare @EvtNotes VarChar(255)         -- Logged event notes.
+
+    BEGIN TRY
+        -- Get the last processed Id from the classification table
+        SELECT @LastProcessedId = ISNULL(MAX(Id), 0)
+        FROM PharmAssist.dbo.OeOrderTextDocumentClassification;
+		SELECT @LastProcessedId
+		Set @EvtNotes = '@LastProcessedId=' + Cast(@LastProcessedId As VarChar(12)) + ';@NumOfRowsBatchSize=' + Cast(@BatchSize As VarChar(12)) + ';@MaxRecords=' + Cast(@MaxRecords As VarChar(12))
+		Exec lsp_DbLogSqlEvent 'A', 'OEOrderTDClassify Beg', '', @EvtNotes, 'lsp_OeOrderTextDocumentsClassify' 
+
+        
+
+While Exists
+
+(SELECT 1
+    FROM [PWDAZNSYMPH02].PHARMASSIST.dbo.OeOrderTextDocument WITH (NOLOCK)
+    WHERE HistoryDtTm < @CutoffDate
+      AND Id > @LastProcessedId)  
+
+        BEGIN
+            ;WITH Batch AS (
+                SELECT TOP (@BatchSize)
+                    Id,
+                    OrderId,
+                    HistoryDtTm,
+                    DATALENGTH(DocData) AS DocDataLength
+                FROM [PWDAZNSYMPH02].PHARMASSIST.dbo.OeOrderTextDocument with (nolock)
+                WHERE HistoryDtTm < @CutoffDate
+                  AND Id > @LastProcessedId
+                ORDER BY Id ASC
+            )
+            INSERT INTO PharmAssist.dbo.OeOrderTextDocumentClassification (
+                Id,
+                OrderId,
+                DocDataLength,
+                IsLeaflet,
+                HistoryDtTm,
+                ProcessedDtTm,IsDeleted
+            )
+            SELECT
+                Id,
+                OrderId,
+                DocDataLength,
+                CASE WHEN DocDataLength > 153600 THEN 'Non-Leaflet' ELSE 'Leaflet' END,
+                HistoryDtTm,
+                GETDATE(),0
+            FROM Batch;
+			
+            SET @TotalProcessed += @@ROWCOUNT;
+			SELECT @TotalProcessed
+            -- Update last processed Id
+            SELECT @LastProcessedId = ISNULL(MAX(Id), @LastProcessedId)
+            FROM PharmAssist.dbo.OeOrderTextDocumentClassification;
+			--SELECT @LastProcessedId
+            -- Exit if no more records or max limit reached
+            --IF @@ROWCOUNT = 0 OR @TotalProcessed >= @MaxRecords
+			IF @TotalProcessed >= @MaxRecords
+BEGIN
+			Set @EvtNotes = '@LastProcessedId=' + Cast(@LastProcessedId As VarChar(12)) + ';@TotalProcessed=' + Cast(@TotalProcessed As VarChar(12)) 
+			Exec lsp_DbLogSqlEvent 'A', 'OEOrderTDClassify End', '', @EvtNotes, 'lsp_OeOrderTextDocumentsClassify' 
+
+                BREAK;
+     END --END IF TOTALPROCESSED
+	 END
+    END TRY
+    BEGIN CATCH
+        SET @ErrorMessage = ERROR_MESSAGE();
+        SET @ErrorSeverity = ERROR_SEVERITY();
+        SET @ErrorState = ERROR_STATE();
+		
+		Set @EvtNotes = '@@ErrorSeverity=' + Cast(@ErrorSeverity As VarChar(12)) + ';@ErrorState=' + Cast(@ErrorState As VarChar(12)) + ';@ErrorMessage=' +  Cast(@ErrorMessage As VarChar(200))
+		Exec lsp_DbLogSqlEvent 'A', 'OEOrderTDClassify Err', '', @EvtNotes, 'lsp_OeOrderTextDocumentsClassify' 
+
+
+        RAISERROR('Error in ClassifyOeOrderTextDocuments: %s', @ErrorSeverity, @ErrorState, @ErrorMessage); --WITH LOG;
+    END CATCH
+END
+GO
