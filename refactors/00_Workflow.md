@@ -41,19 +41,19 @@ Cross-MFC Query Store outputs live at `WAF_Work/diagnostics/querystore_outputs/<
 
 ## Analysis.md Template
 
-Eleven sections. Each one has a clear job. Do not merge or reorder.
+Eleven sections. Each one has a clear job. Do not merge or reorder. Each section is tagged below as either **prose** (paragraphs are appropriate for explaining reasoning) or **findings** (lead with the number, use bullets/tables, no throat-clearing). See "Tone By Section" below for what each tag means in practice.
 
-1. **Procedure Name & Surface Area.** What the proc does in one line; the tables touched with brief descriptions; the indexes used (extracted from the v25 plan or equivalent); the callers if known.
-2. **Overview of Performance.** Two or three short paragraphs setting the cost picture from the cross-MFC view. Headline numbers, plan instability indicators, per-site spread, dominant cost driver.
-3. **Evidence of Original.** 3.1 cross-MFC Query Store table with one row per site. 3.2 STATS IO/TIME from a representative MFC run, with per-table reads aggregated and per-statement timing.
-4. **Issue Identification.** Walk the DDL. List each anti-pattern with the line number it lives on and a brief description. One subsection per issue.
-5. **First Principles.** One subsection per principle. Cite existing masterclass notes by bare wikilink (`[[Note Name]]`). If a refactor surfaces a principle not covered by an existing note, write a fresh masterclass note in `masterclass/` and cite it here.
-6. **Refactor (commented).** The new SQL as it appears in `Refactored.sql`, with inline comments explaining each changed block. Mirror the structure of the file.
-7. **Risk & Rollback.** What could go wrong, what to look for in the first 24 hours, how to revert. Include a monitoring window with specific metrics to watch.
-8. **Evidence of Refactor.** STATS IO/TIME from the warm-cache run on the same data state as Section 3.2, plus the post-refactor plan summary.
-9. **Comparison & Improvement.** Apples-to-apples comparison of v-N to v-N+1. Read counts per table, total reads, CPU time, elapsed time, plan operator counts. Verdict at the top of the section.
-10. **Validation Checklist.** Marked pass or fail against the criteria below. Net call sentence at the end.
-11. **Open Items / Future Improvements.** Three subsections. 11.1 index recommendations with full CREATE INDEX statements. 11.2 proc-level changes that are out of scope for this version but ready to apply next. 11.3 schema-level changes that need DBA blessing.
+1. **Procedure Name & Surface Area.** *(findings)* What the proc does in one line. Tables touched as a bullet list with one-line descriptions. Indexes used as a table. Callers as a bullet list.
+2. **Overview of Performance.** *(prose, capped)* Cap at three short paragraphs. Headline numbers, plan instability indicators, per-site spread, dominant cost driver. If a paragraph runs more than four sentences, break it. State the dominant cost driver in the first sentence.
+3. **Evidence of Original.** *(findings)* 3.1: cross-MFC Query Store table, one row per site. 3.2: STATS IO/TIME block verbatim, then a short bullet list of the headline numbers (the LOB read count, the dominant table by logical reads, the bound index). Do not narrate the numbers in paragraph form.
+4. **Issue Identification.** *(prose, structured)* One subsection per issue, bolded label. Line number, one-line problem statement, one-paragraph explanation of why it matters. Cap each issue at one paragraph.
+5. **First Principles.** *(prose)* One subsection per principle. Cite existing masterclass notes by bare wikilink (`[[Note Name]]`). If a refactor surfaces a principle not covered by an existing note, write a fresh masterclass note in `masterclass/` and cite it here. Reasoning is the point here, so prose is appropriate.
+6. **Refactor (commented).** *(code + brief annotation)* The new SQL as it appears in `Refactored.sql`, with inline comments explaining each changed block. Mirror the structure of the file. The SQL is the deliverable; annotation is supporting.
+7. **Risk & Rollback.** *(prose, capped)* What could go wrong, what to look for in the first 24 hours, how to revert. Cap concerns at three bullets with one-paragraph elaborations. Monitoring metrics as a bullet list.
+8. **Evidence of Refactor.** *(findings)* STATS IO/TIME block verbatim, then a short bullet list of the headline numbers and a short bullet list of plan-shape observations from the .sqlplan. No narrative wrapper.
+9. **Comparison & Improvement.** *(findings, table-led)* The comparison table is the section. Above the table: one sentence stating which bodies are being compared. Below the table: a single bullet list of "what the numbers say" findings, one bullet per finding, no transitional sentences. If a finding needs a caveat, the caveat is part of the bullet, not a new paragraph.
+10. **Validation Checklist.** *(findings)* Text markers (`[PASS]`, `[WARN]`, `[FAIL]`, `[?]`) against the criteria below. Each item gets at most one sentence of justification. Net call as a single sentence at the end.
+11. **Open Items / Future Improvements.** *(findings + prose hybrid)* One subsection per item. Each subsection leads with a one-sentence statement of the open item, then at most two short paragraphs of supporting detail. 11.1 covers index recommendations with full CREATE INDEX statements. 11.2 covers proc-level changes that are out of scope for this version but ready to apply next. 11.3 covers schema-level changes that need DBA blessing. Add more numbered subsections as needed for net-new follow-ups surfaced by the capture.
 
 ## Apples-to-Apples Evidence Protocol
 
@@ -120,7 +120,7 @@ When a refactor surfaces a principle not covered by an existing note, write a ne
 
 ## Validation Checklist (Section 10)
 
-Mark each pass or fail using ✅ ⚠️ ❌ or ? as appropriate. Every refactor must pass all of these before being declared done.
+Mark each item using `[PASS]`, `[WARN]`, `[FAIL]`, or `[?]` as appropriate. Every refactor must reach `[PASS]` on all of these before being declared done.
 
 - **Same data state.** Captures taken back to back, ideally with a data freeze.
 - **Warm cache only.** Two runs, cold-cache numbers discarded.
@@ -132,17 +132,287 @@ Mark each pass or fail using ✅ ⚠️ ❌ or ? as appropriate. Every refactor 
 
 End the section with a one-sentence net call.
 
+## Hard Rules (apply to every deliverable)
+
+These are non-negotiable. They apply to Analysis.md, Refactored.sql comments, masterclass notes, `tasks/lessons.md` entries, and any other text artifact produced by this workflow. A deliverable that violates these is not done.
+
+1. **No em-dashes anywhere.** Not `—`, not `–` (en-dash) used as one. If a sentence reaches for an em-dash, use a comma, a period, a colon, parentheses, or rewrite the sentence to flow without one. This rule has zero exceptions in deliverables. This workflow doc itself may name the prohibited character literally (as in this rule) and may show it inside a labeled "Before" illustration; neither use counts as a violation.
+2. **No emojis anywhere, including in the validation checklist.** No `✅`, `⚠️`, `❌`, `🔧`, `🚨`, no checkmarks, no warning signs, no decorative pictographs of any kind. The validation checklist uses text markers: `[PASS]`, `[WARN]`, `[FAIL]`, `[?]`. A plain `?` is fine as a marker for unknown; it is not an emoji. As with Rule 1, this workflow doc may literally name the prohibited characters when describing the rule; that is not a violation.
+3. **Wikilinks use bare style.** `[[Note Name]]`, not `[[masterclass/Note Name]]`.
+4. **Tables: empty cells for "no value."** No placeholder dashes, no "N/A," no "TBD" unless TBD is genuinely informative.
+
 ## Prose Conventions
 
-These apply to all deliverables: Analysis.md, Refactored.sql comments, masterclass notes, and `tasks/lessons.md` entries.
+These apply to all deliverables. They are softer than the Hard Rules above; treat them as defaults rather than absolutes.
 
-- Plain prose. Sentences are sentences.
-- No em-dashes. Use commas, periods, colons, or rewrite the sentence to flow without one.
-- No clipped phrasing or rhetorical flourishes.
-- No emojis except in validation checklist status markers (✅ ⚠️ ❌ ?).
-- Wikilinks use bare style: `[[Note Name]]`, not `[[masterclass/Note Name]]`.
-- Tables: empty cells for "no value" rather than placeholder dashes.
-- When in doubt, match the tone of the existing masterclass notes.
+- Match the tone of the existing masterclass notes for reasoning sections; match the tone of a research-findings memo for evidence sections (see "Tone By Section" below).
+- Active voice in findings sections; passive voice acceptable in reasoning sections when it makes the subject of the sentence the object of attention.
+- Prefer specific numbers to generalizations. "Logical reads dropped 38%" is better than "logical reads dropped significantly."
+
+## Tone By Section
+
+Analysis.md is two documents glued together: a reasoning document (why this refactor) and a findings document (what the captures showed). They should not read the same.
+
+**Findings sections (3.2, 8, 9, 10, 11) read as a research memo.** Lead with the number or the conclusion. Use bullet lists for enumerable findings. Use tables for comparisons. One idea per bullet; the bullet stands on its own. No transitional sentences between bullets. No hedging ("worth noting," "worth flagging," "it bears mentioning"). No throat-clearing ("The headline observation from this capture is that…"). If a finding has a caveat, the caveat is part of the same bullet, not a follow-up paragraph. Length budget: a findings section should be shorter than its source data block.
+
+**Reasoning sections (2, 4, 5, 7) read as the existing masterclass notes.** Paragraphs are appropriate. Sentences are sentences. The reader needs to follow the argument, so transitional language is allowed. Cap paragraphs at four sentences; if you reach for a fifth, break the paragraph or move detail to a bullet.
+
+**Refactor section (6) is annotated code.** The SQL is the deliverable. Comments inside the SQL explain each changed block. The surrounding markdown is a one-paragraph orientation, not a re-explanation of the code.
+
+**Rules that apply to every section:**
+
+- Lead with the conclusion. Then the supporting detail. Never the other way around.
+- Numbers belong in the first sentence of the paragraph or bullet that discusses them.
+- If a sentence starts with "It is worth," "Worth noting," "Note that," "Importantly," cut the prefix.
+- If a sentence ends with "is the headline indicator," "is the dominant driver," "is the key finding," cut the sentence and put the number at the top of the section instead.
+- If a paragraph repeats a number that already appears in a table, cut the paragraph.
+
+### Before / After example
+
+**Before (verbose, prose-y).** From a findings section:
+
+> The headline cost driver visible in this capture is the 66,109 LOB logical reads on `ImgImage`, which is one read per outer row driven by the `i.ImageData Is Not Null` predicate. The `OeOrderHistory` numbers (66,035 scans, 286,341 logical reads) match the plan binding `PK_OeOrderHistory` and applying `OrderStatus = 'Shipped'` as a residual filter rather than as a seek-key predicate. The captured plan is in `Tolleson/original_executionPlan.sqlplan`.
+
+**After (direct, findings-style).** Same content, two-thirds the length:
+
+> Findings:
+>
+> - 66,109 LOB logical reads on `ImgImage`. One per outer row, driven by `i.ImageData Is Not Null`.
+> - 66,035 scans / 286,341 logical reads on `OeOrderHistory`. Plan binds `PK_OeOrderHistory`; `OrderStatus = 'Shipped'` is a residual, not a seek key.
+>
+> Plan: `Tolleson/original_executionPlan.sqlplan`.
+
+**Before (verbose).** From a comparison section:
+
+> The 7.6% drop in `OeOrderHistory` logical reads is the structural part of the win — the index switch from `PK_OeOrderHistory` to `ByOrderStatus` happens correctly, but the per-image probe was already a 1-row seek under the original plan, so the residual-to-seek-key promotion is largely cosmetic on this dataset.
+
+**After (direct).** Same content:
+
+> `OeOrderHistory` index switch fired (`PK_OeOrderHistory` → `ByOrderStatus`) but only saved 7.6% of logical reads on this dataset. Per-image probe was already 1-row under the original; the residual-to-seek-key promotion is cosmetic at Tolleson's current data shape.
+
+## Section Recipes
+
+Each section follows a concrete template. These recipes are what the abstract rules in "Tone By Section" look like in practice. Match the structure of every recipe; the wording fills in around it.
+
+### Header (above Section 1)
+
+```
+# <ProcName>: Refactor Analysis (vN to vN+1)
+
+**Date:** <YYYY-MM-DD>; <site> capture added <YYYY-MM-DD>.
+**Tracking sheet row:** <descriptor>.
+**Deployment state:** <state>. `Refactored.sql` matches the <committed version>.
+
+**Note on the <date> <site> capture.** The captures measure <count> bodies:
+
+- <body 1 in one line>.
+- <body 2 in one line, if applicable>.
+
+<One sentence on what was NOT captured if there is a gap. Otherwise omit.>
+```
+
+### Section 1: Procedure Name & Surface Area
+
+```
+**Procedure:** `dbo.<ProcName>`
+
+**Purpose:** <one sentence stating what the proc returns and the eligibility rule>.
+
+**Tables touched:**
+
+- `<TableA>`: <one-line role>. <Optional filter list>.
+- `<TableB>`: ...
+- ...
+
+**Indexes used (predicted from <version>; not all confirmed against a <version> plan):**
+
+| Table | Index | Where used |
+|---|---|---|
+| ... | ... | ... |
+
+**Callers:** <one line>.
+
+**<Optional gap or caveat note>.** <One short paragraph>.
+```
+
+No "pivotal index" commentary in Section 1. That argument belongs in Section 5.
+
+### Section 2: Overview of Performance
+
+Three short paragraphs. Each leads with the cost driver in the first sentence.
+
+```
+<Para 1: dominant cost in original. First sentence names the driver. Two or three more sentences on why it is expensive.>
+
+<Para 2: structural fix in refactor. What it unlocks. Reference to a secondary change if one applies (rowgoal, FORCESEEK, etc.) with a forward pointer to §11.>
+
+<Para 3: open issue not addressed by the refactor, if any. One paragraph. Cross-reference to §11.>
+```
+
+### Section 3.2: STATISTICS IO and STATISTICS TIME
+
+Stats block then bullets, no narrative paragraph.
+
+```
+<site>, <date>. Warm cache.
+
+```
+<verbatim STATS IO / STATS TIME block>
+```
+
+Findings:
+
+- <largest cost driver as a number + cause>.
+- <secondary cost driver as a number + cause>.
+- <CPU and elapsed totals>.
+
+Plan: `<path/to/plan.sqlplan>`. Source: `<path/to/results.txt>`.
+```
+
+### Section 4: Issue Identification
+
+One bolded label per issue. Line number in the label. Two sentences maximum.
+
+```
+**Issue N: <name> (line X).** `<code snippet>`. <One sentence on the mechanism>. <Optional second sentence on the fix or the source of the cost number>.
+```
+
+Cap each issue at two sentences. A third sentence almost always belongs in Section 5 or Section 11.
+
+### Section 5: First Principles
+
+One bolded wikilink per principle. Two to three sentences each.
+
+```
+**[[Note Name]].** <Principle in one sentence>. <How it applies to this refactor in one sentence>. <Optional cross-reference to §11 if the application is partial or unverified>.
+```
+
+Do not add a closing summary paragraph. The principles speak for themselves.
+
+### Section 6: Refactor (commented)
+
+```
+The vN body lives in `Refactored.sql`. Key blocks:
+
+```sql
+<code block 1>
+```
+
+```sql
+<code block 2>
+```
+
+<One paragraph on what the refactor does. Cross-references to §11 for follow-ups (do not restate the rationale).>
+```
+
+Inline comments in the SQL itself carry the per-block explanation. The markdown does not re-explain them.
+
+### Section 7: Risk & Rollback
+
+```
+**Concerns:**
+
+- <Concern 1>. <One-sentence elaboration>.
+- <Concern 2>. <One-sentence elaboration>.
+- <Concern 3>. <One-sentence elaboration>.
+
+**First 24 hours:** <one or two sentences on the headline indicator>.
+
+**Rollback:** <one sentence on the path back>.
+```
+
+### Section 8: Evidence of Refactor
+
+8.1 is brief, often a placeholder if the committed version has not been captured.
+
+```
+### 8.1 <version> (committed): not yet captured at <site>
+
+Holding for <version> STATS IO / STATS TIME and plan capture under the same data state used for §3.2.
+
+```
+(holding for <version> capture)
+```
+```
+
+8.2 (or the body of 8 if there is no 8.1/8.2 split) follows the findings template.
+
+```
+### 8.2 <Body description>: <date> <site> capture
+
+The captured body <description, including any deviation from the committed body>:
+
+- <body characteristic 1>.
+- <body characteristic 2>.
+- ...
+
+<Optional one-paragraph note if the captured body is not a deploy candidate, with a cross-reference to §11.1 or wherever the fix is recommended.>
+
+```
+<verbatim STATS IO / STATS TIME block, including per-statement breakdown if applicable>
+```
+
+Headline numbers:
+
+- <largest delta as a number>.
+- <secondary delta>.
+- ...
+
+Plan-shape observations (`<path/to/plan.sqlplan>`):
+
+- <observation 1, one line>.
+- <observation 2>.
+- ...
+```
+
+### Section 9: Comparison & Improvement
+
+One sentence above the table stating which bodies are compared. The table. A single "Findings:" bullet list below. Maximum eight bullets. No "What the table shows" / "What the table does not show" paragraphs.
+
+```
+Comparison is <body A> vs <body B>. <One sentence on what cannot be inferred from this table>.
+
+| Metric | <A> | <B> | Delta |
+|---|---|---|---|
+| ... | ... | ... | ... |
+
+Findings:
+
+- <finding 1 with its number>.
+- <finding 2>.
+- ...
+```
+
+### Section 10: Validation Checklist
+
+```
+Status reflects the <date> <site> capture. Items dependent on <body or capture not yet in hand> are pending.
+
+- `[PASS]` <criterion>. <One-sentence justification>.
+- `[WARN]` <criterion>. <One-sentence justification>.
+- `[?]` <criterion>. <One-sentence justification, including what would close it>.
+- ...
+
+Net call: <one sentence summarizing what the capture supports and what it does not>.
+```
+
+### Section 11: Open Items / Future Improvements
+
+Each subsection has a title that names the action ("Remove the LOB predicate," "Capture v7 at Tolleson"). Lead the body with the finding or recommendation. Two short paragraphs maximum. Code blocks allowed.
+
+```
+### 11.N <Action verb> <thing>
+
+<One-sentence statement of the finding or recommendation, including any number that validates it>.
+
+<Two to three sentences of supporting detail. Cross-reference other §11 subsections by number when relevant. Do not narrate.>
+
+<Optional code block, before/after SQL, or evidence quote>.
+
+<Optional second short paragraph if a second concrete action falls out>.
+```
+
+Add subsections as needed for net-new follow-ups surfaced by the capture; the original 11.1 / 11.2 / 11.3 ordering is a starting point, not a ceiling.
 
 ## Workflow Per Procedure
 
@@ -162,7 +432,30 @@ These apply to all deliverables: Analysis.md, Refactored.sql comments, mastercla
 
 ## Quality Bar
 
-The pilot Analysis.md (`refactors/lsp_ShpGetOrdersForTopReadyToShipGroup/Analysis.md`) is the reference. Each subsequent analysis should match its depth, structure, and prose quality. If a procedure is small enough that the full template feels heavyweight, follow the template anyway. The consistency is more valuable than the brevity. The reader of these documents may be reviewing six of them in a sitting; they should not have to recalibrate per proc.
+**Two reference documents:**
+
+- `refactors/lsp_ShpGetOrdersForTopReadyToShipGroup/Analysis.md` (the pilot) is the reference for *structure*: which eleven sections to include, the order they appear in, what each one is for.
+- `refactors/lsp_ImgGetListOfTopXImagesToMove/Analysis.md` is the reference for *tone and length*: how much prose each section gets, where bullets replace paragraphs, how the findings-vs-reasoning split plays out in practice.
+
+Match the structural depth of the pilot (eleven sections, all populated, no merges). Match the tone budget of `lsp_ImgGetListOfTopXImagesToMove`. The pilot itself is longer than it needs to be in its findings sections; do not use it as a length reference.
+
+If a procedure is small enough that the full template feels heavyweight, follow the template anyway and let the findings sections collapse to bullets. The consistency is in the structure. The reader of these documents may be reviewing six of them in a sitting; the structural consistency lets them skim, and the findings-tone discipline lets them skim quickly.
+
+**Length budget per section (target, not a hard cap):**
+
+- Section 1: under a page. Tables and bullets only; no narrative paragraphs except a single optional "Index DDL gap" or equivalent caveat.
+- Section 2: three short paragraphs, never more. Each leads with the cost driver in the first sentence. Cap each paragraph at four sentences.
+- Section 3.2 (post-block): three or four findings bullets plus a one-line plan/source pointer. No narrative paragraph.
+- Section 4: each issue is two sentences maximum.
+- Section 5: each principle is two or three sentences. No closing summary paragraph.
+- Section 6: code blocks plus a one-paragraph orientation. No re-explanation of what the inline comments already say.
+- Section 7: three concern bullets with one-sentence elaborations, a one-or-two-sentence 24-hour watch, a one-sentence rollback.
+- Section 8 (post-block): up to four bullets of headline numbers plus up to six bullets of plan-shape observations. No narrative wrapper.
+- Section 9: the table plus a single "Findings:" bullet list; no more than eight bullets. No "what the table shows" prose paragraphs.
+- Section 10: one line per checklist item, justification capped at one sentence. Net call as a single sentence.
+- Section 11: each subsection one or two short paragraphs, plus optional code or evidence blocks.
+
+If a section exceeds the target, the right move is almost always to cut, not to push the work into a different section. If you find yourself reaching for a third paragraph in Section 9 or Section 11, ask whether the content belongs in a different subsection of Section 11 instead.
 
 ## Lessons Learned (cross-cutting)
 

@@ -12,6 +12,12 @@ Deep-dive analysis and refactoring of the stored procedures listed in the MFC da
 
 ---
 
+## Recommendation.md Batch (2026-05-14)
+
+Generated `Recommendation.md` alongside every `Analysis.md` in `refactors/`. Template, hard rules, and the verified MS Learn citation library live in `tasks/recommendation_template.md`. 33 files written (one pilot plus 32 batched via four parallel subagents). Verification pass confirmed: 33/33 correct title format, zero em-dashes, zero en-dashes used as em-dashes, zero emojis, sampled masterclass quotes verbatim against source, MS Learn URLs all drawn from the citation library.
+
+Pilot reference: `refactors/lsp_SrtGetShipToteIfExists/Recommendation.md`.
+
 ## Pilot Target — Row 15
 
 **Procedure:** `lsp_ShpGetOrdersForTopReadyToShipGroup`
