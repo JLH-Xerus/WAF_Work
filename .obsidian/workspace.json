@@ -185,6 +185,7 @@
   },
   "active": "ecf0d969f4faab68",
   "lastOpenFiles": [
+    "refactors.zip",
     "refactors/lsp_SrtGetShipToteIfExists/~$commendation.docx",
     "reference/zi9hJOEV",
     "reference/reference_aptos.docx",
@@ -195,7 +196,6 @@
     "reference/unpacked/word/theme",
     "reference/unpacked/word/styles.xml",
     "reference/unpacked/word/settings.xml",
-    "reference/unpacked/word/numbering.xml",
     "refactors/lsp_OeOrderTextDocumentsClassify/Recommendation.md",
     "refactors/lsp_OrdGetRxNumsMedsFromPo/Recommendation.md",
     "refactors/lsp_CanGetPriorityCanistersForReplenishment/Recommendation.md",
