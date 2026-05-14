@@ -185,6 +185,17 @@
   },
   "active": "ecf0d969f4faab68",
   "lastOpenFiles": [
+    "refactors/lsp_SrtGetShipToteIfExists/~$commendation.docx",
+    "reference/zi9hJOEV",
+    "reference/reference_aptos.docx",
+    "reference/unpacked/word/theme/theme1.xml",
+    "reference/unpacked/word/_rels/footnotes.xml.rels",
+    "reference/unpacked/word/_rels/document.xml.rels",
+    "reference/unpacked/word/webSettings.xml",
+    "reference/unpacked/word/theme",
+    "reference/unpacked/word/styles.xml",
+    "reference/unpacked/word/settings.xml",
+    "reference/unpacked/word/numbering.xml",
     "refactors/lsp_OeOrderTextDocumentsClassify/Recommendation.md",
     "refactors/lsp_OrdGetRxNumsMedsFromPo/Recommendation.md",
     "refactors/lsp_CanGetPriorityCanistersForReplenishment/Recommendation.md",
@@ -209,17 +220,6 @@
     "refactors/lsp_DbPurgeHistoryData/Recommendation.md",
     "refactors/lsp_BnkGetNextNonAssignableRx/Recommendation.md",
     "refactors/lsp_DbDeleteOldRxData/Recommendation.md",
-    "refactors/lsp_GovGetSingleVialSorterCounts/Recommendation.md",
-    "refactors/lsp_RxvGetRxsQueuedForVerification/Recommendation.md",
-    "refactors/lsp_ImgGetListOfTopXImagesToMove/lsp_ImgGetListOfTopXImagesToMove/Tolleson/refactor_executionPlan.sqlplan",
-    "refactors/lsp_ImgGetListOfTopXImagesToMove/lsp_ImgGetListOfTopXImagesToMove/Tolleson/procresults.txt",
-    "refactors/lsp_ImgGetListOfTopXImagesToMove/lsp_ImgGetListOfTopXImagesToMove/Tolleson/original_executionPlan.sqlplan",
-    "refactors/lsp_ImgGetListOfTopXImagesToMove/lsp_ImgGetListOfTopXImagesToMove/Tolleson",
-    "refactors/lsp_ImgGetListOfTopXImagesToMove/lsp_ImgGetListOfTopXImagesToMove",
-    "refactors/lsp_ImgGetListOfTopXImagesToMove/lsp_ImgGetListOfTopXImagesToMove.zip",
-    "lsp_ImgGetListOfTopXImagesToMove.zip",
-    "refactored_procstats_4.txt",
-    "refactored_procstats_3.txt",
-    "refactors/lsp_BnkGetNextNonAssignableRx/refactored_procstats_2.txt"
+    "refactors/lsp_GovGetSingleVialSorterCounts/Recommendation.md"
   ]
 }
