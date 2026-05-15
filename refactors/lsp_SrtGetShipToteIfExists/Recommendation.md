@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_SrtGetShipToteIfExists
 
 **Date:** 2026-05-08
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** v27 deployed across the MFC fleet.
 
 ---

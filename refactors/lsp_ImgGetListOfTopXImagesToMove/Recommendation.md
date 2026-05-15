@@ -1,8 +1,8 @@
 # Refactor Recommendation: lsp_ImgGetListOfTopXImagesToMove
 
 **Date:** 2026-05-07
-**Companion analysis:** `Analysis.md` in this folder.
-**Deployment state:** Cataloged. `Refactored.sql` matches the committed v7 body; ready for iA review handoff. v7 has not yet been captured at Tolleson; an exploratory body (not v7) was measured on 2026-05-13 and is documented in `Analysis.md` Section 8.2.
+**Companion analysis:** `Analysis.docx` in this folder.
+**Deployment state:** Cataloged. `Refactored.sql` matches the committed v7 body; ready for iA review handoff. v7 has not yet been captured at Tolleson; an exploratory body (not v7) was measured on 2026-05-13 and is documented in `Analysis.docx` Section 8.2.
 
 ---
 
@@ -20,12 +20,12 @@ The structural issues in v6:
 
 ## Recommendation
 
-Apply the v7 package, which is the textbook fix for the LEFT JOIN + OR anti-pattern: split the two join paths into independent INNER JOIN branches and combine with `UNION` (not `UNION ALL`, because images can qualify through both paths and the result must deduplicate). The LOB predicate stays in v7 and is the largest open item; the schema change behind it is tracked in Section 11.1 of `Analysis.md`.
+Apply the v7 package, which is the textbook fix for the LEFT JOIN + OR anti-pattern: split the two join paths into independent INNER JOIN branches and combine with `UNION` (not `UNION ALL`, because images can qualify through both paths and the result must deduplicate). The LOB predicate stays in v7 and is the largest open item; the schema change behind it is tracked in Section 11.1 of `Analysis.docx`.
 
 1. Pull the configured batch size into a local variable (`@MaxImages`) so the optimizer can sniff the value and apply rowgoal to the outer TOP. The rowgoal claim is unverified by the 2026-05-13 capture; the v7 capture is the test.
 2. Split the LEFT JOIN + OR into two INNER JOIN branches in a derived table: Branch 1 joins `vImgImage` to `ImgRxImgAssoc` and `OeOrderHistory` with `OH.OrderStatus = 'Shipped'`. Branch 2 joins `vImgImage` to `ImgCanImgAssoc` and `CanCanister` with `C.Status = 'Verified'`.
 3. Combine the branches with `UNION` and apply the outer `Top (@MaxImages)` plus `Order By Id Asc` over the combined set.
-4. Retain the existing `WITH (NoLock, FORCESEEK)` hints on the association tables for the v7 ship, pending post-deployment observation. Section 11.2 of `Analysis.md` flags the removal as the cleaner end state.
+4. Retain the existing `WITH (NoLock, FORCESEEK)` hints on the association tables for the v7 ship, pending post-deployment observation. Section 11.2 of `Analysis.docx` flags the removal as the cleaner end state.
 
 The full v7 body is in `Refactored.sql`. The v6 body is in `Original.sql` for diff and rollback.
 
@@ -63,4 +63,4 @@ The techniques in this refactor anchor to the following Transact-SQL reference p
 
 ## Risk Note
 
-UNION over a two-column projection where `Id` is the clustering key has bounded dedup cost; worth confirming in monitoring that the plan choice on `OeOrderHistory` is `ByOrderStatus` and not back to `PK_OeOrderHistory`. Rowgoal sensitivity is real: a site with few Shipped Rx images and many Verified Canister images may need both branches to fill the TOP. FORCESEEK retention is conservative; if the optimizer's natural choice differs, the hint blocks a better plan, and the cleaner end state is v8 without hints. Watch the plan shape on `OeOrderHistory` in the first 24 hours after deploy; `ByOrderStatus` is the predicted win. Capture v7 at Tolleson under the same data state used 2026-05-13 before fleet-wide rollout, per Section 11.7 of `Analysis.md`. Rollback path: redeploy v6 from `Original.sql`. No schema dependency.
+UNION over a two-column projection where `Id` is the clustering key has bounded dedup cost; worth confirming in monitoring that the plan choice on `OeOrderHistory` is `ByOrderStatus` and not back to `PK_OeOrderHistory`. Rowgoal sensitivity is real: a site with few Shipped Rx images and many Verified Canister images may need both branches to fill the TOP. FORCESEEK retention is conservative; if the optimizer's natural choice differs, the hint blocks a better plan, and the cleaner end state is v8 without hints. Watch the plan shape on `OeOrderHistory` in the first 24 hours after deploy; `ByOrderStatus` is the predicted win. Capture v7 at Tolleson under the same data state used 2026-05-13 before fleet-wide rollout, per Section 11.7 of `Analysis.docx`. Rollback path: redeploy v6 from `Original.sql`. No schema dependency.

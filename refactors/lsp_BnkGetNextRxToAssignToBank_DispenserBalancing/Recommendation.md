@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_BnkGetNextRxToAssignToBank_DispenserBalancing
 
 **Date:** 2026-05-08
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** Cataloged. Refactored.sql is a proposed v10 awaiting iA review.
 
 ---

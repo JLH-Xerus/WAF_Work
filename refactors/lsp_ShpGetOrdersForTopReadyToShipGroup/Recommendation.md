@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_ShpGetOrdersForTopReadyToShipGroup
 
 **Date:** 2026-05-07
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** Pilot. v25 captured at Tolleson on 2026-05-07 against a near-empty driver state; plan-shape evidence is conclusive, cost numbers require a representative-driver re-capture before fleet rollout. A Maxdop discrepancy between the test body and `Refactored.sql` must be resolved before deploy.
 
 ---
@@ -30,7 +30,7 @@ Apply the v25 package. The semantic-risk-minimizing changes are intentional: the
 5. Replace the three legacy `Object_Id` existence checks with `Drop Table If Exists`. Normalize `With (NoLock)` capitalization.
 6. Explicit drops at the end of the proc for `#AllQualifyingGroups` and `#MultiVialReadyParents`.
 
-The full v25 body is in `Refactored.sql`. The v24 body is in `Original.sql` for diff and rollback. The Tolleson capture confirmed the plan-shape prediction (operators 140 to 87, UDX nodes 6 to 2, TOP 3 to 1) but ran against a near-empty driver state, so the cost-side evidence is inconclusive. Section 9.5 of `Analysis.md` lists the three clean paths to close out the comparison.
+The full v25 body is in `Refactored.sql`. The v24 body is in `Original.sql` for diff and rollback. The Tolleson capture confirmed the plan-shape prediction (operators 140 to 87, UDX nodes 6 to 2, TOP 3 to 1) but ran against a near-empty driver state, so the cost-side evidence is inconclusive. Section 9.5 of `Analysis.docx` lists the three clean paths to close out the comparison.
 
 ## First Principles
 
@@ -58,7 +58,7 @@ The techniques in this refactor anchor to the following Transact-SQL reference p
 - UNION semantics. [Set Operators - UNION (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/language-elements/set-operators-union-transact-sql) covers the UNION-versus-UNION-ALL distinction that justifies replacing the v24 top-of-Part-4 UNION with `UNION ALL` inside the consolidation.
 - Existence checks. [EXISTS (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/language-elements/exists-transact-sql) documents the short-circuit semantics that v25's `Exists` probes against `#MultiVialReadyParents` rely on. The page is explicit that EXISTS returns TRUE on the first qualifying row.
 - Indexed temp tables. [CREATE INDEX (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/statements/create-index-transact-sql) covers the clustered index on `#MultiVialReadyParents.OrderId` that supports the five `Exists` probes.
-- Hint placement. [Query Hints (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/queries/hints-transact-sql-query) documents the `Maxdop 1` hint preserved on Part 1; the hint cannot legally sit inside a CTE branch, which is the discrepancy currently in `Refactored.sql` that Section 11.2.C of `Analysis.md` resolves.
+- Hint placement. [Query Hints (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/queries/hints-transact-sql-query) documents the `Maxdop 1` hint preserved on Part 1; the hint cannot legally sit inside a CTE branch, which is the discrepancy currently in `Refactored.sql` that Section 11.2.C of `Analysis.docx` resolves.
 
 ## Risk Note
 

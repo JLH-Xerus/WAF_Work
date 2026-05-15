@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_PmssIwebGetTopQueuedTrx
 
 **Date:** 2026-05-07
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** v2 deployed across the MFC fleet. The recommended change is an index addition on `PmssCapturedXmlTrxs`, not a body change. The proc body in v2 stays as-is.
 
 ---

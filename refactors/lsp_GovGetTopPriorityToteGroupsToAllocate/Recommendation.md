@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_GovGetTopPriorityToteGroupsToAllocate
 
 **Date:** 2026-05-08
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** v2 in production. v3 proposed by the MFC DBA team, awaiting iA review.
 
 ---

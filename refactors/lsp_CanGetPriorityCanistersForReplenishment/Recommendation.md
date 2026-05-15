@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_CanGetPriorityCanistersForReplenishment
 
 **Date:** 2026-05-08
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** Cataloged. Refactored.sql is a proposed v74 awaiting iA review. v74 is the first of an expected multi-version refactor sequence; v75 through v77 are scoped in the Analysis Section 11.
 
 ---

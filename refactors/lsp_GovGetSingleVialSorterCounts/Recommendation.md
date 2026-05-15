@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_GovGetSingleVialSorterCounts
 
 **Date:** 2026-05-08
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** v10 in production. v11 proposed by the MFC DBA team, awaiting iA review.
 
 ---

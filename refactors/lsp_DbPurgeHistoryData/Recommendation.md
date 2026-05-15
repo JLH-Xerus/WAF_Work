@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_DbPurgeHistoryData
 
 **Date:** 2026-05-12
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** Cataloged. v2 is the proposed body in `Refactored.sql`, pending evidence capture before deploy. Scope of this revision is one CTE inside a 1618-line procedure; the rest of the proc is unchanged.
 
 ---

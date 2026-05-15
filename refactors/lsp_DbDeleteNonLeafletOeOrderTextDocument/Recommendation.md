@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_DbDeleteNonLeafletOeOrderTextDocument
 
 **Date:** 2026-05-08
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** Cataloged. `Refactored.sql` is a proposed v4 designed by the MFC DBA team and me, awaiting iA review. v4 carries an open semantic question on the linked-server reference that must be resolved before deployment.
 
 ---
@@ -16,7 +16,7 @@ The structural issues in v3:
 - CTE projection is `Select Top (@NumOfRowsBlockSize) *` (line 134). The delete only needs the row locator; reading every column for every candidate is wasted I/O.
 - Stray debug `select @NumOfRowsDeleted` (line 143). Returns a single-value result set to the caller on every iteration. Almost certainly a development leftover.
 - IN-subquery shape for the candidate-Id filter inside the CTE. The optimizer evaluates the inner subquery per outer row unless it is pre-materialized. An indexed temp table converts the per-row work into a single seek per block.
-- Asymmetry between the WHILE check (linked-server) and the DELETE body (local tables). Open question for the iA team; tracked in Section 11.1 of `Analysis.md`.
+- Asymmetry between the WHILE check (linked-server) and the DELETE body (local tables). Open question for the iA team; tracked in Section 11.1 of `Analysis.docx`.
 
 ## Recommendation
 
@@ -58,4 +58,4 @@ The techniques in this refactor anchor to the following Transact-SQL reference p
 
 ## Risk Note
 
-The gating risk is the linked-server question in Section 11.1 of `Analysis.md`; v4 cannot deploy until the iA team confirms the local classification table is authoritative. If qualifying rows are being added to the classification table during the loop, the `@@ROWCOUNT`-driven exit may end one block earlier than v3, which is acceptable because the next nightly run catches the remainder. The `#BlockIds` truncate-then-insert pattern preserves the downstream DELETE join's plan cache across iterations. Watch the nightly maintenance log for total elapsed time (expected: substantially lower because the linked-server check is gone), deletion-count parity with v3 on the first night after deployment, and the absence of debug result sets in the orchestrator's stream. Rollback path: redeploy v3 from `Original.sql`. No schema change.
+The gating risk is the linked-server question in Section 11.1 of `Analysis.docx`; v4 cannot deploy until the iA team confirms the local classification table is authoritative. If qualifying rows are being added to the classification table during the loop, the `@@ROWCOUNT`-driven exit may end one block earlier than v3, which is acceptable because the next nightly run catches the remainder. The `#BlockIds` truncate-then-insert pattern preserves the downstream DELETE join's plan cache across iterations. Watch the nightly maintenance log for total elapsed time (expected: substantially lower because the linked-server check is gone), deletion-count parity with v3 on the first night after deployment, and the absence of debug result sets in the orchestrator's stream. Rollback path: redeploy v3 from `Original.sql`. No schema change.

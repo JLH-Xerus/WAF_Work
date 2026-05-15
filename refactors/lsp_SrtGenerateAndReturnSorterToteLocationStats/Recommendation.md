@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_SrtGenerateAndReturnSorterToteLocationStats
 
 **Date:** 2026-05-08
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** Original in production. Proposed refactor designed by the MFC DBA team, awaiting iA review.
 
 ---

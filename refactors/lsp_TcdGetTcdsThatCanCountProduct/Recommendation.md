@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_TcdGetTcdsThatCanCountProduct
 
 **Date:** 2026-05-08
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** Cataloged. Refactored.sql is a proposed v18 awaiting iA review.
 
 ---

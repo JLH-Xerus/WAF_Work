@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_SrtGetSortationItems
 
 **Date:** 2026-05-07
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** v2 in production across 13 of 14 reporting MFCs. v3 proposed, in progress.
 
 ---

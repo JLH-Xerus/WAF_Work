@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_RxvGetRxsQueuedForVerification
 
 **Date:** 2026-05-07
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** v7 deployed across the MFC fleet; v8 cataloged as the proposed deployment, captured 2026-05-07.
 
 ---

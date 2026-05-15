@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_OrdGetRxStatusCounts
 
 **Date:** 2026-05-07
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** v1 in production across the MFC fleet. v2 proposed, awaiting deployment.
 
 ---

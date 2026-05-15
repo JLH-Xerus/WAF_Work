@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_SrtGetNumOfStoresWithAndWithoutSorterLocs
 
 **Date:** 2026-05-07
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** v6 in production across all 14 reporting MFCs. v7 proposed, awaiting deployment.
 
 ---

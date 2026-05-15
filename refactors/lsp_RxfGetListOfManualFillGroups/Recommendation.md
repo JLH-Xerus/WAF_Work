@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_RxfGetListOfManualFillGroups
 
 **Date:** 2026-05-07
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** In iA Review. v49 Merged_v1 body submitted; v48 is the committed baseline.
 
 ---

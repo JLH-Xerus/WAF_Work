@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_RbtDetermineNextVialToProcess
 
 **Date:** 2026-05-07
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** Cataloged. Refactored.sql is a proposed v11 awaiting iA review.
 
 ---

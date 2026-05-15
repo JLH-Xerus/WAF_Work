@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_DbDeleteOldSmartShelfEvents
 
 **Date:** 2026-05-12
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** Cataloged. v2 is the proposed body in `Refactored.sql`, pending evidence capture before deploy.
 
 ---

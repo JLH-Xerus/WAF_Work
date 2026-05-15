@@ -1,7 +1,7 @@
 # Refactor Recommendation: lsp_DbDeleteOldScriptImages
 
 **Date:** 2026-05-12
-**Companion analysis:** `Analysis.md` in this folder.
+**Companion analysis:** `Analysis.docx` in this folder.
 **Deployment state:** Cataloged. v2 is the proposed body in `Refactored.sql`, pending evidence capture before deploy.
 
 ---
@@ -34,7 +34,7 @@ The full v2 body is in `Refactored.sql`. The v1 body is in `Original.sql` for di
 
 > An index "covers" a query when every column the query references (in SELECT, WHERE, JOIN, GROUP BY, and ORDER BY) is available in the index, either as a key or as an INCLUDE. The optimizer can satisfy the query entirely from the nonclustered index without touching the clustered index.
 
-The PK-only projection unlocks a covering-index path. Any nonclustered index on `ScanDateTime` automatically carries `RxNum` as the row locator, so the v2 projection is covered without an INCLUDE list. If such an index does not exist, the filtered DDL in Section 11.1 of `Analysis.md` is the recommended add. Either way, the projection fix is the prerequisite.
+The PK-only projection unlocks a covering-index path. Any nonclustered index on `ScanDateTime` automatically carries `RxNum` as the row locator, so the v2 projection is covered without an INCLUDE list. If such an index does not exist, the filtered DDL in Section 11.1 of `Analysis.docx` is the recommended add. Either way, the projection fix is the prerequisite.
 
 ## MS Learn Citations
 
