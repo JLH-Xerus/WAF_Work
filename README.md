@@ -2,7 +2,13 @@
 
 A small PowerShell harness for running SQL Server scripts repeatedly under controlled conditions and capturing the diagnostic output you need to compare query versions during performance tuning.
 
-The harness is being built incrementally. Today it discovers `.sql` files, runs each one against a SQL Server instance with a configurable number of warmup and measurement iterations, and writes captured Messages-pane output (PRINT, info messages) to disk per measurement run. Upcoming iterations will layer in `STATISTICS IO` / `STATISTICS TIME` capture and per-iteration `.sqlplan` files (actual execution plans, openable in SSMS).
+For every measurement run of every script the harness captures three things:
+
+- The full Messages-pane output, including everything `STATISTICS IO` and `STATISTICS TIME` emit (per-statement logical reads, physical reads, CPU time, elapsed time).
+- The actual XML execution plan, written as a `.sqlplan` file you can double-click to open in SSMS.
+- Wall-clock timing as a sanity check against the server-side numbers.
+
+It does this across a configurable number of warmup and measurement iterations so the metrics reflect steady-state performance, not cold-cache noise.
 
 ---
 
@@ -17,8 +23,11 @@ WAF_Work/
 └─ results/                 created on first run; a timestamped subfolder per run
    └─ 2026-05-20_08-42-17/
       ├─ 01_smoke_test.run1.messages.txt
+      ├─ 01_smoke_test.run1.sqlplan
       ├─ 01_smoke_test.run2.messages.txt
-      └─ 01_smoke_test.run3.messages.txt
+      ├─ 01_smoke_test.run2.sqlplan
+      ├─ 01_smoke_test.run3.messages.txt
+      └─ 01_smoke_test.run3.sqlplan
 ```
 
 You place SQL scripts into `sql/`. Each script is treated as a single batch — do not include `GO` separators. The harness discovers them in alphabetical order, which is why the sample is prefixed `01_`; numbering the files keeps run order predictable when you're comparing v1 vs v2 of the same query.
@@ -32,7 +41,7 @@ The script targets Windows PowerShell 5.1 (the in-box version that ships with Wi
 You need:
 
 - Network reach from the machine running the script to the SQL Server instance (TCP, default port 1433 unless your instance is custom).
-- A login with permission to execute the queries in `sql/`. For the upcoming `.sqlplan` capture you will also need `SHOWPLAN` permission on the database, which is granted with `GRANT SHOWPLAN TO [your_login]`.
+- A login with permission to execute the queries in `sql/`, plus `SHOWPLAN` permission on the database so `STATISTICS XML` can return execution plans. Grant it with `GRANT SHOWPLAN TO [your_login]`. Without this, the harness will throw at the first iteration with a clear "Showplan permission denied" message.
 - If you're running from a Parallels (or any non-domain-joined) Windows VM, see [Running from Parallels](#running-from-parallels) below.
 
 ---
@@ -85,17 +94,26 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 ## Output
 
-For every measurement iteration of every script, the harness writes a file named:
+For every measurement iteration of every script, the harness writes two files:
 
 ```
-<script_basename>.run<N>.messages.txt
+<script_basename>.run<N>.messages.txt    # PRINT + STATISTICS IO + STATISTICS TIME
+<script_basename>.run<N>.sqlplan         # actual XML execution plan
 ```
 
-Each file has a header block (script, server, database, timestamp, iteration number, wall-clock milliseconds for the iteration) followed by everything SQL Server emitted on the message channel — every `PRINT`, every low-severity info message, and (once we wire it up in the next iteration) the full `STATISTICS IO` and `STATISTICS TIME` blocks.
+For a multi-statement batch (rare in tuning, but supported), each statement that produces a plan gets its own file, suffixed with the statement index: `<script>.run<N>.stmt1.sqlplan`, `<script>.run<N>.stmt2.sqlplan`, and so on. The `Plans captured` count in the messages-file header tells you how many were emitted for the iteration.
+
+Each messages file has a header block (script, server, database, timestamp, iteration number, wall-clock milliseconds, plans captured) followed by everything SQL Server emitted on the message channel — every `PRINT`, every low-severity info message, and the full per-statement `STATISTICS IO` and `STATISTICS TIME` blocks.
+
+The `.sqlplan` files are written as UTF-8 without a BOM. Double-clicking one in Windows opens it in SSMS as the graphical actual plan, with operator costs, row-count estimates vs actuals, the works.
 
 Warmup iterations are *executed* but their output is *not* written; their job is to populate the buffer pool and plan cache so the measurement runs reflect steady-state performance.
 
-The wall-clock timing in the header is captured in PowerShell with a `Stopwatch` and includes round-trip overhead. Trust the `STATISTICS TIME` numbers (once enabled) as the authoritative server-side timing; the wall-clock value is a useful sanity check.
+The wall-clock timing in the header is captured in PowerShell with a `Stopwatch` and includes round-trip overhead. Trust the `STATISTICS TIME` numbers as the authoritative server-side timing; the wall-clock value is a useful sanity check.
+
+### Under the hood
+
+The harness prepends `SET STATISTICS IO ON; SET STATISTICS TIME ON; SET STATISTICS XML ON;` to each iteration's batch — your `.sql` files are never modified on disk. With `STATISTICS XML ON`, SQL Server returns each statement's actual execution plan as an extra result set with a single XML column. The harness uses `ExecuteReader` and walks every result set via `NextResult()`, identifying plan result sets by their column name (which contains "Showplan"). Plan rows are captured to disk; rows from regular query result sets are drained without being materialized, since you've said you don't care about the data.
 
 ---
 
@@ -151,14 +169,12 @@ If your VM *is* domain-joined, regular Shift + right-click → "Run as different
 
 **`Execution Timeout Expired`** — your query took longer than `-CommandTimeoutSeconds` (default 300). Increase the timeout, or investigate why the query is slow (which is presumably what you're here for).
 
-**Messages file is empty** — the script ran but produced no PRINT or info messages. Once `STATISTICS IO`/`STATISTICS TIME` capture is wired up in the next iteration, you should always see output here.
+**`Showplan permission denied`** — the login lacks the `SHOWPLAN` permission needed for `STATISTICS XML ON`. Grant it with `GRANT SHOWPLAN TO [your_login]` on the target database.
+
+**`.sqlplan` file is missing for an iteration** — the script ran but produced no plan. Most often this means the batch only contained statements that don't generate a plan (pure `PRINT`, `DECLARE`, `SET`). Add an actual query and re-run.
 
 ---
 
 ## Roadmap
 
-The current scaffold proves the plumbing. Next iterations will add:
-
-1. `SET STATISTICS IO ON; SET STATISTICS TIME ON` at the head of each iteration so the messages file fills with logical-reads, physical-reads, and CPU/elapsed numbers per statement.
-2. `SET STATISTICS XML ON` plus a switch from `ExecuteNonQuery` to `ExecuteReader`, so each measurement iteration also produces a `<script>.run<N>.sqlplan` file — double-click in SSMS to see the graphical plan.
-3. A small summary file per run that pulls the per-iteration numbers into a table for at-a-glance comparison.
+A natural next addition: a per-run summary file (CSV or Markdown) that parses the `STATISTICS TIME` and `STATISTICS IO` numbers out of each iteration's messages file and pulls them into a single table — script, iteration, CPU ms, elapsed ms, logical reads, physical reads — so original-vs-refactored comparisons are one glance instead of a directory of text files.

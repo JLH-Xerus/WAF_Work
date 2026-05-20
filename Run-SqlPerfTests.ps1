@@ -53,11 +53,20 @@ Write-Host ""
 
 $connStr = "Server=$ServerInstance;Database=$Database;Integrated Security=SSPI;Application Name=Run-SqlPerfTests"
 
+$statisticsPrologue = @"
+SET STATISTICS IO ON;
+SET STATISTICS TIME ON;
+SET STATISTICS XML ON;
+"@
+
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+
 foreach ($script in $scripts) {
 
     Write-Host ("--- {0} ---" -f $script.Name)
 
-    $sqlText  = Get-Content -LiteralPath $script.FullName -Raw
+    $userSql  = Get-Content -LiteralPath $script.FullName -Raw
+    $batch    = $statisticsPrologue + [Environment]::NewLine + $userSql
     $baseName = [System.IO.Path]::GetFileNameWithoutExtension($script.Name)
 
     $connection = New-Object System.Data.SqlClient.SqlConnection $connStr
@@ -83,6 +92,7 @@ foreach ($script in $scripts) {
             Write-Host ("  {0,-11} {1}/{2}" -f $phase, $phaseIdx, $phaseTot)
 
             $messages = New-Object 'System.Collections.Generic.List[string]'
+            $plans    = New-Object 'System.Collections.Generic.List[string]'
 
             $handler = [System.Data.SqlClient.SqlInfoMessageEventHandler] {
                 param($eventSender, $eventArgs)
@@ -96,9 +106,27 @@ foreach ($script in $scripts) {
 
             try {
                 $command = $connection.CreateCommand()
-                $command.CommandText    = $sqlText
+                $command.CommandText    = $batch
                 $command.CommandTimeout = $CommandTimeoutSeconds
-                [void] $command.ExecuteNonQuery()
+
+                $reader = $command.ExecuteReader()
+                try {
+                    do {
+                        $isShowplan = ($reader.FieldCount -eq 1) -and
+                                      ($reader.GetName(0) -like '*Showplan*')
+
+                        if ($isShowplan) {
+                            while ($reader.Read()) {
+                                $plans.Add($reader.GetString(0))
+                            }
+                        } else {
+                            while ($reader.Read()) { }
+                        }
+                    } while ($reader.NextResult())
+                }
+                finally {
+                    $reader.Dispose()
+                }
             }
             catch {
                 $messages.Add("*** EXCEPTION: $($_.Exception.Message)")
@@ -119,6 +147,7 @@ foreach ($script in $scripts) {
                     "Run at         : $runStamp"
                     "Iteration      : measurement $phaseIdx of $MeasurementRuns (after $WarmupRuns warmup run(s))"
                     "Wall-clock ms  : $([int]$iterationStart.Elapsed.TotalMilliseconds)"
+                    "Plans captured : $($plans.Count)"
                     ('-' * 60)
                     ''
                 ) -join [Environment]::NewLine
@@ -127,6 +156,19 @@ foreach ($script in $scripts) {
                     Set-Content -LiteralPath $messageFile -Encoding UTF8
 
                 Write-Host ("              -> {0}" -f (Split-Path $messageFile -Leaf))
+
+                if ($plans.Count -eq 1) {
+                    $planFile = Join-Path $runFolder ("{0}.run{1}.sqlplan" -f $baseName, $phaseIdx)
+                    [System.IO.File]::WriteAllText($planFile, $plans[0], $utf8NoBom)
+                    Write-Host ("              -> {0}" -f (Split-Path $planFile -Leaf))
+                }
+                elseif ($plans.Count -gt 1) {
+                    for ($p = 0; $p -lt $plans.Count; $p++) {
+                        $planFile = Join-Path $runFolder ("{0}.run{1}.stmt{2}.sqlplan" -f $baseName, $phaseIdx, ($p + 1))
+                        [System.IO.File]::WriteAllText($planFile, $plans[$p], $utf8NoBom)
+                        Write-Host ("              -> {0}" -f (Split-Path $planFile -Leaf))
+                    }
+                }
             }
         }
     }
