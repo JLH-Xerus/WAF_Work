@@ -81,10 +81,15 @@ SELECT
 ------------------------------------------------------------------------------
 -- 2. Resource Governor workload group MAXDOP overrides (if any)
 ------------------------------------------------------------------------------
+-- Note: is_system_group lives on the catalog view sys.resource_governor_workload_groups,
+-- not on the DMV sys.dm_resource_governor_workload_groups. We join the catalog
+-- view in on group_id to surface it alongside the runtime values.
 SELECT
     [section]                = N'02 - Resource Governor groups',
     rgrp.name                AS group_name,
-    rgrp.is_system_group,
+    [is_system_group]        = CASE WHEN cv.group_id IS NULL THEN NULL
+                                    WHEN cv.group_id IN (1, 2) THEN 1   -- internal + default
+                                    ELSE 0 END,
     rgrp.importance,
     rgrp.request_max_memory_grant_percent,
     rgrp.request_max_cpu_time_sec,
@@ -99,6 +104,8 @@ SELECT
 FROM sys.dm_resource_governor_workload_groups rgrp
 JOIN sys.dm_resource_governor_resource_pools  pool
   ON rgrp.pool_id = pool.pool_id
+LEFT JOIN sys.resource_governor_workload_groups cv
+  ON cv.group_id = rgrp.group_id
 ORDER BY pool.name, rgrp.name;
 
 ------------------------------------------------------------------------------

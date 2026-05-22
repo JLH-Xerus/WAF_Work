@@ -185,6 +185,7 @@
   },
   "active": "ecf0d969f4faab68",
   "lastOpenFiles": [
+    "waf_config_audit/PreflightChecks.xlsx",
     "waf_config_audit/Run-WafConfigAudit.ps1",
     "waf_config_audit/00_preflight_validate_dmvs.sql",
     "waf_config_audit/00_run_all.sql",
@@ -195,7 +196,6 @@
     "waf_config_audit/09_backup_posture.sql",
     "waf_config_audit/08_ha_dr_detection.sql",
     "waf_config_audit/07_storage_and_volumes.sql",
-    "waf_config_audit/06_database_files_and_vlfs.sql",
     "waf_config_audit/00_README.md",
     "README.md",
     "docs/image.png",

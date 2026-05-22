@@ -211,7 +211,7 @@ SELECT
     [is_rpc_out_enabled]     = s.is_rpc_out_enabled,
     [is_data_access_enabled] = s.is_data_access_enabled,
     [is_collation_compatible]= s.is_collation_compatible,
-    [is_promotion_of_distributed_txns_enabled] = s.is_promotion_of_distributed_transactions_enabled,
+    [is_remote_proc_transaction_promotion_enabled] = s.is_remote_proc_transaction_promotion_enabled,
     [modify_date]            = s.modify_date,
     [lazy_schema_validation] = s.lazy_schema_validation
 FROM sys.servers s

@@ -98,8 +98,11 @@ INSERT INTO @inventory (object_name, needed_cols) VALUES
 
 -- Resource Governor
 ('sys.dm_resource_governor_workload_groups',
- N'name,is_system_group,importance,request_max_memory_grant_percent,request_max_cpu_time_sec,'
+ N'name,group_id,importance,request_max_memory_grant_percent,request_max_cpu_time_sec,'
 + N'request_memory_grant_timeout_sec,max_dop,group_max_requests,pool_id'),
+
+('sys.resource_governor_workload_groups',     -- catalog view (has is_system_group? no - has group_id)
+ N'group_id,name,importance'),
 
 ('sys.dm_resource_governor_resource_pools',
  N'pool_id,name,min_cpu_percent,max_cpu_percent,min_memory_percent,max_memory_percent'),
@@ -207,7 +210,7 @@ INSERT INTO @inventory (object_name, needed_cols) VALUES
 
 ('sys.servers',
  N'server_id,name,product,provider,data_source,is_remote_login_enabled,is_rpc_out_enabled,'
-+ N'is_data_access_enabled,is_collation_compatible,is_promotion_of_distributed_transactions_enabled,'
++ N'is_data_access_enabled,is_collation_compatible,is_remote_proc_transaction_promotion_enabled,'
 + N'modify_date,lazy_schema_validation'),
 
 ('sys.dm_database_encryption_keys',
@@ -342,7 +345,57 @@ FROM agg
 ORDER BY [status] DESC, agg.object_name;
 
 ------------------------------------------------------------------------------
--- Read both result sets: any row with status <> 'OK' will cause a downstream
--- audit script to throw. Investigate before running the rest of the
--- collection on this build.
+-- 03 - Permission diagnostics
+--
+-- If you see msdb.dbo.<table> entries marked OBJECT NOT FOUND above, this is
+-- almost always a permissions issue rather than a missing object. These
+-- msdb tables are visible only to logins with the right role:
+--
+--   sysalerts, syscategories, sysnotifications   -> SQLAgentReaderRole (+) or sysadmin
+--   sysmail_*                                    -> DatabaseMailUserRole or sysadmin
+--   log_shipping_*                               -> sysadmin
+--
+-- The query below tells you which roles the *current* login is in, and
+-- whether it is sysadmin. For a full audit run we recommend sysadmin
+-- because the collection scripts query many of the privileged tables above.
+------------------------------------------------------------------------------
+SELECT
+    [section]                = N'03 - Current login permissions',
+    [login]                  = SUSER_SNAME(),
+    [is_sysadmin]            = IS_SRVROLEMEMBER('sysadmin'),
+    [is_serveradmin]         = IS_SRVROLEMEMBER('serveradmin'),
+    [is_securityadmin]       = IS_SRVROLEMEMBER('securityadmin'),
+    [has_view_server_state]  = HAS_PERMS_BY_NAME(NULL, NULL, 'VIEW SERVER STATE'),
+    [has_view_any_definition]= HAS_PERMS_BY_NAME(NULL, NULL, 'VIEW ANY DEFINITION'),
+    [has_view_server_perf_state] = HAS_PERMS_BY_NAME(NULL, NULL, 'VIEW SERVER PERFORMANCE STATE');
+
+-- msdb role membership for the current login
+IF DB_ID('msdb') IS NOT NULL
+BEGIN
+    DECLARE @msdb_perms TABLE (role_name sysname);
+    INSERT INTO @msdb_perms (role_name)
+    EXEC ('USE msdb;
+           SELECT r.name
+             FROM sys.database_role_members rm
+             JOIN sys.database_principals r ON rm.role_principal_id = r.principal_id
+             JOIN sys.database_principals m ON rm.member_principal_id = m.principal_id
+            WHERE m.name = ORIGINAL_LOGIN()
+               OR m.sid = SUSER_SID();');
+
+    SELECT
+        [section]            = N'03b - msdb role membership for current login',
+        [role_name]          = role_name
+    FROM @msdb_perms
+    ORDER BY role_name;
+
+    IF NOT EXISTS (SELECT 1 FROM @msdb_perms)
+        SELECT [section] = N'03b - msdb role membership for current login',
+               [role_name] = N'(none beyond public; this explains the OBJECT NOT FOUND rows above)';
+END
+
+------------------------------------------------------------------------------
+-- Read all three result sets:
+--   01 - Missing columns        -> real column mismatches; will throw at runtime
+--   02 - Per-object summary     -> OK / MISSING COLUMNS / OBJECT NOT FOUND
+--   03 - Current login perms    -> explains msdb OBJECT NOT FOUND rows
 ------------------------------------------------------------------------------
