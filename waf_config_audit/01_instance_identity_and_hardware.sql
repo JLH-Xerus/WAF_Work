@@ -169,17 +169,52 @@ GROUP BY status
 ORDER BY status;
 
 ------------------------------------------------------------------------------
--- 8. NUMA node detail
+-- 8. NUMA node detail (memory side)
+--    sys.dm_os_memory_nodes does NOT have node_state_desc - that is on
+--    sys.dm_os_nodes (the SQLOS/scheduler-node view). We join the two so
+--    you see both the memory accounting and the node state.
 ------------------------------------------------------------------------------
 SELECT
-    [section]                = N'08 - NUMA nodes',
-    [memory_node_id]         = memory_node_id,
+    [section]                            = N'08 - NUMA nodes (memory side)',
+    [memory_node_id]                     = mn.memory_node_id,
+    [virtual_address_space_reserved_kb]  = mn.virtual_address_space_reserved_kb,
+    [virtual_address_space_committed_kb] = mn.virtual_address_space_committed_kb,
+    [foreign_committed_kb]               = mn.foreign_committed_kb,
+    [pages_kb]                           = mn.pages_kb,
+    [target_kb]                          = mn.target_kb,
+    [shared_memory_reserved_kb]          = mn.shared_memory_reserved_kb,
+    [shared_memory_committed_kb]         = mn.shared_memory_committed_kb,
+    [processor_group]                    = mn.processor_group,
+    -- Aggregate SQLOS node info per memory node so we don't fan out on
+    -- soft-NUMA (where one memory node can have multiple SQLOS nodes).
+    [sqlos_nodes_in_this_memory_node]    = n.node_count,
+    [first_node_state_desc]              = n.first_node_state_desc,
+    [total_online_schedulers]            = n.total_online_schedulers,
+    [combined_cpu_affinity_mask]         = n.combined_cpu_affinity_mask
+FROM sys.dm_os_memory_nodes mn
+OUTER APPLY (
+    SELECT  node_count               = COUNT(*),
+            first_node_state_desc    = MIN(node_state_desc),
+            total_online_schedulers  = SUM(online_scheduler_count),
+            combined_cpu_affinity_mask = SUM(cpu_affinity_mask)
+      FROM  sys.dm_os_nodes
+     WHERE  memory_node_id = mn.memory_node_id
+) n
+WHERE mn.memory_node_id <> 64;   -- 64 = DAC node, not interesting here
+
+------------------------------------------------------------------------------
+-- 8b. SQLOS nodes detail (separate row per SQLOS node, before aggregation)
+------------------------------------------------------------------------------
+SELECT
+    [section]                = N'08b - SQLOS nodes (one row per SQLOS node)',
+    [node_id]                = node_id,
     [node_state_desc]        = node_state_desc,
-    [virtual_address_space_reserved_kb] = virtual_address_space_reserved_kb,
-    [virtual_address_space_committed_kb] = virtual_address_space_committed_kb,
-    [foreign_committed_kb]   = foreign_committed_kb,
-    [pages_kb]               = pages_kb,
-    [shared_memory_reserved_kb] = shared_memory_reserved_kb,
-    [shared_memory_committed_kb] = shared_memory_committed_kb
-FROM sys.dm_os_memory_nodes
-WHERE memory_node_id <> 64;   -- 64 = DAC node, not interesting here
+    [memory_node_id]         = memory_node_id,
+    [cpu_affinity_mask]      = cpu_affinity_mask,
+    [online_scheduler_count] = online_scheduler_count,
+    [active_worker_count]    = active_worker_count,
+    [avg_load_balance]       = avg_load_balance,
+    [resource_monitor_state] = resource_monitor_state
+FROM sys.dm_os_nodes
+WHERE node_state_desc NOT LIKE '%DAC%'
+ORDER BY node_id;

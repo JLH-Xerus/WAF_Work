@@ -109,7 +109,10 @@ SELECT
     [on_failure_desc]        = a.on_failure_desc,
     [queue_delay]            = a.queue_delay,
     [predicate]              = a.predicate,
-    [is_state_enabled]       = sa.is_state_enabled,
+    [runtime_status]         = sa.status,           -- 0 = stopped, 1 = started
+    [runtime_status_desc]    = sa.status_desc,
+    [status_time]            = sa.status_time,
+    [audit_file_path]        = sa.audit_file_path,
     [create_date]            = a.create_date,
     [modify_date]            = a.modify_date
 FROM sys.server_audits a

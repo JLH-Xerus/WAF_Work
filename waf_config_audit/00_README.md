@@ -17,9 +17,14 @@ SSMS. Together they produce the raw material we need to:
    whichever node is currently active).
 2. Set results to **Grid** (Ctrl+T) for readability, or **Text** (Ctrl+T then
    Ctrl+T again) if you want copy-pastable text.
-3. Each script begins with a `:setvar` style header comment describing what it
-   collects. They are all `SELECT`-only and safe to run on production.
-4. Run scripts in numeric order, or pick the section(s) you need.
+3. **Run `00_preflight_validate_dmvs.sql` once first.** It checks every DMV
+   and column referenced across the collection against the live schema on
+   this instance. Any row with status `MISSING COLUMNS` or `OBJECT NOT FOUND`
+   means a downstream script will throw on that build - fix or remove the
+   reference before continuing.
+4. Each script begins with a comment describing what it collects. They are
+   all `SELECT`-only and safe to run on production.
+5. Run scripts in numeric order, or pick the section(s) you need.
 
 ## File index
 
@@ -38,6 +43,37 @@ SSMS. Together they produce the raw material we need to:
 | 11 | `11_query_store_and_perf.sql`                | Query Store per DB, parameterization, ad-hoc workload |
 | 12 | `12_sql_agent_configuration.sql`             | Agent service account, jobs, alerts, operators        |
 | 13 | `13_wait_stats_baseline.sql`                 | Top waits, latch stats, signal-wait ratio             |
+
+## Running across many instances (PowerShell orchestrator)
+
+`Run-WafConfigAudit.ps1` automates the collection. For each instance in the
+`$Instances` array at the top of the script it:
+
+1. Opens a connection using the supplied ADO.NET connection string.
+2. Runs every numbered audit script (00_run_all.sql is skipped - it's a
+   SQLCMD driver, not a collection script).
+3. Captures every result set the script returns.
+4. Writes each result set to its own worksheet in `<InstanceName>.xlsx`.
+5. Adds a `Summary` worksheet at the top of each workbook with script
+   status, result-set count, row count, elapsed time, and any errors.
+
+Prerequisites:
+
+- PowerShell 5.1 or 7+.
+- `Install-Module -Name ImportExcel -Scope CurrentUser`.
+
+Edit the 14 instances at the top of the script (connection strings can be
+trusted or SQL auth - any ADO.NET conn string works). Then:
+
+```powershell
+.\Run-WafConfigAudit.ps1
+.\Run-WafConfigAudit.ps1 -IncludePreflight       # also runs 00_preflight first
+.\Run-WafConfigAudit.ps1 -CommandTimeoutSec 1200 # raise per-script timeout
+.\Run-WafConfigAudit.ps1 -OutputFolder C:\Audit  # change output dir
+```
+
+Workbooks land in `.\output\<InstanceName>.xlsx` by default. One workbook
+per instance, ~70-100 worksheets per workbook.
 
 ## Assumptions and notes
 

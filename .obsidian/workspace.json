@@ -185,6 +185,8 @@
   },
   "active": "ecf0d969f4faab68",
   "lastOpenFiles": [
+    "waf_config_audit/Run-WafConfigAudit.ps1",
+    "waf_config_audit/00_preflight_validate_dmvs.sql",
     "waf_config_audit/00_run_all.sql",
     "waf_config_audit/13_wait_stats_baseline.sql",
     "waf_config_audit/12_sql_agent_configuration.sql",
@@ -194,8 +196,6 @@
     "waf_config_audit/08_ha_dr_detection.sql",
     "waf_config_audit/07_storage_and_volumes.sql",
     "waf_config_audit/06_database_files_and_vlfs.sql",
-    "waf_config_audit/05_database_configuration.sql",
-    "waf_config_audit/04_tempdb_configuration.sql",
     "waf_config_audit/00_README.md",
     "README.md",
     "docs/image.png",

@@ -29,7 +29,7 @@ SELECT
     [is_auto_update_stats_on]          = d.is_auto_update_stats_on,
     [is_auto_update_stats_async_on]    = d.is_auto_update_stats_async_on,
     [is_memory_optimized_elevate_to_snapshot_on] = d.is_memory_optimized_elevate_to_snapshot_on,
-    [is_delayed_durability_desc]       = d.delayed_durability_desc,
+    [delayed_durability_desc]          = d.delayed_durability_desc,
     [compatibility_level]              = d.compatibility_level,
     [page_verify_option_desc]          = d.page_verify_option_desc
 FROM sys.databases d
