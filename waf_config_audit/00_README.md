@@ -102,6 +102,7 @@ is equivalent for audit purposes.
 |-----------------------------------------------|-----------------------------------------|
 | `VIEW SERVER STATE` (server)                  | All `sys.dm_*` DMVs                     |
 | `VIEW ANY DEFINITION` (server)                | Full visibility into `sys.databases`, `sys.server_principals`, certificates, audits |
+| `ALTER TRACE` (server)                        | Read the default trace and `sys.fn_trace_gettable` (failover/cluster history in script 08) |
 | `SQLAgentReaderRole` on msdb                  | Read `sysjobs`, `sysjobhistory`, `sysalerts`, `syscategories`, `sysnotifications` |
 | `DatabaseMailUserRole` on msdb                | Read `sysmail_*`                        |
 | `sysadmin` (or rights to run `DBCC DBINFO`)   | Last-known-good CHECKDB date            |
@@ -117,6 +118,7 @@ Grant example for a least-privilege audit login `AUDIT\sqlaudit`:
 USE master;
 GRANT VIEW SERVER STATE TO [AUDIT\sqlaudit];
 GRANT VIEW ANY DEFINITION TO [AUDIT\sqlaudit];
+GRANT ALTER TRACE TO [AUDIT\sqlaudit];
 
 USE msdb;
 ALTER ROLE SQLAgentReaderRole  ADD MEMBER [AUDIT\sqlaudit];

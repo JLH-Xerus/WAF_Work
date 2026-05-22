@@ -264,27 +264,41 @@ BEGIN
     END
 END
 
-DECLARE @trace_path nvarchar(520) =
-    (SELECT REVERSE(SUBSTRING(REVERSE([path]), CHARINDEX(N'\', REVERSE([path])), 520)) + N'log.trc'
-       FROM sys.traces WHERE is_default = 1);
+DECLARE @trace_path nvarchar(520);
+BEGIN TRY
+    SELECT @trace_path =
+        REVERSE(SUBSTRING(REVERSE([path]), CHARINDEX(N'\', REVERSE([path])), 520)) + N'log.trc'
+      FROM sys.traces WHERE is_default = 1;
+END TRY
+BEGIN CATCH
+    SELECT [section] = N'08 - Recent failover/cluster mentions in default trace',
+           [note]    = N'Skipped: ' + ERROR_MESSAGE() + N' (needs ALTER TRACE).';
+    SET @trace_path = NULL;
+END CATCH
 
 IF @trace_path IS NOT NULL
 BEGIN
-    SELECT TOP (50)
-        [section]      = N'08 - Recent failover/cluster mentions in default trace',
-        [StartTime]    = StartTime,
-        [EventClass]   = EventClass,
-        [TextData]     = CAST(TextData AS nvarchar(1000)),
-        [DatabaseName] = DatabaseName,
-        [LoginName]    = LoginName,
-        [HostName]     = HostName,
-        [ApplicationName] = ApplicationName
-    FROM sys.fn_trace_gettable(@trace_path, DEFAULT)
-    WHERE TextData LIKE N'%failover%'
-       OR TextData LIKE N'%cluster%'
-       OR TextData LIKE N'%role change%'
-       OR EventClass = 148
-    ORDER BY StartTime DESC;
+    BEGIN TRY
+        SELECT TOP (50)
+            [section]      = N'08 - Recent failover/cluster mentions in default trace',
+            [StartTime]    = StartTime,
+            [EventClass]   = EventClass,
+            [TextData]     = CAST(TextData AS nvarchar(1000)),
+            [DatabaseName] = DatabaseName,
+            [LoginName]    = LoginName,
+            [HostName]     = HostName,
+            [ApplicationName] = ApplicationName
+        FROM sys.fn_trace_gettable(@trace_path, DEFAULT)
+        WHERE TextData LIKE N'%failover%'
+           OR TextData LIKE N'%cluster%'
+           OR TextData LIKE N'%role change%'
+           OR EventClass = 148
+        ORDER BY StartTime DESC;
+    END TRY
+    BEGIN CATCH
+        SELECT [section] = N'08 - Recent failover/cluster mentions in default trace',
+               [note]    = N'Skipped: ' + ERROR_MESSAGE() + N' (needs ALTER TRACE).';
+    END CATCH
 
     IF EXISTS (SELECT 1 FROM sys.dm_xe_sessions WHERE name = N'AlwaysOn_health')
     BEGIN
