@@ -1,20 +1,6 @@
-/* ============================================================================
-   01_instance_identity_and_hardware.sql
-   ----------------------------------------------------------------------------
-   Captures: who/what this instance is and what hardware it sits on.
-            Version, edition, build, host, services, startup parameters,
-            CPU/memory layout, hyperthreading ratio, and active trace flags.
-
-   Target  : SQL Server 2019, physical host, SAN, A-P cluster (FCI or AG)
-   Safety  : Read-only. Requires VIEW SERVER STATE for most DMVs.
-   Output  : 8 labeled result sets.
-   ============================================================================ */
 SET NOCOUNT ON;
 SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 
-------------------------------------------------------------------------------
--- 1. Version and edition
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'01 - Version and edition',
     [@@SERVERNAME]           = @@SERVERNAME,
@@ -42,9 +28,6 @@ SELECT
     [FilestreamEffectiveLevel] = CAST(SERVERPROPERTY('FilestreamEffectiveLevel') AS int),
     [@@VERSION]              = @@VERSION;
 
-------------------------------------------------------------------------------
--- 2. Host / OS info (from sys.dm_os_sys_info and sys.dm_os_host_info)
-------------------------------------------------------------------------------
 SELECT
     [section]                          = N'02 - Host and OS',
     [host_platform]                    = h.host_platform,
@@ -75,13 +58,10 @@ SELECT
     [scheduler_count]                  = s.scheduler_count,
     [affinity_type_desc]               = s.affinity_type_desc,
     [process_physical_affinity]        = s.process_physical_affinity,
-    [sql_memory_model_desc]            = s.sql_memory_model_desc      -- LPIM is "LOCK_PAGES" or "LARGE_PAGES"
+    [sql_memory_model_desc]            = s.sql_memory_model_desc
 FROM sys.dm_os_sys_info s
 CROSS APPLY (SELECT TOP (1) * FROM sys.dm_os_host_info) h;
 
-------------------------------------------------------------------------------
--- 3. Services - account, start type, cluster awareness
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'03 - SQL services',
     [servicename]            = servicename,
@@ -94,12 +74,9 @@ SELECT
     [cluster_nodename]       = cluster_nodename,
     [filename]               = [filename],
     [instant_file_initialization_enabled] =
-        TRY_CAST(instant_file_initialization_enabled AS char(1))  -- 'Y' / 'N' on supported builds
+        TRY_CAST(instant_file_initialization_enabled AS char(1))
 FROM sys.dm_server_services;
 
-------------------------------------------------------------------------------
--- 4. Registered startup parameters and trace flags from -T
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'04 - Registry startup parameters',
     [registry_key]           = registry_key,
@@ -108,9 +85,6 @@ SELECT
 FROM sys.dm_server_registry
 WHERE registry_key LIKE N'%MSSQLServer\Parameters%';
 
-------------------------------------------------------------------------------
--- 5. Active trace flags (session-wide and global)
-------------------------------------------------------------------------------
 IF OBJECT_ID('tempdb..#trace') IS NOT NULL DROP TABLE #trace;
 CREATE TABLE #trace (TraceFlag int, [Status] tinyint, [Global] tinyint, [Session] tinyint);
 INSERT INTO #trace EXEC ('DBCC TRACESTATUS() WITH NO_INFOMSGS');
@@ -135,9 +109,6 @@ SELECT
     END
 FROM #trace;
 
-------------------------------------------------------------------------------
--- 6. SQL Server process (memory, CPU usage right now)
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'06 - Process memory',
     [physical_memory_in_use_kb]    = physical_memory_in_use_kb,
@@ -151,9 +122,6 @@ SELECT
     [process_virtual_memory_low]   = process_virtual_memory_low
 FROM sys.dm_os_process_memory;
 
-------------------------------------------------------------------------------
--- 7. Schedulers (one row per CPU plus hidden ones)
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'07 - Scheduler summary',
     [status]                 = status,
@@ -168,12 +136,6 @@ FROM sys.dm_os_schedulers
 GROUP BY status
 ORDER BY status;
 
-------------------------------------------------------------------------------
--- 8. NUMA node detail (memory side)
---    sys.dm_os_memory_nodes does NOT have node_state_desc - that is on
---    sys.dm_os_nodes (the SQLOS/scheduler-node view). We join the two so
---    you see both the memory accounting and the node state.
-------------------------------------------------------------------------------
 SELECT
     [section]                            = N'08 - NUMA nodes (memory side)',
     [memory_node_id]                     = mn.memory_node_id,
@@ -185,8 +147,7 @@ SELECT
     [shared_memory_reserved_kb]          = mn.shared_memory_reserved_kb,
     [shared_memory_committed_kb]         = mn.shared_memory_committed_kb,
     [processor_group]                    = mn.processor_group,
-    -- Aggregate SQLOS node info per memory node so we don't fan out on
-    -- soft-NUMA (where one memory node can have multiple SQLOS nodes).
+
     [sqlos_nodes_in_this_memory_node]    = n.node_count,
     [first_node_state_desc]              = n.first_node_state_desc,
     [total_online_schedulers]            = n.total_online_schedulers,
@@ -200,11 +161,8 @@ OUTER APPLY (
       FROM  sys.dm_os_nodes
      WHERE  memory_node_id = mn.memory_node_id
 ) n
-WHERE mn.memory_node_id <> 64;   -- 64 = DAC node, not interesting here
+WHERE mn.memory_node_id <> 64;
 
-------------------------------------------------------------------------------
--- 8b. SQLOS nodes detail (separate row per SQLOS node, before aggregation)
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'08b - SQLOS nodes (one row per SQLOS node)',
     [node_id]                = node_id,

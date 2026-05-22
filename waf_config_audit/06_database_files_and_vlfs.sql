@@ -1,23 +1,5 @@
-/* ============================================================================
-   06_database_files_and_vlfs.sql
-   ----------------------------------------------------------------------------
-   Captures: physical layout for every database file - drive, path, size,
-            used space, autogrowth settings, and VLF counts. This is where
-            most "we ran out of disk at 3am" stories begin.
-
-   Target  : SQL Server 2019, physical host, SAN, A-P cluster
-   Safety  : Read-only. Uses sys.dm_db_log_info instead of DBCC LOGINFO so
-            no transaction-log lock is taken.
-   Output  : 3 result sets.
-   ============================================================================ */
 SET NOCOUNT ON;
 
-------------------------------------------------------------------------------
--- 1. Full file layout per database
---    Build a per-DB dynamic batch that inserts into a shared temp table.
---    Each per-DB block is wrapped in TRY/CATCH so a single bad DB does not
---    abort collection for the rest.
-------------------------------------------------------------------------------
 DECLARE @sql nvarchar(max) = N'';
 
 SELECT @sql = @sql +
@@ -64,8 +46,6 @@ FROM sys.databases d
 WHERE d.state_desc = 'ONLINE'
   AND HAS_DBACCESS(d.name) = 1;
 
--- We need to substitute the table variable name in dynamic SQL contexts.
--- Use a temp table instead so it is shareable.
 IF OBJECT_ID('tempdb..#file_layout') IS NOT NULL DROP TABLE #file_layout;
 CREATE TABLE #file_layout (
     database_id        int,
@@ -109,9 +89,6 @@ SELECT
 FROM #file_layout
 ORDER BY database_name, file_type DESC, file_id;
 
-------------------------------------------------------------------------------
--- 2. File-level deviations: percent growth, tiny growth, mixed locations
-------------------------------------------------------------------------------
 ;WITH per_db AS (
     SELECT
         database_name,
@@ -149,12 +126,6 @@ FROM per_db
 WHERE database_name NOT IN ('master','model','msdb')
 ORDER BY database_name;
 
-------------------------------------------------------------------------------
--- 3. VLF counts per database (sys.dm_db_log_info - DMV, no DBCC needed)
---    Targets:  < 100 VLFs healthy
---              100-500 acceptable
---              > 500 investigate (long recovery and AG failover times)
-------------------------------------------------------------------------------
 DECLARE @vlf_sql nvarchar(max) = N'';
 IF OBJECT_ID('tempdb..#vlfs') IS NOT NULL DROP TABLE #vlfs;
 CREATE TABLE #vlfs (

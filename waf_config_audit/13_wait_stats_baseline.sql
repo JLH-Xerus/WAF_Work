@@ -1,25 +1,5 @@
-/* ============================================================================
-   13_wait_stats_baseline.sql
-   ----------------------------------------------------------------------------
-   Captures: a one-shot wait-stats baseline from instance start. This is NOT
-            a delta capture - it's the cumulative shape since restart, which
-            is enough to identify the dominant wait categories on an
-            instance that has been up for a while.
-
-   Use it to:
-       - Spot dominant waits (CPU? IO? lock? AG sync? memory grants?)
-       - Identify NUMA imbalance or scheduler pressure (SOS_SCHEDULER_YIELD)
-       - Confirm storage stalls (PAGEIOLATCH_* and WRITELOG)
-
-   Target  : SQL Server 2019, physical host, SAN, A-P cluster
-   Safety  : Read-only.
-   Output  : 4 result sets.
-   ============================================================================ */
 SET NOCOUNT ON;
 
-------------------------------------------------------------------------------
--- 1. Instance uptime context (so the wait totals can be interpreted)
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'01 - Wait stats window',
     [sqlserver_start_time]   = sqlserver_start_time,
@@ -28,9 +8,6 @@ SELECT
     [comment]                = N'All wait totals below are cumulative since this time.'
 FROM sys.dm_os_sys_info;
 
-------------------------------------------------------------------------------
--- 2. Top waits (filtering out benign/idle waits)
-------------------------------------------------------------------------------
 ;WITH waits AS (
     SELECT
         wait_type,
@@ -43,7 +20,6 @@ FROM sys.dm_os_sys_info;
     FROM sys.dm_os_wait_stats
     WHERE waiting_tasks_count > 0
       AND wait_type NOT IN (
-        -- Benign/idle waits to exclude (Paul Randal's list, trimmed)
         N'BROKER_EVENTHANDLER', N'BROKER_RECEIVE_WAITFOR', N'BROKER_TASK_STOP',
         N'BROKER_TO_FLUSH', N'BROKER_TRANSMITTER', N'CHECKPOINT_QUEUE',
         N'CHKPT', N'CLR_AUTO_EVENT', N'CLR_MANUAL_EVENT', N'CLR_SEMAPHORE',
@@ -105,9 +81,6 @@ SELECT TOP (40)
 FROM waits
 ORDER BY wait_time_ms DESC;
 
-------------------------------------------------------------------------------
--- 3. Top latch waits (excluding buffer latches, which show as PAGELATCH)
-------------------------------------------------------------------------------
 SELECT TOP (20)
     [section]                = N'03 - Top latch waits',
     [latch_class]            = latch_class,
@@ -120,11 +93,6 @@ FROM sys.dm_os_latch_stats
 WHERE waiting_requests_count > 0
 ORDER BY wait_time_ms DESC;
 
-------------------------------------------------------------------------------
--- 4. Signal-wait ratio (CPU pressure indicator)
---    Signal waits = time spent waiting for a CPU after the resource became
---    available. > 25% sustained = likely CPU pressure.
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'04 - Signal wait ratio',
     [total_wait_seconds]     = SUM(wait_time_ms) / 1000,

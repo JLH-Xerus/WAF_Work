@@ -1,35 +1,14 @@
-/* ============================================================================
-   08_ha_dr_detection.sql
-   ----------------------------------------------------------------------------
-   Captures: which HA/DR technologies are actually in use, then dumps the
-            relevant configuration for each. Auto-detects FCI, Always On AG,
-            log shipping, and database mirroring (legacy, still seen).
-
-   Why auto-detect? In the user's environment "Active-Passive cluster with
-   a listener" can be either:
-       - FCI (the listener is the WSFC virtual network name), or
-       - AG (a single-secondary AG with an AG listener), or
-       - both (FCI for local HA + AG for DR).
-   The script lets the data tell us which.
-
-   Target  : SQL Server 2019, physical host, SAN, A-P cluster
-   Safety  : Read-only.
-   Output  : 8 result sets (sections that don't apply emit an explanatory row).
-   ============================================================================ */
 SET NOCOUNT ON;
 
 DECLARE @is_clustered     int = ISNULL(CAST(SERVERPROPERTY('IsClustered')     AS int), 0);
 DECLARE @is_hadr_enabled  int = ISNULL(CAST(SERVERPROPERTY('IsHadrEnabled')   AS int), 0);
 DECLARE @hadr_manager     int = ISNULL(CAST(SERVERPROPERTY('HadrManagerStatus') AS int), -1);
 
-------------------------------------------------------------------------------
--- 1. HA/DR posture summary
-------------------------------------------------------------------------------
 SELECT
     [section]                   = N'01 - HA/DR posture summary',
-    [IsClustered_FCI]           = @is_clustered,                 -- 1 = FCI
-    [IsHadrEnabled_AG]          = @is_hadr_enabled,              -- 1 = AG feature enabled
-    [HadrManagerStatus]         = @hadr_manager,                 -- 1 = started, 0 = not started
+    [IsClustered_FCI]           = @is_clustered,
+    [IsHadrEnabled_AG]          = @is_hadr_enabled,
+    [HadrManagerStatus]         = @hadr_manager,
     [HadrManagerStatus_desc]    = CASE @hadr_manager
                                       WHEN  1 THEN N'Started and running'
                                       WHEN  0 THEN N'Not started (AG feature on but Hadr_manager off)'
@@ -47,9 +26,6 @@ SELECT
         ELSE N'Standalone instance - no FCI, no AG'
     END;
 
-------------------------------------------------------------------------------
--- 2. Failover Cluster Instance - nodes and ownership
-------------------------------------------------------------------------------
 IF @is_clustered = 1
 BEGIN
     SELECT
@@ -67,7 +43,7 @@ BEGIN
         [SqlDumperDumpFlags]     = SqlDumperDumpFlags,
         [SqlDumperDumpPath]      = SqlDumperDumpPath,
         [SqlDumperDumpTimeOut]   = SqlDumperDumpTimeOut,
-        [FailureConditionLevel]  = FailureConditionLevel,        -- 0-5, default 3
+        [FailureConditionLevel]  = FailureConditionLevel,
         [HealthCheckTimeout]     = HealthCheckTimeout
     FROM sys.dm_os_cluster_properties;
 
@@ -81,9 +57,6 @@ BEGIN
     SELECT [section] = N'02 - FCI cluster nodes', [note] = N'IsClustered = 0. This is not a Failover Cluster Instance.';
 END
 
-------------------------------------------------------------------------------
--- 3. Always On - feature enabled? endpoint?
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'03 - Always On endpoints',
     [name]                   = e.name,
@@ -101,9 +74,6 @@ LEFT JOIN sys.database_mirroring_endpoints mre ON e.endpoint_id = mre.endpoint_i
 LEFT JOIN sys.tcp_endpoints tep ON e.endpoint_id = tep.endpoint_id
 WHERE e.type_desc = 'DATABASE_MIRRORING';
 
-------------------------------------------------------------------------------
--- 4. Always On - Availability Groups
-------------------------------------------------------------------------------
 IF @is_hadr_enabled = 1
 BEGIN
     SELECT
@@ -130,13 +100,13 @@ BEGIN
         [ag_name]                     = ag.name,
         [replica_server_name]         = ar.replica_server_name,
         [endpoint_url]                = ar.endpoint_url,
-        [availability_mode_desc]      = ar.availability_mode_desc,    -- SYNC / ASYNC
-        [failover_mode_desc]          = ar.failover_mode_desc,        -- AUTOMATIC / MANUAL
+        [availability_mode_desc]      = ar.availability_mode_desc,
+        [failover_mode_desc]          = ar.failover_mode_desc,
         [session_timeout]             = ar.session_timeout,
         [primary_role_allow_connections_desc] = ar.primary_role_allow_connections_desc,
         [secondary_role_allow_connections_desc] = ar.secondary_role_allow_connections_desc,
         [backup_priority]             = ar.backup_priority,
-        [seeding_mode_desc]           = ar.seeding_mode_desc,         -- AUTOMATIC / MANUAL
+        [seeding_mode_desc]           = ar.seeding_mode_desc,
         [read_only_routing_url]       = ar.read_only_routing_url,
         [create_date]                 = ar.create_date,
         [modify_date]                 = ar.modify_date
@@ -157,7 +127,7 @@ BEGIN
     SELECT
         [section]                = N'04d - AG replica current state',
         [replica_server_name]    = ar.replica_server_name,
-        [role_desc]              = ars.role_desc,                  -- PRIMARY / SECONDARY
+        [role_desc]              = ars.role_desc,
         [operational_state_desc] = ars.operational_state_desc,
         [connected_state_desc]   = ars.connected_state_desc,
         [recovery_health_desc]   = ars.recovery_health_desc,
@@ -195,9 +165,6 @@ BEGIN
     SELECT [section] = N'04 - Availability Groups', [note] = N'IsHadrEnabled = 0. Always On feature is not enabled on this instance.';
 END
 
-------------------------------------------------------------------------------
--- 5. Database mirroring (legacy - still seen, deprecated since 2012)
-------------------------------------------------------------------------------
 IF EXISTS (SELECT 1 FROM sys.database_mirroring WHERE mirroring_state IS NOT NULL)
 BEGIN
     SELECT
@@ -209,7 +176,7 @@ BEGIN
         [mirroring_partner_instance]    = mirroring_partner_instance,
         [mirroring_witness_name]        = mirroring_witness_name,
         [mirroring_witness_state_desc]  = mirroring_witness_state_desc,
-        [mirroring_safety_level_desc]   = mirroring_safety_level_desc,   -- FULL / OFF
+        [mirroring_safety_level_desc]   = mirroring_safety_level_desc,
         [mirroring_redo_queue]          = mirroring_redo_queue,
         [mirroring_redo_queue_type]     = mirroring_redo_queue_type,
         [mirroring_failover_lsn]        = mirroring_failover_lsn
@@ -221,9 +188,6 @@ BEGIN
     SELECT [section] = N'05 - Database mirroring', [note] = N'No databases participating in mirroring.';
 END
 
-------------------------------------------------------------------------------
--- 6. Log shipping (primary side)
-------------------------------------------------------------------------------
 IF DB_ID('msdb') IS NOT NULL
 BEGIN
     SELECT
@@ -261,9 +225,6 @@ BEGIN
     JOIN msdb.dbo.log_shipping_secondary_databases sd ON s.secondary_id = sd.secondary_id;
 END
 
-------------------------------------------------------------------------------
--- 7. WSFC quorum / cluster membership (visible from SQL since 2012)
-------------------------------------------------------------------------------
 IF @is_clustered = 1 OR @is_hadr_enabled = 1
 BEGIN
     IF OBJECT_ID('sys.dm_hadr_cluster') IS NOT NULL
@@ -295,10 +256,6 @@ BEGIN
     END
 END
 
-------------------------------------------------------------------------------
--- 8. Recent automatic failover events (from default trace - last 7 days)
---    Useful to spot recent failovers without going to the Windows event log.
-------------------------------------------------------------------------------
 DECLARE @trace_path nvarchar(520) =
     (SELECT REVERSE(SUBSTRING(REVERSE([path]), CHARINDEX(N'\', REVERSE([path])), 520)) + N'log.trc'
        FROM sys.traces WHERE is_default = 1);
@@ -318,12 +275,9 @@ BEGIN
     WHERE TextData LIKE N'%failover%'
        OR TextData LIKE N'%cluster%'
        OR TextData LIKE N'%role change%'
-       OR EventClass = 148          -- Deadlock Graph - only documented class we want unconditionally
+       OR EventClass = 148
     ORDER BY StartTime DESC;
 
-    -- AG state changes go to the AlwaysOn_health Extended Events session, not
-    -- the default trace. The query below pulls the most recent role-change
-    -- events from that session. Will be empty if AG is not in use.
     IF EXISTS (SELECT 1 FROM sys.dm_xe_sessions WHERE name = N'AlwaysOn_health')
     BEGIN
         SELECT TOP (25)

@@ -1,25 +1,7 @@
-/* ============================================================================
-   02_sp_configure_and_advanced.sql
-   ----------------------------------------------------------------------------
-   Captures: full sys.configurations output with non-default flags and brief
-            best-practice annotations for the most consequential settings.
-
-   Target  : SQL Server 2019, physical host, SAN, A-P cluster
-   Safety  : Read-only. No call to sp_configure, no RECONFIGURE.
-   Output  : 2 result sets:
-              (a) every configurable option with current/run/default values
-              (b) curated "consequential settings" view with guidance text
-   ============================================================================ */
 SET NOCOUNT ON;
 
-------------------------------------------------------------------------------
--- 1. Full sys.configurations with non-default flag
---    is_value_default = 1 only when value AND value_in_use match the engine
---    default. We compute it from the documented default list below.
-------------------------------------------------------------------------------
 ;WITH defaults AS (
-    -- SQL Server 2019 documented defaults. (Curated, not exhaustive; any
-    -- option not listed will simply show as default_value = NULL.)
+
     SELECT * FROM (VALUES
         ('access check cache bucket count',              0),
         ('access check cache quota',                     0),
@@ -129,11 +111,6 @@ LEFT JOIN defaults d
     ON LOWER(c.name) = LOWER(d.name)
 ORDER BY c.name;
 
-------------------------------------------------------------------------------
--- 2. Curated "consequential settings" view with guidance
---    These are the settings that, in our FCI-on-SAN-physical context, most
---    often drive performance, stability, or security outcomes.
-------------------------------------------------------------------------------
 ;WITH cfg AS (
     SELECT name, value_in_use FROM sys.configurations
 )

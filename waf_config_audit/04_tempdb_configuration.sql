@@ -1,26 +1,11 @@
-/* ============================================================================
-   04_tempdb_configuration.sql
-   ----------------------------------------------------------------------------
-   Captures: tempdb's full physical and logical configuration. tempdb is the
-            single most commonly-misconfigured object in SQL Server and one
-            of the few that benefits from per-instance tuning even on a
-            cluster.
-
-   Target  : SQL Server 2019, physical host, SAN, A-P cluster
-   Safety  : Read-only.
-   Output  : 6 result sets.
-   ============================================================================ */
 SET NOCOUNT ON;
 
-------------------------------------------------------------------------------
--- 1. tempdb database-level options
-------------------------------------------------------------------------------
 SELECT
     [section]                          = N'01 - tempdb database options',
     [name]                             = d.name,
     [database_id]                      = d.database_id,
-    [recovery_model_desc]              = d.recovery_model_desc,        -- always SIMPLE for tempdb
-    [collation_name]                   = d.collation_name,             -- should match instance collation
+    [recovery_model_desc]              = d.recovery_model_desc,
+    [collation_name]                   = d.collation_name,
     [user_access_desc]                 = d.user_access_desc,
     [is_read_only]                     = d.is_read_only,
     [snapshot_isolation_state_desc]    = d.snapshot_isolation_state_desc,
@@ -35,9 +20,6 @@ SELECT
 FROM sys.databases d
 WHERE d.database_id = 2;
 
-------------------------------------------------------------------------------
--- 2. tempdb file layout - the headline check
-------------------------------------------------------------------------------
 DECLARE @scheduler_count int =
     (SELECT COUNT(*) FROM sys.dm_os_schedulers WHERE status = 'VISIBLE ONLINE');
 
@@ -73,9 +55,6 @@ SELECT
 FROM files
 ORDER BY type_desc, file_id;
 
-------------------------------------------------------------------------------
--- 3. tempdb data-file sanity checks (equal sizing, count vs schedulers)
-------------------------------------------------------------------------------
 ;WITH data_files AS (
     SELECT
         size       AS pages,
@@ -99,9 +78,6 @@ SELECT
     [comment] = N'MS guidance: equal-sized data files. Count = #schedulers (cap 8); add by 4 if PAGELATCH contention persists.'
 FROM data_files;
 
-------------------------------------------------------------------------------
--- 4. tempdb contention indicators - PAGELATCH on allocation pages
-------------------------------------------------------------------------------
 SELECT
     [section]                          = N'04 - tempdb allocation latch waits (current)',
     [session_id]                       = r.session_id,
@@ -114,16 +90,9 @@ SELECT
     [status]                           = r.status
 FROM sys.dm_exec_requests r
 WHERE r.wait_type LIKE 'PAGELATCH%'
-  AND r.wait_resource LIKE '2:%'        -- DB 2 = tempdb
+  AND r.wait_resource LIKE '2:%'
   AND r.session_id <> @@SPID;
 
-------------------------------------------------------------------------------
--- 5. tempdb metadata memory-optimization (2019 feature)
---    Configured value (sp_configure) reflects intent.
---    Runtime state requires an instance restart to take effect; if the
---    feature is active, sys.dm_xtp_system_memory_consumers will report a
---    non-zero allocation in tempdb (database_id = 2).
-------------------------------------------------------------------------------
 SELECT
     [section]                          = N'05 - tempdb metadata memory-optimized (configured)',
     [sp_configure_value]               = (SELECT value_in_use
@@ -131,7 +100,6 @@ SELECT
                                             WHERE name = N'tempdb metadata memory-optimized'),
     [notes] = N'1 = configured ON, 0 = OFF. Requires restart to apply. Helps when sysschobjs / sysobjvalues PAGELATCH contention is high in tempdb.';
 
--- Runtime verification (only meaningful if the feature is actually active)
 IF EXISTS (SELECT 1 FROM sys.all_objects WHERE name = 'dm_xtp_system_memory_consumers')
 BEGIN
     SELECT
@@ -143,9 +111,6 @@ BEGIN
     WHERE allocated_bytes > 0;
 END
 
-------------------------------------------------------------------------------
--- 6. tempdb file I/O stats (since startup) for a quick I/O smell test
-------------------------------------------------------------------------------
 SELECT
     [section]                  = N'06 - tempdb I/O stats',
     [file_id]                  = vfs.file_id,

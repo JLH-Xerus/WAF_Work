@@ -1,31 +1,12 @@
-/* ============================================================================
-   00_preflight_validate_dmvs.sql
-   ----------------------------------------------------------------------------
-   Purpose: confirm that every DMV / catalog view / system table the audit
-            collection references exists on this build and exposes the columns
-            we will query.
-
-   Run this once per instance BEFORE running the rest of the collection. Any
-   row that returns column_count = 0 or missing_columns <> '' means the
-   referenced script will throw - flag it before you run a production audit.
-
-   Target  : SQL Server 2019 (build 15.x), but written defensively so it can
-            run on 2016+ to spot version-specific gaps.
-   Safety  : Read-only.
-   ============================================================================ */
 SET NOCOUNT ON;
 
-------------------------------------------------------------------------------
--- Inventory of (view_name, columns_we_use) pairs.
--- If you add columns to any of the audit scripts, mirror that here.
-------------------------------------------------------------------------------
 DECLARE @inventory TABLE (
     object_name  sysname,
-    needed_cols  nvarchar(max)        -- comma-separated, lowercase
+    needed_cols  nvarchar(max)
 );
 
 INSERT INTO @inventory (object_name, needed_cols) VALUES
--- sys.dm_os_* family
+
 ('sys.dm_os_sys_info',
  N'cpu_count,hyperthread_ratio,physical_memory_kb,committed_kb,committed_target_kb,'
 + N'max_workers_count,scheduler_count,affinity_type_desc,process_physical_affinity,'
@@ -67,7 +48,6 @@ INSERT INTO @inventory (object_name, needed_cols) VALUES
 ('sys.dm_os_latch_stats',
  N'latch_class,waiting_requests_count,wait_time_ms,max_wait_time_ms'),
 
--- sys.dm_server_* family
 ('sys.dm_server_services',
  N'servicename,startup_type_desc,status_desc,process_id,last_startup_time,service_account,'
 + N'is_clustered,cluster_nodename,filename,instant_file_initialization_enabled'),
@@ -78,14 +58,12 @@ INSERT INTO @inventory (object_name, needed_cols) VALUES
 ('sys.dm_server_audit_status',
  N'audit_id,name,status,status_desc,status_time,audit_file_path,event_session_address'),
 
--- sys.dm_exec_*
 ('sys.dm_exec_cached_plans',
  N'objtype,size_in_bytes,usecounts'),
 
 ('sys.dm_exec_requests',
  N'session_id,wait_type,wait_resource,wait_time,blocking_session_id,database_id,command,status'),
 
--- I/O and file stats
 ('sys.dm_io_virtual_file_stats',
  N'database_id,file_id,num_of_reads,num_of_writes,io_stall_read_ms,io_stall_write_ms,'
 + N'num_of_bytes_read,num_of_bytes_written'),
@@ -96,18 +74,16 @@ INSERT INTO @inventory (object_name, needed_cols) VALUES
 ('sys.dm_xtp_system_memory_consumers',
  N'memory_consumer_type_desc,allocated_bytes,used_bytes'),
 
--- Resource Governor
 ('sys.dm_resource_governor_workload_groups',
  N'name,group_id,importance,request_max_memory_grant_percent,request_max_cpu_time_sec,'
 + N'request_memory_grant_timeout_sec,max_dop,group_max_requests,pool_id'),
 
-('sys.resource_governor_workload_groups',     -- catalog view (has is_system_group? no - has group_id)
+('sys.resource_governor_workload_groups',
  N'group_id,name,importance'),
 
 ('sys.dm_resource_governor_resource_pools',
  N'pool_id,name,min_cpu_percent,max_cpu_percent,min_memory_percent,max_memory_percent'),
 
--- Clustering / HADR DMVs
 ('sys.dm_os_cluster_nodes',
  N'NodeName,status,status_description,is_current_owner'),
 ('sys.dm_os_cluster_properties',
@@ -129,7 +105,6 @@ INSERT INTO @inventory (object_name, needed_cols) VALUES
 ('sys.dm_hadr_cluster_networks',
  N'member_name,network_subnet_ip,network_subnet_ipv4_mask,network_subnet_prefix_length,is_public,is_ipv4'),
 
--- Catalog views
 ('sys.configurations',
  N'configuration_id,name,value,value_in_use,minimum,maximum,is_dynamic,is_advanced,description'),
 
@@ -219,12 +194,10 @@ INSERT INTO @inventory (object_name, needed_cols) VALUES
 ('sys.certificates',
  N'name,pvt_key_encryption_type_desc,issuer_name,subject,expiry_date,start_date,thumbprint'),
 
--- Default trace / XE
 ('sys.traces',                  N'is_default,path'),
 ('sys.dm_xe_sessions',          N'name,address'),
 ('sys.dm_xe_session_targets',   N'target_name,event_session_address,target_data'),
 
--- msdb tables we touch
 ('msdb.dbo.backupset',
  N'database_name,backup_finish_date,type,is_copy_only,compressed_backup_size,backup_size,media_set_id'),
 ('msdb.dbo.backupmediafamily',  N'media_set_id,device_type,physical_device_name'),
@@ -257,11 +230,6 @@ INSERT INTO @inventory (object_name, needed_cols) VALUES
  N'secondary_id,secondary_database,restore_delay,restore_all,disconnect_users,block_size,'
 + N'restore_mode,last_copied_file,last_copied_date,last_restored_file,last_restored_date,last_restored_latency');
 
-------------------------------------------------------------------------------
--- Build "actual schema" view from both master and msdb. The DMVs we care
--- about live in master under schema sys; the catalog tables we use from
--- msdb live under dbo.
-------------------------------------------------------------------------------
 IF OBJECT_ID('tempdb..#actual') IS NOT NULL DROP TABLE #actual;
 CREATE TABLE #actual (
     object_full sysname,
@@ -285,9 +253,6 @@ FROM msdb.sys.all_objects o
 JOIN msdb.sys.all_columns c ON o.object_id = c.object_id
 WHERE SCHEMA_NAME(o.schema_id) = N'dbo';
 
-------------------------------------------------------------------------------
--- Per-column check
-------------------------------------------------------------------------------
 ;WITH expected AS (
     SELECT
         i.object_name,
@@ -307,9 +272,6 @@ WHERE NOT EXISTS (
 )
 ORDER BY e.object_name, e.needed_col;
 
-------------------------------------------------------------------------------
--- Per-object summary
-------------------------------------------------------------------------------
 ;WITH expected AS (
     SELECT
         i.object_name,
@@ -344,21 +306,6 @@ SELECT
 FROM agg
 ORDER BY [status] DESC, agg.object_name;
 
-------------------------------------------------------------------------------
--- 03 - Permission diagnostics
---
--- If you see msdb.dbo.<table> entries marked OBJECT NOT FOUND above, this is
--- almost always a permissions issue rather than a missing object. These
--- msdb tables are visible only to logins with the right role:
---
---   sysalerts, syscategories, sysnotifications   -> SQLAgentReaderRole (+) or sysadmin
---   sysmail_*                                    -> DatabaseMailUserRole or sysadmin
---   log_shipping_*                               -> sysadmin
---
--- The query below tells you which roles the *current* login is in, and
--- whether it is sysadmin. For a full audit run we recommend sysadmin
--- because the collection scripts query many of the privileged tables above.
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'03 - Current login permissions',
     [login]                  = SUSER_SNAME(),
@@ -369,7 +316,6 @@ SELECT
     [has_view_any_definition]= HAS_PERMS_BY_NAME(NULL, NULL, 'VIEW ANY DEFINITION'),
     [has_view_server_perf_state] = HAS_PERMS_BY_NAME(NULL, NULL, 'VIEW SERVER PERFORMANCE STATE');
 
--- msdb role membership for the current login
 IF DB_ID('msdb') IS NOT NULL
 BEGIN
     DECLARE @msdb_perms TABLE (role_name sysname);
@@ -392,10 +338,3 @@ BEGIN
         SELECT [section] = N'03b - msdb role membership for current login',
                [role_name] = N'(none beyond public; this explains the OBJECT NOT FOUND rows above)';
 END
-
-------------------------------------------------------------------------------
--- Read all three result sets:
---   01 - Missing columns        -> real column mismatches; will throw at runtime
---   02 - Per-object summary     -> OK / MISSING COLUMNS / OBJECT NOT FOUND
---   03 - Current login perms    -> explains msdb OBJECT NOT FOUND rows
-------------------------------------------------------------------------------

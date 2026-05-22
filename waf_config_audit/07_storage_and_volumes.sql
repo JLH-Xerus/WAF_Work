@@ -1,22 +1,5 @@
-/* ============================================================================
-   07_storage_and_volumes.sql
-   ----------------------------------------------------------------------------
-   Captures: storage view from inside the engine. On SAN-attached FCI we
-            cannot see the underlying array, but we can see what Windows
-            presents - block size, free space, mount points - plus the
-            engine's measured I/O stall behavior per drive.
-
-   Target  : SQL Server 2019, physical host, SAN, A-P cluster
-   Safety  : Read-only.
-   Output  : 4 result sets.
-   ============================================================================ */
 SET NOCOUNT ON;
 
-------------------------------------------------------------------------------
--- 1. Volumes hosting SQL files - block size, free space, mount points
---    sys.dm_os_volume_stats walks each database file and asks Windows about
---    the volume it lives on.
-------------------------------------------------------------------------------
 ;WITH volumes AS (
     SELECT DISTINCT
         vs.volume_mount_point,
@@ -48,9 +31,6 @@ SELECT
 FROM volumes
 ORDER BY volume_mount_point;
 
-------------------------------------------------------------------------------
--- 2. Which files live on which volume
-------------------------------------------------------------------------------
 SELECT
     [section]                  = N'02 - File-to-volume mapping',
     [database_name]            = DB_NAME(mf.database_id),
@@ -66,9 +46,6 @@ FROM sys.master_files mf
 CROSS APPLY sys.dm_os_volume_stats(mf.database_id, mf.file_id) vs
 ORDER BY vs.volume_mount_point, mf.database_id, mf.file_id;
 
-------------------------------------------------------------------------------
--- 3. I/O stalls aggregated by drive (since SQL startup)
-------------------------------------------------------------------------------
 ;WITH io AS (
     SELECT
         LEFT(mf.physical_name, 2) AS drive,
@@ -112,12 +89,6 @@ FROM io
 GROUP BY drive, type_desc
 ORDER BY drive, type_desc;
 
-------------------------------------------------------------------------------
--- 4. Heuristic check: NTFS allocation unit
---    SQL Server data files prefer 64 KB NTFS allocation unit. We cannot read
---    NTFS block size from inside SQL, so we emit a reminder row pointing at
---    the recommended verification command (run from Windows).
-------------------------------------------------------------------------------
 SELECT
     [section]      = N'04 - NTFS allocation unit reminder',
     [host_check]   = N'Run from an elevated Windows cmd on the active node:  fsutil fsinfo ntfsinfo <drive>:',

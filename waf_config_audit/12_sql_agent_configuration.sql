@@ -1,19 +1,5 @@
-/* ============================================================================
-   12_sql_agent_configuration.sql
-   ----------------------------------------------------------------------------
-   Captures: SQL Server Agent posture - service account, job inventory,
-            job ownership, schedules, recent failures, alerts, operators,
-            Database Mail accounts.
-
-   Target  : SQL Server 2019, physical host, SAN, A-P cluster
-   Safety  : Read-only.
-   Output  : 8 result sets.
-   ============================================================================ */
 SET NOCOUNT ON;
 
-------------------------------------------------------------------------------
--- 1. SQL Agent service
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'01 - SQL Agent service',
     [servicename]            = servicename,
@@ -27,9 +13,6 @@ SELECT
 FROM sys.dm_server_services
 WHERE servicename LIKE N'%Agent%';
 
-------------------------------------------------------------------------------
--- 2. Agent XPs enabled? Database Mail enabled?
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'02 - Agent-related sp_configure',
     [name]                   = name,
@@ -43,11 +26,6 @@ SELECT
 FROM sys.configurations
 WHERE name IN (N'Agent XPs', N'Database Mail XPs', N'SQL Mail XPs', N'Replication XPs');
 
-------------------------------------------------------------------------------
--- 3. SQL Agent properties (read from registry directly - safer than the
---    undocumented sp_get_sqlagent_properties which has shifted columns
---    across versions).
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'03 - SQL Agent properties',
     [registry_key]           = registry_key,
@@ -57,16 +35,13 @@ FROM sys.dm_server_registry
 WHERE registry_key LIKE N'%SQLServerAgent%'
 ORDER BY registry_key, value_name;
 
-------------------------------------------------------------------------------
--- 4. Job inventory with ownership and last status
-------------------------------------------------------------------------------
 ;WITH last_run AS (
     SELECT
         jh.job_id,
         MAX(msdb.dbo.agent_datetime(jh.run_date, jh.run_time)) AS last_run_dt,
-        MAX(jh.run_status) AS last_run_status     -- 0=fail,1=succ,2=retry,3=cancel,4=in prog
+        MAX(jh.run_status) AS last_run_status
     FROM msdb.dbo.sysjobhistory jh
-    WHERE jh.step_id = 0          -- outcome row
+    WHERE jh.step_id = 0
     GROUP BY jh.job_id
 )
 SELECT
@@ -98,9 +73,6 @@ LEFT JOIN last_run lr              ON j.job_id = lr.job_id
 LEFT JOIN msdb.dbo.sysoperators op ON j.notify_email_operator_id = op.id
 ORDER BY j.name;
 
-------------------------------------------------------------------------------
--- 5. Recent failed job steps (last 7 days)
-------------------------------------------------------------------------------
 SELECT TOP (200)
     [section]                = N'05 - Failed job steps (last 7 days)',
     [job_name]               = j.name,
@@ -118,9 +90,6 @@ WHERE jh.run_status = 0
   AND CONVERT(date, CAST(jh.run_date AS varchar(8)), 112) > DATEADD(DAY, -7, SYSDATETIME())
 ORDER BY run_dt DESC;
 
-------------------------------------------------------------------------------
--- 6. Operators and notification setup
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'06 - Operators',
     [name]                   = name,
@@ -134,9 +103,6 @@ SELECT
     [category_id]            = category_id
 FROM msdb.dbo.sysoperators;
 
-------------------------------------------------------------------------------
--- 7. Alerts (severity, error number, performance counter)
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'07 - Alerts',
     [name]                   = a.name,
@@ -159,9 +125,6 @@ FROM msdb.dbo.sysalerts a
 LEFT JOIN msdb.dbo.sysnotifications n ON a.id = n.alert_id
 LEFT JOIN msdb.dbo.sysoperators op    ON n.operator_id = op.id;
 
-------------------------------------------------------------------------------
--- 8. Database Mail profiles and accounts
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'08 - Database Mail profiles',
     [profile_id]             = p.profile_id,

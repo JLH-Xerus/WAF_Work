@@ -1,22 +1,5 @@
-/* ============================================================================
-   11_query_store_and_perf.sql
-   ----------------------------------------------------------------------------
-   Captures: Query Store posture across all user databases (enabled?,
-            operation mode, retention, capture mode, size cap), plus
-            instance-wide performance toggles like parameterization and
-            ad-hoc workloads.
-
-   Target  : SQL Server 2019, physical host, SAN, A-P cluster
-   Safety  : Read-only.
-   Output  : 3 result sets.
-   ============================================================================ */
 SET NOCOUNT ON;
 
-------------------------------------------------------------------------------
--- 1. Per-database Query Store posture
---    sys.database_query_store_options is a per-database view, so we collect
---    into a temp table via dynamic SQL, then SELECT once at the end.
-------------------------------------------------------------------------------
 IF OBJECT_ID('tempdb..#qs') IS NOT NULL DROP TABLE #qs;
 CREATE TABLE #qs (
     database_name                  sysname,
@@ -102,9 +85,6 @@ SELECT
 FROM #qs
 ORDER BY database_name;
 
-------------------------------------------------------------------------------
--- 2. Instance-wide query/perf toggles
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'02 - Query/perf toggles',
     [setting]                = c.name,
@@ -124,9 +104,6 @@ JOIN (VALUES
 ) x(name, rec) ON LOWER(c.name) = LOWER(x.name)
 ORDER BY c.name;
 
-------------------------------------------------------------------------------
--- 3. Forced parameterization (database-level)
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'03 - Parameterization per database',
     [database_name]          = name,

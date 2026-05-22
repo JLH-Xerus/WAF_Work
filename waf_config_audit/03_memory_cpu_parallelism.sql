@@ -1,20 +1,5 @@
-/* ============================================================================
-   03_memory_cpu_parallelism.sql
-   ----------------------------------------------------------------------------
-   Captures: memory and CPU posture - the levers that hurt most when wrong.
-            Min/max server memory, MAXDOP (global + Resource Governor),
-            cost threshold for parallelism, NUMA layout, LPIM/IFI privilege,
-            optimize-for-ad-hoc, large pages, plan cache, and target ratios.
-
-   Target  : SQL Server 2019, physical host, SAN, A-P cluster
-   Safety  : Read-only.
-   Output  : 6 result sets.
-   ============================================================================ */
 SET NOCOUNT ON;
 
-------------------------------------------------------------------------------
--- 1. Memory and parallelism settings vs derived recommendations
-------------------------------------------------------------------------------
 DECLARE @physical_gb decimal(10,2) =
     (SELECT CAST(physical_memory_kb / 1024.0 / 1024.0 AS decimal(10,2)) FROM sys.dm_os_sys_info);
 
@@ -42,10 +27,6 @@ DECLARE @ctfp int =
 DECLARE @opt_adhoc int =
     CAST((SELECT value_in_use FROM sys.configurations WHERE name = 'optimize for ad hoc workloads') AS int);
 
--- Recommended MAXDOP per MS guidance (KB 2806535 / 2019 docs):
---   * Multiple NUMA nodes: <= logical cores per NUMA node, max 16
---   * Single NUMA, <=8 logical cores: keep at or below logical core count
---   * Single NUMA, >8 logical cores: 8
 DECLARE @rec_maxdop int =
     CASE
         WHEN @numa_nodes > 1 THEN
@@ -72,23 +53,17 @@ SELECT
     [maxdop]                 = @maxdop,
     [recommended_maxdop]     = @rec_maxdop,
     [cost_threshold]         = @ctfp,
-    [rec_cost_threshold]     = 50,            -- common OLTP starting point
+    [rec_cost_threshold]     = 50,
     [optimize_for_ad_hoc]    = @opt_adhoc,
     [numa_node_count]        = @numa_nodes,
     [cpu_count]              = @cpu_count,
     [cores_per_socket]       = @cores_per_socket;
 
-------------------------------------------------------------------------------
--- 2. Resource Governor workload group MAXDOP overrides (if any)
-------------------------------------------------------------------------------
--- Note: is_system_group lives on the catalog view sys.resource_governor_workload_groups,
--- not on the DMV sys.dm_resource_governor_workload_groups. We join the catalog
--- view in on group_id to surface it alongside the runtime values.
 SELECT
     [section]                = N'02 - Resource Governor groups',
     rgrp.name                AS group_name,
     [is_system_group]        = CASE WHEN cv.group_id IS NULL THEN NULL
-                                    WHEN cv.group_id IN (1, 2) THEN 1   -- internal + default
+                                    WHEN cv.group_id IN (1, 2) THEN 1
                                     ELSE 0 END,
     rgrp.importance,
     rgrp.request_max_memory_grant_percent,
@@ -108,12 +83,8 @@ LEFT JOIN sys.resource_governor_workload_groups cv
   ON cv.group_id = rgrp.group_id
 ORDER BY pool.name, rgrp.name;
 
-------------------------------------------------------------------------------
--- 3. Database-scoped MAXDOP overrides (introduced in 2016+)
-------------------------------------------------------------------------------
 DECLARE @sql nvarchar(max) = N'';
--- Use a LEADING separator pattern so the trim math is exact and not
--- dependent on LEN()'s trailing-space behavior.
+
 SELECT @sql = @sql +
     N' UNION ALL
        SELECT ''' + REPLACE(name, '''', '''''') + N''' AS database_name,
@@ -126,7 +97,7 @@ WHERE state_desc = 'ONLINE'
 
 IF LEN(@sql) > 0
 BEGIN
-    -- Strip the leading " UNION ALL" (10 chars including the leading space).
+
     SET @sql = STUFF(@sql, 1, 10, N'');
     SET @sql = N';WITH dsc AS (' + @sql + N')
     SELECT [section] = N''03 - Database scoped configurations'', *
@@ -150,12 +121,9 @@ BEGIN
     SELECT [section] = N'03 - Database scoped configurations', [note] = N'No user databases found / no access.';
 END
 
-------------------------------------------------------------------------------
--- 4. LPIM and Instant File Initialization privileges
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'04 - LPIM and IFI',
-    [sql_memory_model_desc]  = sql_memory_model_desc,   -- "LOCK_PAGES" or "CONVENTIONAL"
+    [sql_memory_model_desc]  = sql_memory_model_desc,
     [lpim_enabled]           = CASE WHEN sql_memory_model_desc IN ('LOCK_PAGES', 'LARGE_PAGES') THEN 1 ELSE 0 END,
     [virtual_machine_type_desc] = virtual_machine_type_desc
 FROM sys.dm_os_sys_info;
@@ -168,9 +136,6 @@ SELECT
 FROM sys.dm_server_services
 WHERE instant_file_initialization_enabled IS NOT NULL;
 
-------------------------------------------------------------------------------
--- 5. Plan cache pressure indicators (ad-hoc bloat)
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'05 - Plan cache by objtype',
     [objtype]                = objtype,
@@ -183,9 +148,6 @@ FROM sys.dm_exec_cached_plans
 GROUP BY objtype
 ORDER BY total_mb DESC;
 
-------------------------------------------------------------------------------
--- 6. Memory clerks - biggest consumers
-------------------------------------------------------------------------------
 SELECT TOP (25)
     [section]                = N'06 - Top memory clerks',
     [type]                   = [type],

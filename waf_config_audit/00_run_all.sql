@@ -1,18 +1,3 @@
-/* ============================================================================
-   00_run_all.sql
-   ----------------------------------------------------------------------------
-   Optional driver. Runs each section script in order via :r in SQLCMD mode.
-
-   Usage in SSMS:
-     1. Query menu -> SQLCMD Mode
-     2. Open this file and execute.
-
-   Each :r is interpreted as "inline the contents of that file here", so all
-   the result sets land in the same SSMS results pane and you can save them
-   in one shot (Right-click results -> Save Results As...).
-
-   If you'd rather run files individually, ignore this driver.
-   ============================================================================ */
 :setvar AuditFolder "."
 
 PRINT N'==================================================================';

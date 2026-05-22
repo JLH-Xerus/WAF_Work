@@ -1,19 +1,5 @@
-/* ============================================================================
-   09_backup_posture.sql
-   ----------------------------------------------------------------------------
-   Captures: how recoverable is this instance, right now?
-            Last full / diff / log backup per database, backup target paths,
-            compression usage, suspect pages, and time since last CHECKDB.
-
-   Target  : SQL Server 2019, physical host, SAN, A-P cluster
-   Safety  : Read-only. Queries only msdb history and sys.suspect_pages.
-   Output  : 5 result sets.
-   ============================================================================ */
 SET NOCOUNT ON;
 
-------------------------------------------------------------------------------
--- 1. Last backup per database (FULL / DIFF / LOG)
-------------------------------------------------------------------------------
 ;WITH last_b AS (
     SELECT
         d.name                                          AS database_name,
@@ -62,11 +48,6 @@ SELECT
 FROM last_b
 ORDER BY database_name;
 
-------------------------------------------------------------------------------
--- 2. Backup destinations seen in the last 7 days (paths and devices)
---    Helps spot anyone backing up to local disk on the active node, which
---    is invisible after failover.
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'02 - Backup destinations (last 7 days)',
     [database_name]          = bs.database_name,
@@ -92,9 +73,6 @@ WHERE bs.backup_finish_date > DATEADD(DAY, -7, SYSDATETIME())
 GROUP BY bs.database_name, bs.type, bmf.device_type, bmf.physical_device_name
 ORDER BY bs.database_name, bs.type;
 
-------------------------------------------------------------------------------
--- 3. Suspect pages - any entries here are a red flag
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'03 - Suspect pages',
     [database_name]          = DB_NAME(database_id),
@@ -114,11 +92,6 @@ SELECT
     [last_update_date]       = last_update_date
 FROM msdb.dbo.suspect_pages;
 
-------------------------------------------------------------------------------
--- 4. Time since last DBCC CHECKDB (per database)
---    Read from boot-time persisted info; DBCC DBINFO has it but locks files.
---    The DBCC PAGE trick is the cleanest read-only way; we use it.
-------------------------------------------------------------------------------
 IF OBJECT_ID('tempdb..#last_checkdb') IS NOT NULL DROP TABLE #last_checkdb;
 CREATE TABLE #last_checkdb (
     database_name      sysname,
@@ -141,7 +114,7 @@ BEGIN TRY
     EXEC sys.sp_executesql @cmd;
 END TRY
 BEGIN CATCH
-    -- DBCC DBINFO needs sysadmin; if it errors we just emit a note.
+
     PRINT 'Note: DBCC DBINFO requires sysadmin; CHECKDB age section may be empty.';
 END CATCH
 
@@ -161,9 +134,6 @@ FROM #last_checkdb
 WHERE field = N'dbi_dbccLastKnownGood'
 ORDER BY database_name;
 
-------------------------------------------------------------------------------
--- 5. Backup compression default setting reminder
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'05 - Backup compression default',
     [value_in_use]           = value_in_use,

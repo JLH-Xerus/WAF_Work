@@ -1,23 +1,8 @@
-/* ============================================================================
-   10_security_configuration.sql
-   ----------------------------------------------------------------------------
-   Captures: the security surface of the instance.
-            Authentication mode, sa login state, sysadmin membership, weak
-            password policies, server-level audits, force encryption,
-            transparent data encryption status per DB, server permissions.
-
-   Target  : SQL Server 2019, physical host, SAN, A-P cluster
-   Safety  : Read-only.
-   Output  : 9 result sets.
-   ============================================================================ */
 SET NOCOUNT ON;
 
-------------------------------------------------------------------------------
--- 1. Authentication mode and force-encryption
-------------------------------------------------------------------------------
 SELECT
     [section]                          = N'01 - Authentication and encryption',
-    [IsIntegratedSecurityOnly]         = CAST(SERVERPROPERTY('IsIntegratedSecurityOnly') AS int),  -- 1 = Windows only, 0 = Mixed
+    [IsIntegratedSecurityOnly]         = CAST(SERVERPROPERTY('IsIntegratedSecurityOnly') AS int),
     [auth_mode]                        = CASE CAST(SERVERPROPERTY('IsIntegratedSecurityOnly') AS int)
                                               WHEN 1 THEN N'Windows Authentication only'
                                               WHEN 0 THEN N'Mixed Mode (Windows + SQL)'
@@ -40,9 +25,6 @@ SELECT
                                            WHERE value_name = 'TcpPort'
                                            ORDER BY registry_key);
 
-------------------------------------------------------------------------------
--- 2. sa login state and recent activity
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'02 - sa login',
     [name]                   = name,
@@ -57,11 +39,8 @@ SELECT
                   ELSE N'OK'
                 END
 FROM sys.sql_logins
-WHERE principal_id = 1;       -- sa is always principal_id = 1
+WHERE principal_id = 1;
 
-------------------------------------------------------------------------------
--- 3. sysadmin and other powerful server-role members
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'03 - Server-role membership',
     [role_name]              = role.name,
@@ -76,9 +55,6 @@ JOIN sys.server_principals member ON rm.member_principal_id = member.principal_i
 WHERE role.name IN ('sysadmin','securityadmin','serveradmin','setupadmin','processadmin','diskadmin','dbcreator','bulkadmin')
 ORDER BY role.name, member.name;
 
-------------------------------------------------------------------------------
--- 4. SQL logins with weak password policy / expiration not enforced
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'04 - SQL logins with weak password policy',
     [name]                   = name,
@@ -98,9 +74,6 @@ FROM sys.sql_logins
 WHERE name NOT LIKE '##%'
 ORDER BY name;
 
-------------------------------------------------------------------------------
--- 5. Server-level audits (SQL Server Audit objects)
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'05 - SQL Server Audits',
     [audit_name]             = a.name,
@@ -109,7 +82,7 @@ SELECT
     [on_failure_desc]        = a.on_failure_desc,
     [queue_delay]            = a.queue_delay,
     [predicate]              = a.predicate,
-    [runtime_status]         = sa.status,           -- 0 = stopped, 1 = started
+    [runtime_status]         = sa.status,
     [runtime_status_desc]    = sa.status_desc,
     [status_time]            = sa.status_time,
     [audit_file_path]        = sa.audit_file_path,
@@ -131,9 +104,6 @@ JOIN sys.server_audits a
 LEFT JOIN sys.server_audit_specification_details sasd
   ON sas.server_specification_id = sasd.server_specification_id;
 
-------------------------------------------------------------------------------
--- 6. TDE - certificates and encrypted databases
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'06 - TDE encrypted databases',
     [database_name]          = DB_NAME(database_id),
@@ -165,9 +135,6 @@ SELECT
     [thumbprint]             = thumbprint
 FROM master.sys.certificates;
 
-------------------------------------------------------------------------------
--- 7. Cross-DB ownership chaining (per-DB level)
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'07 - Cross-DB ownership chaining enabled',
     [database_name]          = name,
@@ -175,9 +142,6 @@ SELECT
 FROM sys.databases
 WHERE is_db_chaining_on = 1;
 
-------------------------------------------------------------------------------
--- 8. Server permissions granted to non-default principals
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'08 - Notable server-level permissions',
     [grantee_name]           = p.name,
@@ -198,9 +162,6 @@ WHERE sp.permission_name IN (
   AND p.name NOT LIKE '##%'
 ORDER BY p.name, sp.permission_name;
 
-------------------------------------------------------------------------------
--- 9. Linked servers - often a forgotten attack surface
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'09 - Linked servers',
     [name]                   = s.name,
@@ -215,4 +176,4 @@ SELECT
     [modify_date]            = s.modify_date,
     [lazy_schema_validation] = s.lazy_schema_validation
 FROM sys.servers s
-WHERE s.server_id > 0;        -- 0 = the local server, not a linked server
+WHERE s.server_id > 0;

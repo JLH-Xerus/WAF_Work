@@ -1,19 +1,5 @@
-/* ============================================================================
-   05_database_configuration.sql
-   ----------------------------------------------------------------------------
-   Captures: every per-database setting that affects performance, recoverability,
-            or security. One row per database, plus a set of "deviation"
-            highlights for quick scanning.
-
-   Target  : SQL Server 2019, physical host, SAN, A-P cluster
-   Safety  : Read-only.
-   Output  : 3 result sets.
-   ============================================================================ */
 SET NOCOUNT ON;
 
-------------------------------------------------------------------------------
--- 1. Per-database configuration matrix
-------------------------------------------------------------------------------
 SELECT
     [section]                              = N'01 - Database configuration',
     [database_id]                          = d.database_id,
@@ -68,10 +54,6 @@ SELECT
 FROM sys.databases d
 ORDER BY d.database_id;
 
-------------------------------------------------------------------------------
--- 2. Deviations from common best-practice defaults
---    One row per "finding" so it sorts well and exports cleanly.
-------------------------------------------------------------------------------
 ;WITH findings AS (
     SELECT name, N'AUTO_CLOSE is ON'          AS finding,
            N'Disable. Causes connection setup overhead and prevents AG/log shipping.' AS rationale
@@ -134,9 +116,6 @@ SELECT
 FROM findings
 ORDER BY name, finding;
 
-------------------------------------------------------------------------------
--- 3. Database owners (helps identify "orphan SID" owners)
-------------------------------------------------------------------------------
 SELECT
     [section]                = N'03 - Database owners',
     [database_id]            = d.database_id,
