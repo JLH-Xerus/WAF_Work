@@ -25,27 +25,20 @@ Will audit 1 instance(s). Output -> C:\Mac\Home\Documents\WAF_Work-main\SystemCo
        Connected. @@SERVERNAME = PWDAZNSYMPH01
        running 01_instance_identity_and_hardware.sql ...  done (8 result sets, 16 rows, 0.2s)
        running 02_sp_configure_and_advanced.sql ...  done (2 result sets, 109 rows, 0.2s)
-       running 03_memory_cpu_parallelism.sql ...
-WARNING:        03_memory_cpu_parallelism.sql: Exception calling "Fill" with "1" argument(s): "Arithmetic overflow error converting expression to data type int."
+       running 03_memory_cpu_parallelism.sql ...  done (7 result sets, 103 rows, 0.4s)
        running 04_tempdb_configuration.sql ...  done (6 result sets, 22 rows, 0.1s)
        running 05_database_configuration.sql ...  done (3 result sets, 40 rows, 2.7s)
-       running 06_database_files_and_vlfs.sql ...
-WARNING:        06_database_files_and_vlfs.sql: Exception calling "Fill" with "1" argument(s): "Cannot perform an aggregate function on an expression containing an aggregate or a subquery."
+       running 06_database_files_and_vlfs.sql ...  done (3 result sets, 67 rows, 1.5s)
        running 07_storage_and_volumes.sql ...  done (1 result sets, 1 rows, 0.1s)
        running 08_ha_dr_detection.sql ...
-WARNING:        08_ha_dr_detection.sql: Exception calling "Fill" with "1" argument(s): "Invalid column name 'history_retention_period'.
-Invalid column name 'last_copied_file'.
-Invalid column name 'last_copied_date'.
-Invalid column name 'last_restored_latency'.
-Argument data type datetime2 is invalid for argument 2 of dateadd function."
-       running 09_backup_posture.sql ...
-WARNING:        09_backup_posture.sql: Exception calling "Fill" with "1" argument(s): "Operand data type bit is invalid for max operator."
+WARNING:        08_ha_dr_detection.sql: Exception calling "Fill" with "1" argument(s): "You do not have permission to run 'SYS.TRACES'."
+       running 09_backup_posture.sql ...  done (3 result sets, 25 rows, 0.5s)
        running 10_security_configuration.sql ...  done (8 result sets, 18 rows, 0.2s)
        running 11_query_store_and_perf.sql ...  done (3 result sets, 27 rows, 0.2s)
        running 12_sql_agent_configuration.sql ...
-WARNING:        12_sql_agent_configuration.sql: Exception calling "Fill" with "1" argument(s): "Invalid column name 'is_default'."
+WARNING:        12_sql_agent_configuration.sql: Exception calling "Fill" with "1" argument(s): "The SELECT permission was denied on the object 'syscategories', database 'msdb', schema 'dbo'."
        running 13_wait_stats_baseline.sql ...  done (4 result sets, 62 rows, 0.1s)
-       instance done in 7.8s (36 sheets)
+       instance done in 8.9s (49 sheets)
 
 
 All instances complete in 0.1 minutes. Workbooks in:
