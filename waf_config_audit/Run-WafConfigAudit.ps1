@@ -46,9 +46,9 @@ function Get-AuditSqlFiles {
         [string] $Pattern,
         [switch] $IncludePreflight
     )
-    $files = Get-ChildItem -Path $Folder -Filter $Pattern -File |
-             Sort-Object Name |
-             Where-Object { $_.Name -ne '00_run_all.sql' }
+    $files = Get-ChildItem -Path $Folder -Filter '*.sql' -File |
+             Where-Object { $_.Name -like $Pattern -and $_.Name -ne '00_run_all.sql' -and $_.Name -ne '00_preflight_validate_dmvs.sql' } |
+             Sort-Object Name
 
     if ($IncludePreflight) {
         $pre = Get-ChildItem -Path $Folder -Filter '00_preflight_validate_dmvs.sql' -File -ErrorAction SilentlyContinue
