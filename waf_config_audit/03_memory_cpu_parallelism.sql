@@ -140,10 +140,10 @@ SELECT
     [section]                = N'05 - Plan cache by objtype',
     [objtype]                = objtype,
     [cached_plans]           = COUNT_BIG(*),
-    [total_mb]               = CAST(SUM(size_in_bytes) / 1024.0 / 1024.0 AS decimal(12,2)),
+    [total_mb]               = CAST(SUM(CAST(size_in_bytes AS bigint)) / 1024.0 / 1024.0 AS decimal(18,2)),
     [single_use_plans]       = SUM(CASE WHEN usecounts = 1 THEN 1 ELSE 0 END),
-    [single_use_mb]          = CAST(SUM(CASE WHEN usecounts = 1 THEN size_in_bytes ELSE 0 END)
-                                    / 1024.0 / 1024.0 AS decimal(12,2))
+    [single_use_mb]          = CAST(SUM(CAST(CASE WHEN usecounts = 1 THEN size_in_bytes ELSE 0 END AS bigint))
+                                    / 1024.0 / 1024.0 AS decimal(18,2))
 FROM sys.dm_exec_cached_plans
 GROUP BY objtype
 ORDER BY total_mb DESC;

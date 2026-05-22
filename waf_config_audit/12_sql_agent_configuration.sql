@@ -139,7 +139,7 @@ SELECT
     [mailserver_type]        = s.servertype,
     [port]                   = s.port,
     [enable_ssl]             = s.enable_ssl,
-    [is_default]             = pa.is_default,
+    [is_default_account]     = CASE WHEN pa.sequence_number = 1 THEN 1 ELSE 0 END,
     [sequence_number]        = pa.sequence_number
 FROM msdb.dbo.sysmail_profile p
 LEFT JOIN msdb.dbo.sysmail_profileaccount pa ON p.profile_id = pa.profile_id

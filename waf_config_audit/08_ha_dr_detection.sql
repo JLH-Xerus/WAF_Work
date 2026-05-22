@@ -190,39 +190,47 @@ END
 
 IF DB_ID('msdb') IS NOT NULL
 BEGIN
-    SELECT
-        [section]                   = N'06 - Log shipping (primary)',
-        [primary_id]                = p.primary_id,
-        [primary_database]          = p.primary_database,
-        [backup_directory]          = p.backup_directory,
-        [backup_share]              = p.backup_share,
-        [backup_retention_period]   = p.backup_retention_period,
-        [backup_job_id]             = p.backup_job_id,
-        [last_backup_file]          = p.last_backup_file,
-        [last_backup_date]          = p.last_backup_date,
-        [history_retention_period]  = p.history_retention_period
-    FROM msdb.dbo.log_shipping_primary_databases p;
+    BEGIN TRY
+        EXEC sys.sp_executesql N'
+            SELECT
+                [section]                   = N''06 - Log shipping (primary)'',
+                [primary_id]                = p.primary_id,
+                [primary_database]          = p.primary_database,
+                [backup_directory]          = p.backup_directory,
+                [backup_share]              = p.backup_share,
+                [backup_retention_period]   = p.backup_retention_period,
+                [backup_job_id]             = p.backup_job_id,
+                [last_backup_file]          = p.last_backup_file,
+                [last_backup_date]          = p.last_backup_date
+            FROM msdb.dbo.log_shipping_primary_databases p;';
+    END TRY
+    BEGIN CATCH
+        SELECT [section] = N'06 - Log shipping (primary)', [note] = N'Skipped: ' + ERROR_MESSAGE();
+    END CATCH
 
-    SELECT
-        [section]                   = N'06b - Log shipping (secondary)',
-        [secondary_id]              = s.secondary_id,
-        [secondary_database]        = sd.secondary_database,
-        [primary_server]            = s.primary_server,
-        [primary_database]          = s.primary_database,
-        [backup_source_directory]   = s.backup_source_directory,
-        [backup_destination_directory] = s.backup_destination_directory,
-        [restore_delay]             = sd.restore_delay,
-        [restore_all]               = sd.restore_all,
-        [disconnect_users]          = sd.disconnect_users,
-        [block_size]                = sd.block_size,
-        [restore_mode]              = sd.restore_mode,
-        [last_copied_file]          = sd.last_copied_file,
-        [last_copied_date]          = sd.last_copied_date,
-        [last_restored_file]        = sd.last_restored_file,
-        [last_restored_date]        = sd.last_restored_date,
-        [last_restored_latency]     = sd.last_restored_latency
-    FROM msdb.dbo.log_shipping_secondary s
-    JOIN msdb.dbo.log_shipping_secondary_databases sd ON s.secondary_id = sd.secondary_id;
+    BEGIN TRY
+        EXEC sys.sp_executesql N'
+            SELECT
+                [section]                      = N''06b - Log shipping (secondary)'',
+                [secondary_id]                 = s.secondary_id,
+                [secondary_database]           = sd.secondary_database,
+                [primary_server]               = s.primary_server,
+                [primary_database]             = s.primary_database,
+                [backup_source_directory]      = s.backup_source_directory,
+                [backup_destination_directory] = s.backup_destination_directory,
+                [restore_delay]                = sd.restore_delay,
+                [restore_all]                  = sd.restore_all,
+                [disconnect_users]             = sd.disconnect_users,
+                [block_size]                   = sd.block_size,
+                [restore_mode]                 = sd.restore_mode,
+                [last_restored_file]           = sd.last_restored_file,
+                [last_restored_date]           = sd.last_restored_date
+            FROM msdb.dbo.log_shipping_secondary s
+            JOIN msdb.dbo.log_shipping_secondary_databases sd ON s.secondary_id = sd.secondary_id;';
+    END TRY
+    BEGIN CATCH
+        SELECT [section] = N'06b - Log shipping (secondary)', [note] = N'Skipped: ' + ERROR_MESSAGE();
+    END CATCH
 END
 
 IF @is_clustered = 1 OR @is_hadr_enabled = 1
@@ -282,7 +290,7 @@ BEGIN
     BEGIN
         SELECT TOP (25)
             [section]     = N'08b - AlwaysOn_health recent role/state changes',
-            [event_time]  = DATEADD(MS, ca.[xml].value('(/event/@timestamp)[1]', 'datetime2'), 0),
+            [event_time]  = ca.[xml].value('(/event/@timestamp)[1]', 'datetime2'),
             [event_name]  = ca.[xml].value('(/event/@name)[1]', 'nvarchar(128)'),
             [event_xml]   = ca.[xml]
         FROM (

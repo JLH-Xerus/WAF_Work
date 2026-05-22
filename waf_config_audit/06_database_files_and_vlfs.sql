@@ -89,7 +89,25 @@ SELECT
 FROM #file_layout
 ORDER BY database_name, file_type DESC, file_id;
 
-;WITH per_db AS (
+;WITH log_drives AS (
+    SELECT DISTINCT database_name, drive
+      FROM #file_layout
+     WHERE file_type = 'LOG'
+),
+joined AS (
+    SELECT
+        f.database_name,
+        f.file_type,
+        f.drive,
+        f.is_percent_growth,
+        f.size_mb,
+        CASE WHEN ld.drive IS NOT NULL THEN 1 ELSE 0 END AS is_on_log_drive
+    FROM #file_layout f
+    LEFT JOIN log_drives ld
+        ON ld.database_name = f.database_name
+       AND ld.drive         = f.drive
+),
+per_db AS (
     SELECT
         database_name,
         COUNT(DISTINCT drive)                                              AS distinct_drives,
@@ -100,11 +118,8 @@ ORDER BY database_name, file_type DESC, file_id;
                  THEN size_mb END)                                         AS smallest_data_mb,
         MAX(CASE WHEN file_type = 'ROWS' AND is_percent_growth = 0
                  THEN size_mb END)                                         AS largest_data_mb,
-        SUM(CASE WHEN file_type = 'ROWS' AND drive IN (
-            SELECT DISTINCT drive FROM #file_layout fl
-            WHERE fl.database_name = f.database_name AND fl.file_type = 'LOG'
-        ) THEN 1 ELSE 0 END)                                               AS data_on_log_drive
-    FROM #file_layout f
+        SUM(CASE WHEN file_type = 'ROWS' AND is_on_log_drive = 1 THEN 1 ELSE 0 END) AS data_on_log_drive
+    FROM joined
     GROUP BY database_name
 )
 SELECT

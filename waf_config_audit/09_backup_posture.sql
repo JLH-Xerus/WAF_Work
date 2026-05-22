@@ -8,7 +8,7 @@ SET NOCOUNT ON;
         MAX(CASE WHEN bs.type = 'D' THEN bs.backup_finish_date END) AS last_full,
         MAX(CASE WHEN bs.type = 'I' THEN bs.backup_finish_date END) AS last_diff,
         MAX(CASE WHEN bs.type = 'L' THEN bs.backup_finish_date END) AS last_log,
-        MAX(CASE WHEN bs.type = 'D' THEN bs.is_copy_only END)       AS last_full_copyonly,
+        MAX(CASE WHEN bs.type = 'D' THEN CAST(bs.is_copy_only AS tinyint) END) AS last_full_copyonly,
         MAX(CASE WHEN bs.type = 'D' THEN bs.compressed_backup_size END) AS last_full_compressed_bytes,
         MAX(CASE WHEN bs.type = 'D' THEN bs.backup_size END)            AS last_full_uncompressed_bytes
     FROM sys.databases d
