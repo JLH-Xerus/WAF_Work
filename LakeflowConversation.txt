@@ -1,6 +1,4 @@
-
-AI-generated content may be incorrect
-
+
 Engelhardt, Stephen started transcription
 
 Engelhardt, Stephen
@@ -46,126 +44,713 @@ Engelhardt, Stephen 0 minutes 46 seconds
 So, who has options to to pitch? I thought you can wait for Vinay to pitch something, or...
 Engelhardt, Stephen 0 minutes 53 seconds
 Kevin, did you have some?
-RV
-Reddy, Venkata
-0 minutes 53 seconds0:53
-Reddy, Venkata 0 minutes 53 seconds
-No, Vinay is from our team, like was facing this issue and we asked Rahul to have a call with the database experts to see like, you know, what are the options or available options for the team to move on with this POC.
+Findling, George 8 minutes 47 seconds
+Ohh.
 
 Engelhardt, Stephen
-1 minute 11 seconds1:11
-Engelhardt, Stephen 1 minute 11 seconds
-Oh, excellent.
+8 minutes 51 seconds8:51
+Engelhardt, Stephen 8 minutes 51 seconds
+basically 5 servers of this size to spin up and run my job. Serverless, Databricks determines, hey, it's a small job. You actually just need super small. Let me give you just what you need to do what you need to do and be done. It spins up real quick, shuts down real quick. And so that's cheap and fast. But then if they determine, oh, actually, you should
+Engelhardt, Stephen 9 minutes 11 seconds
+it's going to be a beefy job. Let me throw all kinds of hardware at it. Then it ends up being more expensive because they're dynamically deciding on the fly what is necessary. And that's a serverless. So that's where the cost like can.
+
+Findling, George
+9 minutes 21 seconds9:21
+Findling, George 9 minutes 21 seconds
+That.
+Findling, George 9 minutes 24 seconds
+Right. But functionally, the end result is they both operate the same way. They both give the same results. They're just different.
+Findling, George 9 minutes 33 seconds
+Different approaches that really comes down to cost.
+
+Engelhardt, Stephen
+9 minutes 33 seconds9:33
+Engelhardt, Stephen 9 minutes 33 seconds
+Yeah.
+Engelhardt, Stephen 9 minutes 36 seconds
+It comes in a custom, where it comes up in this context is you, if you do classic, you can also say, I want just these VMs in this region in this. You can be more prescriptive about what you're picking. Serverless, you don't really know where.
+Engelhardt, Stephen 9 minutes 51 seconds
+you know, where the compute is that they're provisioning for you. So that's where the firewall can be kind of sketchy, can be difficult.
+
+Findling, George
+9 minutes 55 seconds9:55
+Findling, George 9 minutes 55 seconds
+Do we, I mean, oh, firewall, got it, okay.
+KN
+Kevin Nguyen
+10 minutes10:00
+Kevin Nguyen 10 minutes
+Yeah, so for serverless, right?
+
+Engelhardt, Stephen
+10 minutes10:00
+Engelhardt, Stephen 10 minutes
+So.
+
+Findling, George
+10 minutes10:00
+Findling, George 10 minutes
+So when you say where, you mean by region? Is that what you mean? Or by AZ? Or how does that, why do we care if we're running out of, say, you know, East US too?
+
+Engelhardt, Stephen
+10 minutes 13 seconds10:13
+Engelhardt, Stephen 10 minutes 13 seconds
+Well, I consider it a serverless.
+
+Findling, George
+10 minutes 13 seconds10:13
+Findling, George 10 minutes 13 seconds
+Or, or is that?
+Findling, George 10 minutes 15 seconds
+Or will they spread that across regions?
+
+Engelhardt, Stephen
+10 minutes 18 seconds10:18
+Engelhardt, Stephen 10 minutes 18 seconds
+I think the concern is on the serverless side, where it's saying, let's just open it up to all, you know, the entire Databricks data center and just say, you know, any of your servers can hit our stuff. I'm like, that doesn't seem.
 RV
 Reddy, Venkata
-1 minute 13 seconds1:13
-Reddy, Venkata 1 minute 13 seconds
+10 minutes 27 seconds10:27
+Reddy, Venkata 10 minutes 27 seconds
+Yeah.
+
+Findling, George
+10 minutes 32 seconds10:32
+Findling, George 10 minutes 32 seconds
+We, so we have to do that.
+
+Engelhardt, Stephen
+10 minutes 32 seconds10:32
+Engelhardt, Stephen 10 minutes 32 seconds
+Like the...
+Engelhardt, Stephen 10 minutes 35 seconds
+Okay, so that's, but George, that's the...
+Engelhardt, Stephen 10 minutes 37 seconds
+the question slash concern of how broadly would that need to be opened in order for serverless to work.
+
+Findling, George
+10 minutes 39 seconds10:39
+Findling, George 10 minutes 39 seconds
+Yeah.
+Findling, George 10 minutes 41 seconds
+Okay, so.
+Findling, George 10 minutes 44 seconds
+Okay, so that's, so that's one of the trade-offs is like access. It's not just cost, it's possibly access. Okay.
+
+Engelhardt, Stephen
+10 minutes 49 seconds10:49
+Engelhardt, Stephen 10 minutes 49 seconds
+Yeah.
+Engelhardt, Stephen 10 minutes 51 seconds
+Yeah, it's how broad would that firewall have to be, so, but...
+
+Findling, George
+10 minutes 53 seconds10:53
+Findling, George 10 minutes 53 seconds
+Got it.
+RV
+Reddy, Venkata
+10 minutes 55 seconds10:55
+Reddy, Venkata 10 minutes 55 seconds
+Yeah, firewall is the product.
+
+Engelhardt, Stephen
+10 minutes 58 seconds10:58
+Engelhardt, Stephen 10 minutes 58 seconds
+So I thought Kevin, I thought actually you guys were using serverless for, I thought, actually I thought Lake Flow Connect was running on serverless already.
+Engelhardt, Stephen 11 minutes 7 seconds
+Is it not?
+
+Yeah, the Lake Flow MI pipeline uses serverless in the backend. So you guys are already using serverless.
+
+Engelhardt, Stephen
+11 minutes 10 seconds11:10
+Engelhardt, Stephen 11 minutes 10 seconds
+Yeah.
+Kevin Nguyen 14 minutes 58 seconds
+Yeah.
+RV
+Reddy, Venkata
+15 minutes 1 second15:01
+Reddy, Venkata 15 minutes 1 second
 Yeah.
 
 Engelhardt, Stephen
-1 minute 18 seconds1:18
-Engelhardt, Stephen 1 minute 18 seconds
-All right, so Kevin and Brian, what you got?
+15 minutes 12 seconds15:12
+Engelhardt, Stephen 15 minutes 12 seconds
+What's it, CDC?
+Engelhardt, Stephen 15 minutes 14 seconds
+CDC goes down from SQL Server.
 RV
 Reddy, Venkata
-1 minute 21 seconds1:21
-Reddy, Venkata 1 minute 21 seconds
-And do you, Stephen, the question is like, do I mean from the DLX environment, any existing scenario where you know, using the serverless compute, right? Like, is there a connectivity to on-prem database? How are they connecting actually?
-Reddy, Venkata 1 minute 40 seconds
-Any idea?
-KN
-Kevin Nguyen
-1 minute 41 seconds1:41
-Kevin Nguyen 1 minute 41 seconds
-Wait, so right now is serverless enabled, Stephen, on that workspace?
+15 minutes 16 seconds15:16
+Reddy, Venkata 15 minutes 16 seconds
+Siddique.
+
+Engelhardt, Stephen
+15 minutes 18 seconds15:18
+Engelhardt, Stephen 15 minutes 18 seconds
+What's that? CTC? That was change data. Okay, change tracking. Okay, all right, cool. And then here we would do the query-based chain tracking, QB. So to the on-prem.
+RV
+Reddy, Venkata
+15 minutes 21 seconds15:21
+Reddy, Venkata 15 minutes 21 seconds
+Yeah, Siddique.
 
 Findling, George
-1 minute 41 seconds1:41
-Findling, George 1 minute 41 seconds
+15 minutes 21 seconds15:21
+Findling, George 15 minutes 21 seconds
+CT.
+RV
+Reddy, Venkata
+15 minutes 23 seconds15:23
+Reddy, Venkata 15 minutes 23 seconds
+James Karthikeyan.
+Reddy, Venkata 15 minutes 37 seconds
+connect up, yeah.
+
+Engelhardt, Stephen
+15 minutes 39 seconds15:39
+Engelhardt, Stephen 15 minutes 39 seconds
+So...
+Engelhardt, Stephen 15 minutes 40 seconds
+These are queries. It's at like a querying level. So why is it that there's a change in compute?
+
+Findling, George
+15 minutes 46 seconds15:46
+Findling, George 15 minutes 46 seconds
 So.
 
 Engelhardt, Stephen
-1 minute 42 seconds1:42
-Engelhardt, Stephen 1 minute 42 seconds
-What?
-Engelhardt, Stephen 1 minute 47 seconds
-Yes, so we try to, so serverless is turned on everywhere. We try to avoid, it's...
-KN
-Kevin Nguyen
-1 minute 52 seconds1:52
-Kevin Nguyen 1 minute 52 seconds
-Okay.
+15 minutes 48 seconds15:48
+Engelhardt, Stephen 15 minutes 48 seconds
+During, I guess I'm surprised that there would be a firewall change when all I'm if I'm using change tracking versus querying these SQL, these SQL servers.
+Engelhardt, Stephen 15 minutes 59 seconds
+Like, how does that affect the firewall?
+Engelhardt, Stephen 16 minutes 2 seconds
+The network.
+RV
+Reddy, Venkata
+16 minutes 2 seconds16:02
+Reddy, Venkata 16 minutes 2 seconds
+Yeah, because, okay, I can give you a little background. So if from for your first row, right, Lakeflow Connect. From Lakeflow Connect, actually the gateway is the one who connects to the on-prem SQL server and the gateway connect gateway, whatever I'm talking about, that gateway will use the classic.
 
 Engelhardt, Stephen
-1 minute 56 seconds1:56
-Engelhardt, Stephen 1 minute 56 seconds
-more expensive, less control, like we have less control over the cost management and other things, right? Because it's more, it's data works managed. So since it is more expensive for some things, we tend to avoid it for some things. However, for many things, it's, you know, one of the policies we have is that.
-Engelhardt, Stephen 2 minutes 17 seconds
-If it's something that's going to be really quick, if it's going to be short, so for instance, like, and one of the ways where you've actually seen it be cheaper is if it's a short-lived job, right? If a job spins up, if a job's only going to run 5 minutes anyway, then we're better off using serverless because then we don't pay for the startup time. But if it's a long-running job.
-Engelhardt, Stephen 2 minutes 36 seconds
-we could tune it and actually make it cheaper than Serverless would be. So we're trying to use Serverless strategically and manage the costs and controls accordingly. So it is available as an option, as a technological option.
-Engelhardt, Stephen 2 minutes 51 seconds
-In the space.
-Engelhardt, Stephen 2 minutes 56 seconds
-It's just that due to the nature of it, you know, to say like, hey, all, you know, at the very...
-KN
-Kevin Nguyen
-2 minutes 57 seconds2:57
-Kevin Nguyen 2 minutes 57 seconds
-Yeah.
+16 minutes 9 seconds16:09
+Engelhardt, Stephen 16 minutes 9 seconds
+Uh-huh.
+RV
+Reddy, Venkata
+16 minutes 22 seconds16:22
+Reddy, Venkata 16 minutes 22 seconds
+compute, not the serverless. Now, when we are working on working with the query-based connector, right, that approach requires serverless compute to connect to the on-prem. So this is the difference, classic versus serverless.
 
 Engelhardt, Stephen
-3 minutes 3 seconds3:03
-Engelhardt, Stephen 3 minutes 3 seconds
-Fluffiest 50,000 foot view.
-Engelhardt, Stephen 3 minutes 6 seconds
-All of data bricks compute having access firewall, you know, open the firewall from all of data bricks down to one of our servers in one of our data centers. Well, it's kind of there need to be some controls around that, yeah.
+16 minutes 39 seconds16:39
+Engelhardt, Stephen 16 minutes 39 seconds
+I understand, which is the same message that he's been telling. I just architecturally, just my mind, I'm that just still seems so very...
+RV
+Reddy, Venkata
+16 minutes 40 seconds16:40
+Reddy, Venkata 16 minutes 40 seconds
+The first one? Yeah.
+Reddy, Venkata 16 minutes 45 seconds
+Mhm.
+
+Engelhardt, Stephen
+16 minutes 49 seconds16:49
+Engelhardt, Stephen 16 minutes 49 seconds
+Strange, but...
+Engelhardt, Stephen 16 minutes 51 seconds
+that the connector itself is picky about.
+Engelhardt, Stephen 16 minutes 57 seconds
+Which compute you use?
+Engelhardt, Stephen 17 minutes 1 second
+And it, well, it actually even in the wizard that...
+Engelhardt, Stephen 17 minutes 4 seconds
+Yeah, Kevin showed, so, and okay, so you're saying we're able to use, thanks, back to your point too of, so where is it that we're?
+Engelhardt, Stephen 17 minutes 15 seconds
+So, I guess, I guess this is the...
+Engelhardt, Stephen 17 minutes 19 seconds
+This is just using job compute as a...
+Engelhardt, Stephen 17 minutes 22 seconds
+Pool, right, which it gets to your point is it's not using serverless. I was thinking for some reason I was thinking it was using serverless, but clearly it's not. So, because it's just using from our...
+Engelhardt, Stephen 17 minutes 33 seconds
+Normal job compute pool.
+RV
+Reddy, Venkata
+17 minutes 33 seconds17:33
+Reddy, Venkata 17 minutes 33 seconds
+Yes, yeah, yep.
+
+Engelhardt, Stephen
+17 minutes 35 seconds17:35
+Engelhardt, Stephen 17 minutes 35 seconds
+So, okay. All right. Well, that's kind of good news. Like this is, for instance, here's one of them, right? So it's using...
+Engelhardt, Stephen 17 minutes 45 seconds
+Yeah, that's okay. Some okay. Fair. Well, good. I mean, that's so it's using classic compute, not serverless.
+Engelhardt, Stephen 17 minutes 57 seconds
+Gotcha.
+Engelhardt, Stephen 17 minutes 59 seconds
+So then that's why it would be a change. Now, if it's...
+Engelhardt, Stephen 18 minutes 6 seconds
+And then the firewall.
+Engelhardt, Stephen 18 minutes 11 seconds
+Also seems interesting that the compute though.
+Engelhardt, Stephen 18 minutes 18 seconds
+Because.
+Engelhardt, Stephen 18 minutes 19 seconds
+I was surprised that the fire, the compute makes it that much of a difference on the firewall, but it's because it's where it's executing, I guess, so that makes sort of sense.
+Engelhardt, Stephen 18 minutes 29 seconds
+Okay, thanks. Thanks for answering my question.
+RV
+Reddy, Venkata
+18 minutes 38 seconds18:38
+Reddy, Venkata 18 minutes 38 seconds
+We know for sure that it is blocking the firewall, but when we want to open a firewall from the serverless compute, right, what would be the IP that we need to use it for a firewall team to set up the configuration from their end, so...
+Reddy, Venkata 19 minutes 1 second
+For classic, we will have, like, you know, public IP range from the public subnet IP range is what we provided, but for serverless, we, I don't think we have it because it generates the dynamic right, every time dynamic IP will be generated, and when it goes to the firewall, it will block, unless we are.
+Reddy, Venkata 19 minutes 22 seconds
+sending the static IP to the firewall. So we have seen this issue even for WAF, from our WAF workspace, right? Recently, we have created a WAF workspace and from WAF workspace to connect to the on-prem. Earlier, this was the problem actually with the serverless.
+Reddy, Venkata 19 minutes 42 seconds
+Earlier we were using serverless and serverless was not allowing as serverless compute was generating like dynamic IP when it reached to the firewall it was blocking because of this dynamic IP generation. So that's why we wanted to hear.
+Reddy, Venkata 20 minutes
+from Databricks to see, do we have any classic example of this one? If it's already enabled from serverless to the on-prem, right? We can use the same.
 KN
 Kevin Nguyen
-3 minutes 20 seconds3:20
-Kevin Nguyen 3 minutes 20 seconds
-Yeah, so...
-Kevin Nguyen 3 minutes 22 seconds
-per database recommendation, right? If we're looking at query-based connector as a workaround, we definitely recommend serverless, because it's just going to...
-Kevin Nguyen 3 minutes 35 seconds
-As you said, the startup time is going to be faster and this is only going to run for a short period of time and then turn off.
-Kevin Nguyen 3 minutes 42 seconds
-So that's our recommendation. There is a classic compute option route, but that's in beta.
-Kevin Nguyen 3 minutes 50 seconds
-And per beta is not meant for production. This is 1 level before it goes to public preview, which would be for production.
-Kevin Nguyen 4 minutes 1 second
+20 minutes 16 seconds20:16
+Kevin Nguyen 20 minutes 16 seconds
+Okay, like if there's any examples at Walgreens or just documentation in general, how to set the private link.
+
+Reddy, Venkata
+20 minutes 22 seconds20:22
+Reddy, Venkata 20 minutes 22 seconds
+Walgreens, yeah, Walgreens, the biggest Stephen might be aware of, that's why I think Rahul set up a call, this one, if there is any existing scenario where they're already using, I mean, connecting on-prem from the serverless, so that you know we can use the similar.
+Reddy, Venkata 20 minutes 42 seconds
+Kind of approach here is what, that's why Rahul scheduled a meeting with MG and Stephen.
+Reddy, Venkata 20 minutes 52 seconds
+And also, yeah.
+
+Engelhardt, Stephen
+20 minutes 52 seconds20:52
+Engelhardt, Stephen 20 minutes 52 seconds
+Yeah, so Venkata, on your Venkata, on your scenario with WAF, you actually, you, that was what happened. I mean, I assume in that conversation, one more question about the lessons you learned from that. So that was, I assume you worked with Jeff on resolution and he said, he indicated that you really need to use.
+RV
+Reddy, Venkata
+21 minutes 6 seconds21:06
+Reddy, Venkata 21 minutes 6 seconds
+Mhm.
+
+Engelhardt, Stephen
+21 minutes 13 seconds21:13
+Engelhardt, Stephen 21 minutes 13 seconds
+He's strongly guided towards using Classic.
+RV
+Reddy, Venkata
+21 minutes 14 seconds21:14
+Reddy, Venkata 21 minutes 14 seconds
+Classic, no.
+Reddy, Venkata 21 minutes 18 seconds
+Actually, we got the we got the the recommendation from Karthik from infra team saying that, first of all, they don't want to allow serverless because serverless is managed by a cloud, right? So that's why they recommended to not to go with the serverless, rather that's why they recommended to use the.
+
+Engelhardt, Stephen
+21 minutes 33 seconds21:33
+Engelhardt, Stephen 21 minutes 33 seconds
+Mmh.
+RV
+Reddy, Venkata
+21 minutes 40 seconds21:40
+Reddy, Venkata 21 minutes 40 seconds
+Classic, once you get the classic computers, we were facing some issue with the firewall, so that requires some NAT gateway, and then you know some from the NAT gateway it was generating public IP, and then you know, sorry, the static IP and using that static IP.
+Reddy, Venkata 21 minutes 59 seconds
+And the request is generated from the data bricks, right? It reached to the NAT gateway, and the NAT gateway will have the static IP, and from static IP it was with the static IP it was going to the firewall, and firewall we have a rule to allow that static IP when the request comes from, so that's how that we made it work, basically.
+Reddy, Venkata 22 minutes 19 seconds
+with the classic compute. In this case, since query base is supporting only the serverless, right? That's where now we had a challenge now, you know, how can we move forward with anyhow serverless based on our past experience, I mean, the networking team.
+Reddy, Venkata 22 minutes 39 seconds
+strongly recommended to not to go with, right? In this case, we don't have a choice, right? So that's why we ask Rahul to set up with MG and with you, Stephen, to see like any of the existing environment, how this connectivity established already.
+Reddy, Venkata 22 minutes 59 seconds
+If so, then we wanted to follow the same thing.
+
+Engelhardt, Stephen
+23 minutes 7 seconds23:07
+Engelhardt, Stephen 23 minutes 7 seconds
+Yeah, so now I'm agreeing with Karthikeyan, basically.
+Engelhardt, Stephen 23 minutes 14 seconds
+You know, with...
+Engelhardt, Stephen 23 minutes 15 seconds
+Kevin, as far as private link, potentially, um, where you can narrow it.
+Engelhardt, Stephen 23 minutes 23 seconds
 Um...
-Kevin Nguyen 4 minutes 2 seconds
-So the other, so if we're going to service route, then we're going to have to set up the networking in order for the on-prem.
-Kevin Nguyen 4 minutes 11 seconds
-to talk to serverless.
-Kevin Nguyen 4 minutes 14 seconds
-If we go into the classic compute route, then that's going to be done through an API. There's not a DAB for it. It's going to have to be done through either through the UI or through a JSON API.
+Engelhardt, Stephen 23 minutes 26 seconds
+But...
+Engelhardt, Stephen 23 minutes 31 seconds
+That ends up with data links kind of doing a hack to.
+RV
+Reddy, Venkata
+23 minutes 38 seconds23:38
+Reddy, Venkata 23 minutes 38 seconds
+Yeah, some kind of security issues is whatever.
 
 Engelhardt, Stephen
-4 minutes 34 seconds4:34
-Engelhardt, Stephen 4 minutes 34 seconds
-Sorry, I'm not following what you're so I understand the words you're.
+23 minutes 38 seconds23:38
+Engelhardt, Stephen 23 minutes 38 seconds
+Avoid it, yeah.
+Engelhardt, Stephen 23 minutes 42 seconds
+Well, no, but I think Kevin and Brian, the private link would...
+Engelhardt, Stephen 23 minutes 46 seconds
+resolve it, right? Am I thinking the right technology?
+KN
+Kevin Nguyen
+23 minutes 49 seconds23:49
+Kevin Nguyen 23 minutes 49 seconds
+Yeah, so that's how we would set up is we will use a private link to configure Databricks to the source database.
 
-Findling, George
-4 minutes 35 seconds4:35
-Findling, George 4 minutes 35 seconds
+Engelhardt, Stephen
+24 minutes24:00
+Engelhardt, Stephen 24 minutes
+And so that would.
+Engelhardt, Stephen 24 minutes 4 seconds
+What I understand, and kind of that would allow then the subset of, like, it would make the all the databrick service ones.
+Engelhardt, Stephen 24 minutes 14 seconds
+Like, come through as a...
+Engelhardt, Stephen 24 minutes 18 seconds
+Kind of like an app, right? Or it's to...
+RV
+Reddy, Venkata
+24 minutes 19 seconds24:19
+Reddy, Venkata 24 minutes 19 seconds
+No, the problem, probably I will share some diagram. I got some diagram from network team last time, you know.
+Reddy, Venkata 24 minutes 30 seconds
+There is a, I mean, our environment was WAF environment was in a non-routed VNet network versus a DLX is in a routed network. Routed network has directly connected with DMZ net, but the WAF since WAF network was, sorry, WAF workspace was in non-routed VNet.
+
+Engelhardt, Stephen
+24 minutes 40 seconds24:40
+Engelhardt, Stephen 24 minutes 40 seconds
+Right.
+RV
+Reddy, Venkata
+24 minutes 51 seconds24:51
+Reddy, Venkata 24 minutes 51 seconds
+So, we had to we had challenges to connect with the on-prem. This is where on-prem is there, and when the when when the Databricks Databricks is running on here, right? So, when Databricks was running with the serverless, it was every time generating some dynamic IP.
+Reddy, Venkata 25 minutes 12 seconds
+When that dynamic IP reaches to the TMZ VNet, right? It was blocking here because network team set up some NAT gateway when the request is generating from Databricks computer, right? It reaches to NAT gateway and NAT gateway will...
+Reddy, Venkata 25 minutes 31 seconds
+it will have the static IP and from when using the static IP it reaches to the DMG firewall and it was allowing because they set up the rule like when the IP is reaching with that static IP right then they have a rule to allow so it was allowing and then reaching to the Andrew.
+
+Engelhardt, Stephen
+25 minutes 33 seconds25:33
+Engelhardt, Stephen 25 minutes 33 seconds
+Mm.
+Engelhardt, Stephen 25 minutes 41 seconds
+Yeah.
+Engelhardt, Stephen 25 minutes 45 seconds
+Right.
+RV
+Reddy, Venkata
+25 minutes 51 seconds25:51
+Reddy, Venkata 25 minutes 51 seconds
+Now, with the serverless, right, what happens every time it generates the dynamic IP and then reaches to DMZ VNet, and then it will block because it is not it may not come through the NAT gateway, even if you set up a NAT gateway to the serverless computer, right? Always.
+Reddy, Venkata 26 minutes 9 seconds
+It comes with some a dynamic IP, right? So it won't allow NAT gateway, so it will fail.
+Reddy, Venkata 26 minutes 17 seconds
+So that's why we want to hear from existing database environment how they set up with the serverless compute.
+
+Engelhardt, Stephen
+26 minutes 17 seconds26:17
+Engelhardt, Stephen 26 minutes 17 seconds
+GIL.
+Engelhardt, Stephen 26 minutes 25 seconds
+So, A, we're not, I mean, we're not using it for on, we're trying to avoid it, like it, you know, as we discussed earlier, and the, except for the some, you know, outlier processing things, but not for the servers that, not for the connections that have, you know, integration connections.
+
+Reddy, Venkata
+26 minutes 31 seconds26:31
+Reddy, Venkata 26 minutes 31 seconds
+Mm.
+Reddy, Venkata 26 minutes 33 seconds
+Yeah.
+Reddy, Venkata 26 minutes 35 seconds
+Ohh.
+
+Engelhardt, Stephen
+26 minutes 44 seconds26:44
+Engelhardt, Stephen 26 minutes 44 seconds
+Um...
+Engelhardt, Stephen 26 minutes 46 seconds
+And then...
+Engelhardt, Stephen 26 minutes 49 seconds
+So, yeah, so we're not using it. Yeah.
+KN
+Kevin Nguyen
+26 minutes 51 seconds26:51
+Kevin Nguyen 26 minutes 51 seconds
+So.
+RV
+Reddy, Venkata
+26 minutes 52 seconds26:52
+Reddy, Venkata 26 minutes 52 seconds
+You.
+Reddy, Venkata 26 minutes 54 seconds
+Like Kevin, yeah, thanks.
+KN
+Kevin Nguyen
+26 minutes 55 seconds26:55
+Kevin Nguyen 26 minutes 55 seconds
+Yeah, so we can talk more, Stephen, about the private link route. I just talked with, so I talked with the product manager of Lake Flow Connect. They're moving towards, for a classic compute, they're moving towards public preview like really soon. So he says okay to do it for production workload.
+Kevin Nguyen 27 minutes 17 seconds
+So.
+Kevin Nguyen 27 minutes 19 seconds
+We could try the classic compute route right now.
+
+Engelhardt, Stephen
+27 minutes 24 seconds27:24
+Engelhardt, Stephen 27 minutes 24 seconds
+So, I think that's the so, yeah, we all need to drop for other conflicts, yeah, and actually, as everybody knows, two weeks from now is Databricks' big summit, their national conference, so it's, you know, like what they're hinting at is that in two weeks they may have it go to public preview, which isn't full release, but it's a step.
+Engelhardt, Stephen 27 minutes 43 seconds
+more comfortable. So I think that's the pros and cons. So Kevin, if you could, you know, especially since Mohamed is not able to, wasn't able to join, if you have those pros and cons and say, here's the private link ones, here's the public preview option. And if you've got a third option and then write them up and, well, the third option is the.
+KN
+Kevin Nguyen
+27 minutes 44 seconds27:44
+Kevin Nguyen 27 minutes 44 seconds
+Yeah.
+
+Engelhardt, Stephen
+28 minutes 3 seconds28:03
+Engelhardt, Stephen 28 minutes 3 seconds
+Write the source team actually making the change. There's a couple options on the source side. So if you have somebody that writes up to four options and gets some comes back to the table, that'd be great.
+KN
+Kevin Nguyen
+28 minutes 16 seconds28:16
+Kevin Nguyen 28 minutes 16 seconds
+Yeah, we can definitely do that.
+Kevin Nguyen 28 minutes 22 seconds
+All right.
+Kevin Nguyen 28 minutes 24 seconds
+Venkata, let's we can also try.
+Kevin Nguyen 28 minutes 29 seconds
+the classic compute route.
+Kevin Nguyen 28 minutes 34 seconds
+And we can also discuss more about the serverless.
+RV
+Reddy, Venkata
+28 minutes 34 seconds28:34
+Reddy, Venkata 28 minutes 34 seconds
+But.
+Reddy, Venkata 28 minutes 39 seconds
+Yeah, I I don't see right uh resources are not available from datab. I thought MG will join here. Um, Rahul also had some last minute personal emergency.
+KN
+Kevin Nguyen
+28 minutes 52 seconds28:52
+Kevin Nguyen 28 minutes 52 seconds
+I mean, for a quick POC, we can we can try the classic computer, right?
+RV
+Reddy, Venkata
+28 minutes 52 seconds28:52
+Reddy, Venkata 28 minutes 52 seconds
+Um...
+Reddy, Venkata 28 minutes 55 seconds
+Yeah.
+Reddy, Venkata 28 minutes 58 seconds
+Yeah, but the problem is, I heard from our developer, like they don't have that option is not enabled, right? Vinay, correct me if I'm wrong, is that UI is allowing for...
+KN
+Kevin Nguyen
+29 minutes 12 seconds29:12
+Kevin Nguyen 29 minutes 12 seconds
+No, you won't do it through the UI.
+KV
+Kumar, Vinay
+29 minutes 13 seconds29:13
+Kumar, Vinay 29 minutes 13 seconds
+No, I will let you.
+KN
+Kevin Nguyen
+29 minutes 17 seconds29:17
+Kevin Nguyen 29 minutes 17 seconds
+If you do the classic compound, if you...
+RV
+Reddy, Venkata
+29 minutes 17 seconds29:17
+Reddy, Venkata 29 minutes 17 seconds
+Oh, you know what? Sorry, let me spell it. Yeah, even with the classic computers, it was failing, I think. Yeah, you're right. I'm sorry. He told me that actually this morning.
+KN
+Kevin Nguyen
+29 minutes 28 seconds29:28
+Kevin Nguyen 29 minutes 28 seconds
+It was failing with the classic computer.
+RV
+Reddy, Venkata
+29 minutes 31 seconds29:31
+Reddy, Venkata 29 minutes 31 seconds
+Yeah, probably.
+MS
+Majumdar, Shankha
+29 minutes 33 seconds29:33
+Majumdar, Shankha 29 minutes 33 seconds
+See, it was not allowing us to create a classic compute using the .
+KV
+Kumar, Vinay
+29 minutes 40 seconds29:40
+Kumar, Vinay 29 minutes 40 seconds
+Yeah.
+KN
+Kevin Nguyen
+29 minutes 41 seconds29:41
+Kevin Nguyen 29 minutes 41 seconds
+Okay, so yesterday I tried it on my own. Yesterday I tried it on my own workspace, right?
+RV
+Reddy, Venkata
+29 minutes 42 seconds29:42
+Reddy, Venkata 29 minutes 42 seconds
+Hold on, Ma.
+Reddy, Venkata 29 minutes 47 seconds
+Mhm.
+MS
+Majumdar, Shankha
+29 minutes 48 seconds29:48
+Majumdar, Shankha 29 minutes 48 seconds
+Mm.
+KN
+Kevin Nguyen
+29 minutes 48 seconds29:48
+Kevin Nguyen 29 minutes 48 seconds
+Instead of creating a DAB, right, it's going to have to be through a U. It's either you create it through the UI or it's going to have to be through an API that you're going to have to call.
+Kevin Nguyen 30 minutes
+So then it's going to be query-based.
+Kevin Nguyen 30 minutes 5 seconds
+It's going to be query-based connector, where you have to specify the cursor columns and then the tables, and then...
+Kevin Nguyen 30 minutes 14 seconds
+classify the classic compute and then it'll create it like serverless false.
+Kevin Nguyen 30 minutes 23 seconds
+So I would like to see your dab or your how you were creating it.
+
+Kevin Nguyen 30 minutes 14 seconds
+classify the classic compute and then it'll create it like serverless false.
+Kevin Nguyen 30 minutes 23 seconds
+So I would like to see your dab or your how you were creating it.
+KV
+Kumar, Vinay
+30 minutes 28 seconds30:28
+Kumar, Vinay 30 minutes 28 seconds
+Call it me, my screen.
+MS
+Majumdar, Shankha
+30 minutes 29 seconds30:29
+Majumdar, Shankha 30 minutes 29 seconds
+value.
+KV
+Kumar, Vinay
+30 minutes 40 seconds30:40
+Kumar, Vinay 30 minutes 40 seconds
+So, firstly, we have tried with this code, like we are going with the certain list, so, yeah, it was working.
+KN
+Kevin Nguyen
+30 minutes 45 seconds30:45
+Kevin Nguyen 30 minutes 45 seconds
+Yeah, yeah, we right now it's not through a dab.
+Kevin Nguyen 30 minutes 52 seconds
+You can't do it through a dab yet.
+KV
+Kumar, Vinay
+30 minutes 55 seconds30:55
+Kumar, Vinay 30 minutes 55 seconds
+Yeah, so our first approach we had tried with this code. So it is using serverless and it was working fine. So after that, we have added this job cluster as recommended, like whether we are able to create the user job cluster or not. So when we deploy the code, it was throwing error.
+Kumar, Vinay 31 minutes 17 seconds
+Like, you can see the error, like you cannot provide the cluster setting when using serverless compute with database pipeline. Yeah. Apart from that, means I googled it and get the help from the genie also. So they suggested, like, it means they modified the code and they have provided me this code.
+KN
+Kevin Nguyen
+31 minutes 24 seconds31:24
+Kevin Nguyen 31 minutes 24 seconds
+Yeah.
+KV
+Kumar, Vinay
+31 minutes 37 seconds31:37
+Kumar, Vinay 31 minutes 37 seconds
+So, when I tried with this new new code also, again, same issue what I have shown earlier, same issue we are getting.
+Kumar, Vinay 31 minutes 46 seconds
+And, yeah.
+KN
+Kevin Nguyen
+31 minutes 46 seconds31:46
+Kevin Nguyen 31 minutes 46 seconds
+So, then, then...
+Kevin Nguyen 31 minutes 48 seconds
+Venkata, who can meet later today so then we can go through creating it.
+RV
+Reddy, Venkata
+31 minutes 55 seconds31:55
+Reddy, Venkata 31 minutes 55 seconds
+Um, yeah, probably riyaz is that he has access, so probably we can meet.
+Reddy, Venkata 32 minutes 3 seconds
+Um...
+KN
+Kevin Nguyen
+32 minutes 5 seconds32:05
+Kevin Nguyen 32 minutes 5 seconds
+Okay.
+Kevin Nguyen 32 minutes 7 seconds
+Well, we can try through classic compute.
+Kevin Nguyen 32 minutes 12 seconds
+And then, uh, okay, let's schedule a time meet later.
+RV
+Reddy, Venkata
+32 minutes 15 seconds32:15
+Reddy, Venkata 32 minutes 15 seconds
+Yeah, me, yeah, me and riyaz, yeah, we can do that, probably, if you...
+KN
+Kevin Nguyen
+32 minutes 19 seconds32:19
+Kevin Nguyen 32 minutes 19 seconds
+Yeah, we can try it for one table, but I'll show you how it works.
+RV
+Reddy, Venkata
+32 minutes 24 seconds32:24
+Reddy, Venkata 32 minutes 24 seconds
+Mhm.
+Reddy, Venkata 32 minutes 26 seconds
 Okay.
 KN
 Kevin Nguyen
-4 minutes 39 seconds4:39
-Kevin Nguyen 4 minutes 39 seconds
-Yeah.
-
-Engelhardt, Stephen
-4 minutes 40 seconds4:40
-Engelhardt, Stephen 4 minutes 40 seconds
-Usually when you say though, when I think of Lake Flow Connect, I, you know, I configure it to say, here's my source, and then replicate that data over into my catalog, and yay, we're off to the races. When you talk about, hey, it'll be query-based, it'll be API-based. Well, that's of course very different than the, I just clicked a few buttons and it, and the.
+32 minutes 27 seconds32:27
+Kevin Nguyen 32 minutes 27 seconds
+Alright, let's drop.
+RV
+Reddy, Venkata
+32 minutes 30 seconds32:30
+Reddy, Venkata 32 minutes 30 seconds
+Is the classic one, right? You are talking?
 KN
 Kevin Nguyen
-4 minutes 46 seconds4:46
-Kevin Nguyen 4 minutes 46 seconds
-Yeah.
+32 minutes 33 seconds32:33
+Kevin Nguyen 32 minutes 33 seconds
+Yeah, classic compute.
+RV
+Reddy, Venkata
+32 minutes 34 seconds32:34
+Reddy, Venkata 32 minutes 34 seconds
+OK.
+KN
+Kevin Nguyen
+32 minutes 38 seconds32:38
+Kevin Nguyen 32 minutes 38 seconds
+Alright, see you bye.
+KV
+Kumar, Vinay
+32 minutes 39 seconds32:39
+Kumar, Vinay 32 minutes 39 seconds
+It.
+RV
+Reddy, Venkata
+32 minutes 39 seconds32:39
+Reddy, Venkata 32 minutes 39 seconds
+Okay, sounds good. Thank you. Yeah, see you later.
+Reddy, Venkata 32 minutes 44 seconds
+Yeah, Vinay and Shankha, I will see.
+Reddy, Venkata 32 minutes 49 seconds
+I mean, um...
+MS
+Majumdar, Shankha
+32 minutes 50 seconds32:50
+Majumdar, Shankha 32 minutes 50 seconds
+Yes, thank you.
 RV
 Reddy, Venkata
 32 minutes 52 seconds32:52
@@ -213,3 +798,5 @@ Reddy, Venkata 33 minutes 15 seconds
 Hold on, hold on. Yes. Hold on a second.
 Reddy, Venkata 33 minutes 20 seconds
 Can we, I mean, this is actually stop recording.
+
+Reddy, Venkata stopped transcription
