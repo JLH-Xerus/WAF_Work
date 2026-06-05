@@ -73,3 +73,7 @@ The masterclass folder is for principles, not flair. Avoid em-dashes, avoid clip
 ### Update the relevant masterclass note when a new pattern emerges
 
 If a refactor uncovers a counterexample or a new variant of an existing pattern, update the note that covers that pattern. The Img proc taught us that LEFT JOIN + OR has two viable refactors, not one. That belongs in the note, with the criteria for choosing between them.
+
+### A deliverable set is defined by the folder convention, not by the request
+
+On lsp_RxFillingHistory_V4 I produced Original.sql, Refactored.sql, Analysis.md, and masterclass notes, but missed Recommendation.md until Justin asked where it was. The 2026-05-14 batch established that every refactor folder carries a Recommendation.md alongside Analysis.md, with its template in tasks/recommendation_template.md. Before declaring a refactor folder done, diff its contents against a recently completed folder (or the workflow doc) and produce every standard artifact, not just the ones the immediate request named.

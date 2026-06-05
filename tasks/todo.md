@@ -121,6 +121,21 @@ These rules are non-negotiable for every comparison:
 
 ---
 
+## Ad-Hoc — lsp_RxFillingHistory_V4 (2026-06-05)
+
+Justin flagged this proc as the current problem (blocking/CPU on Orlando). Tracking sheet: composite rank 49, P2 fold-in candidate, 2,879 execs / 64.23 CPU hours / 53 plans, worst server pwdorsymp-LST01. Source pulled from the Orlando schemacompare dump (proc not in `stored_procedures/`; BolingBrook dump holds an older drifted body).
+
+Constraint: proc rewrite only, no base-table index changes (index recommendations parked in Analysis.md §11.1).
+
+- [x] Extract v1 from Orlando.sql → `refactors/lsp_RxFillingHistory_V4/Original.sql`
+- [x] Write v2 → `Refactored.sql` (LIKE prefix joins → equality joins, UNION → UNION ALL, dead join removal, dedupe-first STRING_AGG, 1:1 #Grouped assembly)
+- [x] `Analysis.md` drafted; §3.2/8/9/10 hold for Justin's Orlando captures
+- [x] New masterclass notes: Dead Join Elimination, String Aggregate Split Round Trip
+- [x] `Recommendation.md` (added after Justin caught the omission; see lessons.md)
+- [ ] Justin: verify CustomTask.DSCSAReport watermark is advancing on Orlando (§11.2 — may be the real root cause)
+- [ ] Justin: STATS IO/TIME + plans for v1 and v2, same data state, multi-vial rows present
+- [ ] Fill §9/§10, decide on fleet deployment (§11.5 drift)
+
 ## Review Section
 
 ### Pilot Run — Row 15 (`lsp_ShpGetOrdersForTopReadyToShipGroup`)
