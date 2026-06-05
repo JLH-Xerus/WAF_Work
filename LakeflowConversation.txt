@@ -1,0 +1,215 @@
+
+AI-generated content may be incorrect
+
+Engelhardt, Stephen started transcription
+
+Engelhardt, Stephen
+0 minutes 4 seconds0:04
+Engelhardt, Stephen 0 minutes 4 seconds
+Yeah, I have to come off mute to keep talking.
+Engelhardt, Stephen 0 minutes 7 seconds
+And I will go on mute while you talk.
+Engelhardt, Stephen 0 minutes 11 seconds
+But Shankha and Mcdaniel loves to come off mute.
+MS
+
+Majumdar, Shankha
+0 minutes 16 seconds0:16
+Majumdar, Shankha 0 minutes 16 seconds
+Yeah, sorry. So should I explain one more time, Stephen, as the recording is on?
+
+Engelhardt, Stephen
+0 minutes 22 seconds0:22
+Engelhardt, Stephen 0 minutes 22 seconds
+No, I think Rahul understands the problem space, so that's fine, yeah.
+MS
+
+Majumdar, Shankha
+0 minutes 25 seconds0:25
+Majumdar, Shankha 0 minutes 25 seconds
+Yeah, yeah, Rahul.
+
+Engelhardt, Stephen
+0 minutes 28 seconds0:28
+Engelhardt, Stephen 0 minutes 28 seconds
+But we were starting to talk about options, and so that's why I want to make sure we capture it.
+MS
+
+Majumdar, Shankha
+0 minutes 34 seconds0:34
+Majumdar, Shankha 0 minutes 34 seconds
+OP.
+
+Engelhardt, Stephen
+0 minutes 46 seconds0:46
+Engelhardt, Stephen 0 minutes 46 seconds
+So, who has options to to pitch? I thought you can wait for Vinay to pitch something, or...
+Engelhardt, Stephen 0 minutes 53 seconds
+Kevin, did you have some?
+RV
+Reddy, Venkata
+0 minutes 53 seconds0:53
+Reddy, Venkata 0 minutes 53 seconds
+No, Vinay is from our team, like was facing this issue and we asked Rahul to have a call with the database experts to see like, you know, what are the options or available options for the team to move on with this POC.
+
+Engelhardt, Stephen
+1 minute 11 seconds1:11
+Engelhardt, Stephen 1 minute 11 seconds
+Oh, excellent.
+RV
+Reddy, Venkata
+1 minute 13 seconds1:13
+Reddy, Venkata 1 minute 13 seconds
+Yeah.
+
+Engelhardt, Stephen
+1 minute 18 seconds1:18
+Engelhardt, Stephen 1 minute 18 seconds
+All right, so Kevin and Brian, what you got?
+RV
+Reddy, Venkata
+1 minute 21 seconds1:21
+Reddy, Venkata 1 minute 21 seconds
+And do you, Stephen, the question is like, do I mean from the DLX environment, any existing scenario where you know, using the serverless compute, right? Like, is there a connectivity to on-prem database? How are they connecting actually?
+Reddy, Venkata 1 minute 40 seconds
+Any idea?
+KN
+Kevin Nguyen
+1 minute 41 seconds1:41
+Kevin Nguyen 1 minute 41 seconds
+Wait, so right now is serverless enabled, Stephen, on that workspace?
+
+Findling, George
+1 minute 41 seconds1:41
+Findling, George 1 minute 41 seconds
+So.
+
+Engelhardt, Stephen
+1 minute 42 seconds1:42
+Engelhardt, Stephen 1 minute 42 seconds
+What?
+Engelhardt, Stephen 1 minute 47 seconds
+Yes, so we try to, so serverless is turned on everywhere. We try to avoid, it's...
+KN
+Kevin Nguyen
+1 minute 52 seconds1:52
+Kevin Nguyen 1 minute 52 seconds
+Okay.
+
+Engelhardt, Stephen
+1 minute 56 seconds1:56
+Engelhardt, Stephen 1 minute 56 seconds
+more expensive, less control, like we have less control over the cost management and other things, right? Because it's more, it's data works managed. So since it is more expensive for some things, we tend to avoid it for some things. However, for many things, it's, you know, one of the policies we have is that.
+Engelhardt, Stephen 2 minutes 17 seconds
+If it's something that's going to be really quick, if it's going to be short, so for instance, like, and one of the ways where you've actually seen it be cheaper is if it's a short-lived job, right? If a job spins up, if a job's only going to run 5 minutes anyway, then we're better off using serverless because then we don't pay for the startup time. But if it's a long-running job.
+Engelhardt, Stephen 2 minutes 36 seconds
+we could tune it and actually make it cheaper than Serverless would be. So we're trying to use Serverless strategically and manage the costs and controls accordingly. So it is available as an option, as a technological option.
+Engelhardt, Stephen 2 minutes 51 seconds
+In the space.
+Engelhardt, Stephen 2 minutes 56 seconds
+It's just that due to the nature of it, you know, to say like, hey, all, you know, at the very...
+KN
+Kevin Nguyen
+2 minutes 57 seconds2:57
+Kevin Nguyen 2 minutes 57 seconds
+Yeah.
+
+Engelhardt, Stephen
+3 minutes 3 seconds3:03
+Engelhardt, Stephen 3 minutes 3 seconds
+Fluffiest 50,000 foot view.
+Engelhardt, Stephen 3 minutes 6 seconds
+All of data bricks compute having access firewall, you know, open the firewall from all of data bricks down to one of our servers in one of our data centers. Well, it's kind of there need to be some controls around that, yeah.
+KN
+Kevin Nguyen
+3 minutes 20 seconds3:20
+Kevin Nguyen 3 minutes 20 seconds
+Yeah, so...
+Kevin Nguyen 3 minutes 22 seconds
+per database recommendation, right? If we're looking at query-based connector as a workaround, we definitely recommend serverless, because it's just going to...
+Kevin Nguyen 3 minutes 35 seconds
+As you said, the startup time is going to be faster and this is only going to run for a short period of time and then turn off.
+Kevin Nguyen 3 minutes 42 seconds
+So that's our recommendation. There is a classic compute option route, but that's in beta.
+Kevin Nguyen 3 minutes 50 seconds
+And per beta is not meant for production. This is 1 level before it goes to public preview, which would be for production.
+Kevin Nguyen 4 minutes 1 second
+Um...
+Kevin Nguyen 4 minutes 2 seconds
+So the other, so if we're going to service route, then we're going to have to set up the networking in order for the on-prem.
+Kevin Nguyen 4 minutes 11 seconds
+to talk to serverless.
+Kevin Nguyen 4 minutes 14 seconds
+If we go into the classic compute route, then that's going to be done through an API. There's not a DAB for it. It's going to have to be done through either through the UI or through a JSON API.
+
+Engelhardt, Stephen
+4 minutes 34 seconds4:34
+Engelhardt, Stephen 4 minutes 34 seconds
+Sorry, I'm not following what you're so I understand the words you're.
+
+Findling, George
+4 minutes 35 seconds4:35
+Findling, George 4 minutes 35 seconds
+Okay.
+KN
+Kevin Nguyen
+4 minutes 39 seconds4:39
+Kevin Nguyen 4 minutes 39 seconds
+Yeah.
+
+Engelhardt, Stephen
+4 minutes 40 seconds4:40
+Engelhardt, Stephen 4 minutes 40 seconds
+Usually when you say though, when I think of Lake Flow Connect, I, you know, I configure it to say, here's my source, and then replicate that data over into my catalog, and yay, we're off to the races. When you talk about, hey, it'll be query-based, it'll be API-based. Well, that's of course very different than the, I just clicked a few buttons and it, and the.
+KN
+Kevin Nguyen
+4 minutes 46 seconds4:46
+Kevin Nguyen 4 minutes 46 seconds
+Yeah.
+RV
+Reddy, Venkata
+32 minutes 52 seconds32:52
+Reddy, Venkata 32 minutes 52 seconds
+We should have first asked this guy, Kevin, to provide the sample code of that.
+MS
+Majumdar, Shankha
+33 minutes33:00
+Majumdar, Shankha 33 minutes
+Right, so that it is.
+KV
+Kumar, Vinay
+33 minutes 1 second33:01
+Kumar, Vinay 33 minutes 1 second
+So, lasting means deep.
+RV
+Reddy, Venkata
+33 minutes 4 seconds33:04
+Reddy, Venkata 33 minutes 4 seconds
+Mmh.
+KV
+Kumar, Vinay
+33 minutes 5 seconds33:05
+Kumar, Vinay 33 minutes 5 seconds
+Yeah, continue.
+MS
+Majumdar, Shankha
+33 minutes 6 seconds33:06
+Majumdar, Shankha 33 minutes 6 seconds
+No, no, no, yeah, you, yeah.
+RV
+Reddy, Venkata
+33 minutes 9 seconds33:09
+Reddy, Venkata 33 minutes 9 seconds
+No, no, no, hold on. This is no, no, hold on, hold on, hold on, hold on.
+KV
+Kumar, Vinay
+33 minutes 10 seconds33:10
+Kumar, Vinay 33 minutes 10 seconds
+So, last time, Kevin has provided that code.
+RV
+Reddy, Venkata
+33 minutes 15 seconds33:15
+Reddy, Venkata 33 minutes 15 seconds
+Hold on, hold on. Yes. Hold on a second.
+Reddy, Venkata 33 minutes 20 seconds
+Can we, I mean, this is actually stop recording.
